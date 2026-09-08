@@ -1,19 +1,166 @@
-"""Point d'entrée de HF Explorer.
+"""Point d'entrée et composition de l'interface Gradio de HF Explorer."""
 
-L'interface Gradio sera ajoutée à l'étape 2 du plan de développement.
-"""
+from __future__ import annotations
+
+import os
+
+import gradio as gr
 
 from src.api_client import HuggingFaceClient
+from src.ui.analytics_tab import build_analytics_tab
+from src.ui.compare_tab import build_compare_tab
+from src.ui.details_tab import build_details_tab
+from src.ui.favorites_tab import build_favorites_tab
+from src.ui.search_tab import build_search_tab
+from src.ui.test_tab import build_test_tab
+
+APP_CSS = """
+.gradio-container {
+    max-width: 1480px !important;
+}
+.hf-header {
+    align-items: center;
+    background: linear-gradient(120deg, #eef2ff 0%, #f0f9ff 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 18px;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding: 1.15rem 1.35rem;
+}
+.hf-title {
+    color: #1e1b4b;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.hf-subtitle {
+    color: #475569;
+    margin-top: 0.35rem;
+}
+.hf-status {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    color: #334155;
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    gap: 0.45rem;
+    padding: 0.5rem 0.8rem;
+}
+.hf-status-dot {
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+    height: 0.55rem;
+    width: 0.55rem;
+}
+.hf-status.public .hf-status-dot {
+    background: #64748b;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.16);
+}
+.hf-placeholder {
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    color: #64748b;
+    margin-top: 0.5rem;
+    padding: 1rem 1.1rem;
+}
+@media (max-width: 640px) {
+    .hf-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+"""
+
+
+def create_theme() -> gr.themes.Soft:
+    """Créer la palette visuelle cohérente de l'application."""
+    return gr.themes.Soft(
+        primary_hue=gr.themes.colors.indigo,
+        secondary_hue=gr.themes.colors.sky,
+        neutral_hue=gr.themes.colors.slate,
+        radius_size=gr.themes.sizes.radius_lg,
+    )
+
+
+def connection_badge(has_token: bool) -> str:
+    """Produire l'indicateur d'authentification sans afficher le token."""
+    if has_token:
+        label = "Token HF configuré"
+        css_class = "authenticated"
+    else:
+        label = "Accès public"
+        css_class = "public"
+    return (
+        f'<div class="hf-status {css_class}" role="status">'
+        f'<span class="hf-status-dot"></span><span>{label}</span></div>'
+    )
+
+
+def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
+    """Assembler l'application sans la lancer, afin de faciliter les tests."""
+    hub_client = client or HuggingFaceClient()
+
+    # Depuis Gradio 6, le thème et le CSS sont transmis à launch().
+    with gr.Blocks(title="HF Explorer", fill_width=True) as demo:
+        with gr.Row(elem_classes="hf-header"):
+            gr.HTML(
+                """
+                <div>
+                    <div class="hf-title">🤗 HF Explorer</div>
+                    <div class="hf-subtitle">
+                        Recherchez, analysez et testez les modèles du Hugging Face Hub.
+                    </div>
+                </div>
+                """
+            )
+            gr.HTML(connection_badge(hub_client.has_token))
+
+        with gr.Tabs():
+            with gr.Tab("🔍 Recherche", id="search"):
+                build_search_tab()
+            with gr.Tab("📄 Détails", id="details"):
+                build_details_tab()
+            with gr.Tab("🆚 Comparateur", id="compare"):
+                build_compare_tab()
+            with gr.Tab("🧪 Test", id="test"):
+                build_test_tab()
+            with gr.Tab("📈 Analytics", id="analytics"):
+                build_analytics_tab()
+            with gr.Tab("⭐ Favoris", id="favorites"):
+                build_favorites_tab()
+
+        gr.Markdown(
+            "Données fournies par le [Hugging Face Hub](https://huggingface.co/models).",
+            elem_classes="hf-footer",
+        )
+
+    return demo
 
 
 def main() -> None:
-    """Initialiser le client et confirmer que le socle est opérationnel."""
-    client = HuggingFaceClient()
-    auth_label = "configuré" if client.has_token else "anonyme"
-    print(f"HF Explorer — socle API prêt (accès {auth_label}).")
-    print("Validez l'étape 1 pour démarrer l'interface Gradio.")
+    """Lancer le serveur Gradio avec les paramètres de l'environnement."""
+    server_name = os.getenv("GRADIO_SERVER_NAME", "127.0.0.1")
+    raw_port = os.getenv("GRADIO_SERVER_PORT", "7860")
+    try:
+        server_port = int(raw_port)
+    except ValueError as error:
+        raise ValueError("GRADIO_SERVER_PORT doit être un nombre entier.") from error
+
+    create_app().queue().launch(
+        server_name=server_name,
+        server_port=server_port,
+        theme=create_theme(),
+        css=APP_CSS,
+        show_error=True,
+    )
 
 
 if __name__ == "__main__":
     main()
-

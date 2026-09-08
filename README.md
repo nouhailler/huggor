@@ -4,7 +4,7 @@ HF Explorer est une application Python destinée à rechercher, examiner, compar
 
 ## État du projet
 
-L'étape 1 est implémentée : structure du projet, client `HfApi`, validation des filtres, récupération des fiches modèles et cache JSON local. L'interface Gradio sera réalisée à l'étape 2 après validation.
+Les étapes 1 et 2 sont implémentées : socle d'accès au Hub, cache JSON local et squelette complet de l'interface Gradio avec ses six onglets. Les fonctionnalités de recherche interactives seront réalisées à l'étape 3.
 
 ## Prérequis
 
@@ -22,13 +22,13 @@ cp .env.example .env
 
 Renseignez `HF_TOKEN` dans `.env`, ou authentifiez la machine avec `hf auth login`. Ne versionnez jamais le fichier `.env`.
 
-## Lancement actuel
+## Lancement
 
 ```bash
 python app.py
 ```
 
-À ce stade, cette commande vérifie uniquement l'initialisation du socle. Après l'étape 2, elle lancera l'interface Gradio.
+L'interface est ensuite disponible par défaut sur <http://127.0.0.1:7860>. Les variables `GRADIO_SERVER_NAME` et `GRADIO_SERVER_PORT` permettent de modifier cette adresse.
 
 ## Utilisation du client API
 
@@ -63,4 +63,3 @@ python -m unittest discover -s tests -v
 ## Capture d'écran
 
 _À ajouter avec l'interface Gradio._
-
