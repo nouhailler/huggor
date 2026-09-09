@@ -11,7 +11,7 @@ from src.ui.analytics_tab import build_analytics_tab
 from src.ui.compare_tab import build_compare_tab
 from src.ui.details_tab import build_details_tab
 from src.ui.favorites_tab import build_favorites_tab
-from src.ui.search_tab import build_search_tab
+from src.ui.search_tab import build_search_tab, resolve_navigation
 from src.ui.test_tab import build_test_tab
 
 APP_CSS = """
@@ -70,6 +70,25 @@ APP_CSS = """
     margin-top: 0.5rem;
     padding: 1rem 1.1rem;
 }
+.hf-search-status {
+    color: #475569;
+    min-height: 1.5rem;
+}
+.hf-result-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid #dbeafe !important;
+    border-radius: 14px !important;
+    box-shadow: 0 5px 18px rgba(30, 64, 175, 0.05);
+    margin: 0.7rem 0;
+    padding: 0.3rem 0.35rem;
+}
+.hf-result-card:hover {
+    border-color: #a5b4fc !important;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, 0.09);
+}
+.hf-result-content {
+    min-width: 0;
+}
 @media (max-width: 640px) {
     .hf-header {
         align-items: flex-start;
@@ -122,11 +141,11 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             )
             gr.HTML(connection_badge(hub_client.has_token))
 
-        with gr.Tabs():
+        with gr.Tabs() as tabs:
             with gr.Tab("🔍 Recherche", id="search"):
-                build_search_tab()
+                search_tab = build_search_tab(hub_client)
             with gr.Tab("📄 Détails", id="details"):
-                build_details_tab()
+                details_tab = build_details_tab()
             with gr.Tab("🆚 Comparateur", id="compare"):
                 build_compare_tab()
             with gr.Tab("🧪 Test", id="test"):
@@ -135,6 +154,15 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                 build_analytics_tab()
             with gr.Tab("⭐ Favoris", id="favorites"):
                 build_favorites_tab()
+
+        search_tab.selected_model.change(
+            fn=resolve_navigation,
+            inputs=search_tab.selected_model,
+            outputs=[details_tab.repo_id, tabs],
+            queue=False,
+            show_progress="hidden",
+            api_visibility="private",
+        )
 
         gr.Markdown(
             "Données fournies par le [Hugging Face Hub](https://huggingface.co/models).",
