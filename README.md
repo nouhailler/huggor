@@ -4,7 +4,7 @@ HF Explorer est une application Python destinée à rechercher, examiner, compar
 
 ## État du projet
 
-Les étapes 1 à 3 sont implémentées : socle d'accès au Hub, cache JSON local, interface Gradio et recherche multi-critères avec cartes de résultats. La fiche détaillée d'un modèle sera réalisée à l'étape 4.
+Les étapes 1 à 4 sont implémentées : socle d'accès au Hub, cache JSON local, recherche multi-critères et fiches modèles complètes. Le comparateur et les premières analyses seront réalisés à l'étape 5.
 
 ### Fonctionnalités disponibles
 
@@ -12,7 +12,12 @@ Les étapes 1 à 3 sont implémentées : socle d'accès au Hub, cache JSON local
 - Filtrage par plage de paramètres et limite de 5 à 100 résultats
 - Tri par téléchargements, likes, date de création ou pertinence
 - Cartes synthétiques avec lien direct vers le Hub
-- Navigation vers l'onglet Détails avec préremplissage du `repo_id`
+- Ouverture et chargement automatiques de la fiche depuis « Voir détails »
+- Fiche technique centrale : identité, architecture, quantification et compatibilités d'exécution
+- Recommandation explicite des poids, shards ou adapters à télécharger
+- Model Card complète, inventaire annoté et arborescence des fichiers avec leurs tailles
+- Génération de snippets pour une utilisation locale et avec `InferenceClient`
+- Ajout local d'un modèle aux favoris
 
 ## Prérequis
 

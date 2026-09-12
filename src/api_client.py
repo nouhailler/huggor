@@ -11,8 +11,8 @@ from pathlib import Path
 from typing import Any, Literal
 
 from dotenv import load_dotenv
-from huggingface_hub import HfApi, ModelCard, get_token
-from huggingface_hub.errors import GatedRepoError, HfHubHTTPError, RepositoryNotFoundError
+from huggingface_hub import HfApi, ModelCard, get_token, hf_hub_download
+from huggingface_hub.errors import EntryNotFoundError, GatedRepoError, HfHubHTTPError, RepositoryNotFoundError
 from huggingface_hub.utils import HFValidationError, validate_repo_id
 
 from src.utils.cache import JsonCache
@@ -207,6 +207,7 @@ class ModelDetails:
     card_data: dict[str, Any]
     config: dict[str, Any]
     used_storage: int | None
+    tensor_dtypes: tuple[str, ...] = ()
 
     @classmethod
     def from_hub(cls, model: Any) -> ModelDetails:
@@ -217,6 +218,7 @@ class ModelDetails:
             card_data = card_data.to_dict()
         config = _read_field(model, "config") or {}
         used_storage = _read_field(model, "used_storage")
+        tensor_parameters = _read_field(_read_field(model, "safetensors"), "parameters")
 
         return cls(
             summary=ModelSummary.from_hub(model),
@@ -224,6 +226,9 @@ class ModelDetails:
             card_data=_json_mapping(card_data),
             config=_json_mapping(config),
             used_storage=int(used_storage) if used_storage is not None else None,
+            tensor_dtypes=tuple(str(key) for key in tensor_parameters)
+            if isinstance(tensor_parameters, Mapping)
+            else (),
         )
 
     @classmethod
@@ -235,6 +240,7 @@ class ModelDetails:
             card_data=dict(data.get("card_data") or {}),
             config=dict(data.get("config") or {}),
             used_storage=data.get("used_storage"),
+            tensor_dtypes=tuple(data.get("tensor_dtypes") or ()),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -289,7 +295,7 @@ class HuggingFaceClient:
     def get_model_info(self, repo_id: str) -> ModelDetails:
         """Récupérer les métadonnées et tailles de fichiers d'un dépôt de modèle."""
         safe_repo_id = _validate_repo(repo_id)
-        cache_key = self._cache_key({"repo_id": safe_repo_id})
+        cache_key = self._cache_key({"repo_id": safe_repo_id, "details_schema": 3})
         cached = self._cache.get("model", cache_key)
         if isinstance(cached, dict):
             return ModelDetails.from_dict(cached)
@@ -297,12 +303,45 @@ class HuggingFaceClient:
         try:
             model = self._api.model_info(safe_repo_id, files_metadata=True)
             details = ModelDetails.from_hub(model)
+            details = self._with_full_config(details)
         except Exception as error:
             raise self._translate_error(error, repo_id=safe_repo_id) from error
 
         # Les métadonnées privées restent séparées par empreinte d'authentification.
         self._cache.set("model", cache_key, details.to_dict(), ttl=1800)
         return details
+
+    def _with_full_config(self, details: ModelDetails) -> ModelDetails:
+        """Compléter la config résumée de l'API avec le petit fichier config.json."""
+        has_config_file = any(file.path == "config.json" for file in details.files)
+        if not has_config_file:
+            return details
+
+        try:
+            config_path = Path(
+                hf_hub_download(
+                    repo_id=details.summary.repo_id,
+                    filename="config.json",
+                    token=self._token,
+                )
+            )
+            if config_path.stat().st_size > 5 * 1024 * 1024:
+                return details
+            downloaded = json.loads(config_path.read_text(encoding="utf-8"))
+        except Exception:
+            return details
+
+        if not isinstance(downloaded, dict):
+            return details
+        merged_config = {**downloaded, **details.config}
+        return ModelDetails(
+            summary=details.summary,
+            files=details.files,
+            card_data=details.card_data,
+            config=merged_config,
+            used_storage=details.used_storage,
+            tensor_dtypes=details.tensor_dtypes,
+        )
 
     def get_model_card(self, repo_id: str) -> str:
         """Récupérer la Model Card complète au format Markdown."""
@@ -315,6 +354,11 @@ class HuggingFaceClient:
         try:
             card = ModelCard.load(safe_repo_id, token=self._token)
             markdown = str(card)
+        except EntryNotFoundError:
+            markdown = (
+                f"# {safe_repo_id}\n\n"
+                "_Ce dépôt ne fournit pas encore de Model Card (fichier README.md)._"
+            )
         except Exception as error:
             raise self._translate_error(error, repo_id=safe_repo_id) from error
 
@@ -409,4 +453,3 @@ def _json_mapping(value: Any) -> dict[str, Any]:
         return {}
     normalised = json.loads(json.dumps(dict(value), default=str, ensure_ascii=False))
     return normalised if isinstance(normalised, dict) else {}
-

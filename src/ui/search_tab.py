@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import html
-import time
-from dataclasses import dataclass
 from functools import partial
 from typing import Any
 from urllib.parse import quote
@@ -12,6 +10,7 @@ from urllib.parse import quote
 import gradio as gr
 
 from src.api_client import HuggingFaceClient, HuggingFaceClientError, SearchFilters
+from src.ui.details_tab import DetailsTabComponents, load_details_for_ui
 from src.utils.formatters import format_count
 
 PIPELINE_CHOICES = [
@@ -62,14 +61,11 @@ SORT_CHOICES = [
 ]
 
 
-@dataclass(frozen=True, slots=True)
-class SearchTabComponents:
-    """Composants nécessaires au câblage inter-onglets."""
-
-    selected_model: gr.State
-
-
-def build_search_tab(client: HuggingFaceClient) -> SearchTabComponents:
+def build_search_tab(
+    client: HuggingFaceClient,
+    details: DetailsTabComponents,
+    app_tabs: gr.Tabs,
+) -> None:
     """Construire le formulaire, la zone d'état et les cartes de résultats."""
     gr.Markdown(
         "## Rechercher des modèles\n"
@@ -156,7 +152,6 @@ def build_search_tab(client: HuggingFaceClient) -> SearchTabComponents:
         elem_classes="hf-search-status",
     )
     results = gr.State([])
-    selected_model = gr.State(None)
 
     search_inputs = [
         query,
@@ -213,14 +208,20 @@ def build_search_tab(client: HuggingFaceClient) -> SearchTabComponents:
                         key=f"details-{index}-{repo_id}",
                     )
                 details_button.click(
-                    fn=partial(make_navigation_request, repo_id),
-                    outputs=selected_model,
+                    fn=partial(select_model_for_details, repo_id),
+                    outputs=[details.repo_id, app_tabs],
                     queue=False,
                     show_progress="hidden",
                     api_visibility="private",
+                ).then(
+                    fn=partial(load_details_for_ui, client),
+                    inputs=details.repo_id,
+                    outputs=list(details.load_outputs),
+                    show_progress="minimal",
+                    api_visibility="private",
+                    concurrency_limit=2,
+                    concurrency_id="hub-details",
                 )
-
-    return SearchTabComponents(selected_model=selected_model)
 
 
 def search_for_ui(
@@ -294,14 +295,8 @@ def format_model_card(model: dict[str, Any]) -> str:
     )
 
 
-def make_navigation_request(repo_id: str) -> dict[str, Any]:
-    """Créer un événement unique même si le même modèle est sélectionné deux fois."""
-    return {"repo_id": repo_id, "nonce": time.time_ns()}
-
-
-def resolve_navigation(request: dict[str, Any] | None) -> tuple[str, gr.Tabs]:
-    """Préparer le repo_id et la sélection de l'onglet Détails."""
-    repo_id = str((request or {}).get("repo_id") or "")
+def select_model_for_details(repo_id: str) -> tuple[str, gr.Tabs]:
+    """Préremplir la fiche et sélectionner directement l'onglet Détails."""
     return repo_id, gr.Tabs(selected="details")
 
 

@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from datetime import datetime, timezone
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
+
+from huggingface_hub.errors import EntryNotFoundError
 
 from src.api_client import HuggingFaceClient, SearchFilters
 from src.utils.cache import JsonCache
@@ -53,7 +57,7 @@ class FakeApi:
             tags=["fr"],
             created_at=None,
             last_modified=None,
-            safetensors=SimpleNamespace(total=1_500_000),
+            safetensors=SimpleNamespace(total=1_500_000, parameters={"F32": 1_500_000}),
             private=False,
             gated=False,
             siblings=[SimpleNamespace(rfilename="model.safetensors", size=42, blob_id="abc")],
@@ -135,7 +139,52 @@ class HuggingFaceClientTests(unittest.TestCase):
 
         self.assertEqual(first, second)
         self.assertEqual(first.files[0].size, 42)
+        self.assertEqual(first.tensor_dtypes, ("F32",))
         self.assertEqual(self.fake_api.info_calls, [("acme/modele", True)])
+
+    def test_model_info_enriches_the_api_summary_from_config_json(self) -> None:
+        """Le contexte, le vocabulaire et le dtype doivent provenir du vrai config.json."""
+        self.fake_api.model_info = lambda repo_id, files_metadata: SimpleNamespace(
+            id=repo_id,
+            author="acme",
+            likes=0,
+            downloads=0,
+            pipeline_tag="text-generation",
+            library_name="transformers",
+            tags=[],
+            created_at=None,
+            last_modified=None,
+            safetensors=SimpleNamespace(total=10),
+            private=False,
+            gated=False,
+            siblings=[SimpleNamespace(rfilename="config.json", size=100, blob_id="config")],
+            card_data={},
+            config={"architectures": ["Qwen2ForCausalLM"], "model_type": "qwen2"},
+            used_storage=100,
+        )
+        config_path = Path(self.temporary_directory.name) / "config.json"
+        config_path.write_text(
+            json.dumps(
+                {
+                    "max_position_embeddings": 32_768,
+                    "vocab_size": 151_936,
+                    "torch_dtype": "bfloat16",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with patch("src.api_client.hf_hub_download", return_value=str(config_path)) as download:
+            details = self.client.get_model_info("acme/full-config")
+
+        self.assertEqual(details.config["max_position_embeddings"], 32_768)
+        self.assertEqual(details.config["vocab_size"], 151_936)
+        self.assertEqual(details.config["architectures"], ["Qwen2ForCausalLM"])
+        download.assert_called_once_with(
+            repo_id="acme/full-config",
+            filename="config.json",
+            token=False,
+        )
 
     def test_model_card_is_cached(self) -> None:
         """La Model Card Markdown doit être récupérée une seule fois."""
@@ -149,6 +198,14 @@ class HuggingFaceClientTests(unittest.TestCase):
         self.assertEqual(second, "# Carte")
         load.assert_called_once_with("acme/modele", token=False)
 
+    def test_missing_model_card_returns_a_markdown_placeholder(self) -> None:
+        """Un dépôt sans README doit conserver une fiche exploitable."""
+        with patch("src.api_client.ModelCard.load", side_effect=EntryNotFoundError("absent")):
+            card = self.client.get_model_card("acme/sans-carte")
+
+        self.assertIn("acme/sans-carte", card)
+        self.assertIn("Model Card", card)
+
     def test_invalid_repo_id_is_rejected_before_network(self) -> None:
         """Un identifiant invalide ne doit jamais atteindre le Hub."""
         with self.assertRaises(ValueError):
@@ -158,4 +215,3 @@ class HuggingFaceClientTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

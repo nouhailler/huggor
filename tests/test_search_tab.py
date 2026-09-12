@@ -7,9 +7,8 @@ import unittest
 from src.api_client import HuggingFaceClientError, ModelSummary, SearchFilters
 from src.ui.search_tab import (
     format_model_card,
-    make_navigation_request,
-    resolve_navigation,
     search_for_ui,
+    select_model_for_details,
 )
 
 
@@ -147,14 +146,11 @@ class SearchRenderingTests(unittest.TestCase):
 
     def test_navigation_targets_details_tab(self) -> None:
         """Le clic d'une carte doit préremplir le modèle et sélectionner Détails."""
-        request = make_navigation_request("acme/modele")
-        repo_id, tabs_update = resolve_navigation(request)
+        repo_id, tabs_update = select_model_for_details("acme/modele")
 
         self.assertEqual(repo_id, "acme/modele")
         self.assertEqual(tabs_update.selected, "details")
-        self.assertIn("nonce", request)
 
 
 if __name__ == "__main__":
     unittest.main()
-

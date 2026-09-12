@@ -26,7 +26,7 @@ class AppStructureTests(unittest.TestCase):
         labels = [
             component.get("props", {}).get("label")
             for component in demo.config["components"]
-            if component.get("type") == "tabitem"
+            if component.get("type") == "tabitem" and component.get("props", {}).get("id")
         ]
 
         self.assertIsInstance(demo, gr.Blocks)

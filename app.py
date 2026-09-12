@@ -9,9 +9,9 @@ import gradio as gr
 from src.api_client import HuggingFaceClient
 from src.ui.analytics_tab import build_analytics_tab
 from src.ui.compare_tab import build_compare_tab
-from src.ui.details_tab import build_details_tab
+from src.ui.details_tab import build_details_tab, create_repo_id_input
 from src.ui.favorites_tab import build_favorites_tab
-from src.ui.search_tab import build_search_tab, resolve_navigation
+from src.ui.search_tab import build_search_tab
 from src.ui.test_tab import build_test_tab
 
 APP_CSS = """
@@ -59,6 +59,9 @@ APP_CSS = """
     height: 0.55rem;
     width: 0.55rem;
 }
+.hf-status span {
+    color: #334155 !important;
+}
 .hf-status.public .hf-status-dot {
     background: #64748b;
     box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.16);
@@ -75,7 +78,7 @@ APP_CSS = """
     min-height: 1.5rem;
 }
 .hf-result-card {
-    background: rgba(255, 255, 255, 0.72);
+    background: var(--block-background-fill);
     border: 1px solid #dbeafe !important;
     border-radius: 14px !important;
     box-shadow: 0 5px 18px rgba(30, 64, 175, 0.05);
@@ -88,6 +91,41 @@ APP_CSS = """
 }
 .hf-result-content {
     min-width: 0;
+}
+.hf-details-status,
+.hf-favorite-status {
+    min-height: 1.5rem;
+}
+.hf-tech-card {
+    background: var(--block-background-fill);
+    border: 1px solid var(--border-color-primary);
+    border-radius: 14px;
+    margin: 0.75rem 0;
+    min-width: 0;
+    padding: 0.8rem 1rem;
+}
+.hf-tech-card table {
+    font-size: 0.92rem;
+}
+.hf-download-advice {
+    background: var(--block-background-fill);
+    border: 1px solid #a5b4fc;
+    border-left: 5px solid #4f46e5;
+    border-radius: 14px;
+    margin: 0.75rem 0 1rem;
+    padding: 0.8rem 1.1rem;
+}
+.hf-download-advice pre {
+    margin-bottom: 0;
+}
+.hf-model-card {
+    max-height: 780px;
+    overflow: auto;
+    padding: 0.5rem;
+}
+.hf-file-tree {
+    max-height: 680px;
+    overflow: auto;
 }
 @media (max-width: 640px) {
     .hf-header {
@@ -141,11 +179,12 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             )
             gr.HTML(connection_badge(hub_client.has_token))
 
+        details_repo_id = create_repo_id_input(render=False)
         with gr.Tabs() as tabs:
-            with gr.Tab("🔍 Recherche", id="search"):
-                search_tab = build_search_tab(hub_client)
+            with gr.Tab("🔍 Recherche", id="search") as search_tab:
+                pass
             with gr.Tab("📄 Détails", id="details"):
-                details_tab = build_details_tab()
+                details = build_details_tab(hub_client, repo_id=details_repo_id)
             with gr.Tab("🆚 Comparateur", id="compare"):
                 build_compare_tab()
             with gr.Tab("🧪 Test", id="test"):
@@ -155,14 +194,8 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             with gr.Tab("⭐ Favoris", id="favorites"):
                 build_favorites_tab()
 
-        search_tab.selected_model.change(
-            fn=resolve_navigation,
-            inputs=search_tab.selected_model,
-            outputs=[details_tab.repo_id, tabs],
-            queue=False,
-            show_progress="hidden",
-            api_visibility="private",
-        )
+        with search_tab:
+            build_search_tab(hub_client, details, tabs)
 
         gr.Markdown(
             "Données fournies par le [Hugging Face Hub](https://huggingface.co/models).",
