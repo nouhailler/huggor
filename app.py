@@ -107,6 +107,49 @@ APP_CSS = """
 .hf-tech-card table {
     font-size: 0.92rem;
 }
+.hf-field-label {
+    font-weight: 600;
+}
+.hf-field-help {
+    background: transparent;
+    border: 0;
+    font: inherit;
+    position: relative;
+    display: inline-block;
+    color: var(--link-text-color);
+    cursor: help;
+    font-weight: 400;
+    padding: 0.15rem 0.25rem;
+}
+.hf-field-help:focus {
+    outline: 2px solid var(--link-text-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+.hf-field-tooltip {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 30;
+    width: min(280px, 60vw);
+    box-sizing: border-box;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-color-primary);
+    border-radius: 8px;
+    background: var(--block-background-fill);
+    color: var(--body-text-color);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    font-size: 0.85rem;
+    font-weight: 400;
+    line-height: 1.5;
+    white-space: normal;
+    text-align: left;
+}
+.hf-field-help:hover > .hf-field-tooltip,
+.hf-field-help:focus > .hf-field-tooltip {
+    display: block;
+}
 .hf-download-advice {
     background: var(--block-background-fill);
     border: 1px solid #a5b4fc;
@@ -186,11 +229,11 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             with gr.Tab("📄 Détails", id="details"):
                 details = build_details_tab(hub_client, repo_id=details_repo_id)
             with gr.Tab("🆚 Comparateur", id="compare"):
-                build_compare_tab()
+                build_compare_tab(hub_client)
             with gr.Tab("🧪 Test", id="test"):
                 build_test_tab()
             with gr.Tab("📈 Analytics", id="analytics"):
-                build_analytics_tab()
+                build_analytics_tab(hub_client)
             with gr.Tab("⭐ Favoris", id="favorites"):
                 build_favorites_tab()
 

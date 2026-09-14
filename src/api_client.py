@@ -274,6 +274,11 @@ class HuggingFaceClient:
             return bool(self._token.strip())
         return get_token() is not None
 
+    @property
+    def cache_scope(self) -> str:
+        """Exposer une empreinte non réversible pour isoler les observations locales."""
+        return self._authentication_scope()
+
     def search_models(self, filters: SearchFilters | None = None) -> list[ModelSummary]:
         """Rechercher au plus 100 modèles, avec une limite de 20 par défaut."""
         safe_filters = filters or SearchFilters()

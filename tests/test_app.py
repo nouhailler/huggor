@@ -15,6 +15,7 @@ class StubClient:
     def __init__(self, has_token: bool) -> None:
         """Définir le statut d'authentification simulé."""
         self.has_token = has_token
+        self.cache_scope = "anonymous"
 
 
 class AppStructureTests(unittest.TestCase):

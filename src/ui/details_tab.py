@@ -28,6 +28,62 @@ from src.utils.formatters import format_bytes, format_count
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
+
+_FIELD_HELP = {
+    "Auteur": "Personne ou organisation qui publie ce modèle sur Hugging Face. Ce compte n’est pas forcément son créateur initial.",
+    "Création": "Date de création de l’espace où sont publiés les fichiers du modèle, appelé dépôt.",
+    "Dernière modification": "Date de la dernière mise à jour du dépôt : elle peut concerner les fichiers ou simplement la documentation.",
+    "Licence": "Conditions fixées par l’auteur pour utiliser, modifier ou partager le modèle. Consultez le texte de la licence pour connaître les usages autorisés.",
+    "Pipeline": "Tâche principale prévue pour ce modèle, par exemple rédiger du texte, traduire ou classer des messages.",
+    "Bibliothèque": "Ensemble d’outils logiciels utilisé pour charger et faire fonctionner le modèle, par exemple Transformers.",
+    "Langue(s)": "Langues déclarées par l’auteur. Leur présence ne garantit pas la même qualité de résultat dans chacune d’elles.",
+    "Téléchargements": "Nombre de téléchargements comptabilisés par Hugging Face sur sa période de mesure. C’est un indice d’utilisation, pas une mesure de qualité ni un nombre de personnes.",
+    "Likes": "Nombre de personnes ayant marqué leur intérêt pour ce modèle sur Hugging Face. Cela ne garantit pas sa fiabilité.",
+    "Stockage du dépôt": "Espace occupé par l’ensemble des fichiers publiés. Il peut inclure plusieurs versions du modèle et ne correspond pas à la mémoire nécessaire pour l’exécuter.",
+    "Accès restreint": "Indique si l’auteur impose des conditions d’accès, comme accepter un accord ou obtenir une autorisation avant de télécharger le modèle.",
+    "Tags principaux": "Mots-clés décrivant le modèle, ses usages ou ses formats. Ils aident à le retrouver et proviennent des informations du dépôt.",
+    "Famille": "Type général de conception du modèle, par exemple BERT ou Llama. Les modèles d’une même famille partagent des principes de fonctionnement.",
+    "Classe(s)": "Nom technique utilisé par le logiciel pour charger le modèle avec sa tâche prévue. Ce n’est pas un classement de qualité.",
+    "Paramètres": "Nombre de valeurs que le modèle a apprises pendant son entraînement. Plus il en contient, plus il demande généralement de mémoire ; cela ne garantit pas de meilleurs résultats. M signifie millions et B milliards.",
+    "Dtype": "Précision des nombres utilisés pour représenter le modèle, par exemple float16. Une précision plus faible réduit généralement la mémoire nécessaire.",
+    "Contexte maximal": "Quantité maximale de texte que le modèle peut traiter à la fois, mesurée en tokens : des morceaux de mots ou des signes. Pour la génération de texte, la question et la réponse partagent généralement cette limite.",
+    "Vocabulaire": "Nombre de tokens différents que le modèle reconnaît. Un token peut être un mot, un morceau de mot ou un signe ; ce n’est donc pas le nombre de mots ou de langues connus.",
+    "Quantification": "Technique qui réduit la précision des nombres du modèle pour prendre moins de place et de mémoire. Elle peut modifier la qualité des réponses et nécessite des outils adaptés.",
+    "Format / moteur": "Un format décrit comment le modèle est enregistré dans ses fichiers. Un moteur ou une bibliothèque est un logiciel qui permet de le faire fonctionner.",
+    "Statut": "Niveau de compatibilité estimé à partir des fichiers et des informations publiées. Le modèle n’a pas été exécuté pour vérifier ces résultats.",
+    "Indice": "Information du dépôt utilisée pour établir le statut, par exemple la présence d’un fichier ou d’un mot-clé.",
+    "Transformers": "Bibliothèque Python permettant de charger et d’utiliser de nombreux modèles. Le modèle doit être pris en charge par la version installée.",
+    "Safetensors": "Format de fichier contenant les valeurs apprises par le modèle, appelées poids. Il faut aussi un logiciel compatible pour utiliser ces fichiers.",
+    "GGUF": "Format de fichier souvent utilisé pour exécuter des modèles sur son ordinateur, notamment avec llama.cpp ou Ollama.",
+    "GPTQ": "Méthode de compression des valeurs du modèle pour réduire la mémoire nécessaire, souvent utilisée sur carte graphique. Elle nécessite un logiciel compatible.",
+    "AWQ": "Méthode de compression qui cherche à préserver les valeurs importantes du modèle tout en réduisant la mémoire nécessaire. Elle nécessite un logiciel compatible.",
+    "MLX": "Ensemble d’outils pour faire fonctionner des modèles notamment sur les Mac équipés d’une puce Apple Silicon, comme les puces M1 ou M2.",
+    "Ollama": "Application qui simplifie le téléchargement et l’exécution de modèles sur votre ordinateur. Le modèle doit être dans un format pris en charge.",
+    "vLLM": "Logiciel conçu pour servir des modèles de génération de texte et traiter efficacement plusieurs demandes, souvent sur un serveur avec carte graphique.",
+    "llama.cpp": "Logiciel qui permet d’exécuter des modèles de langage sur différents ordinateurs, avec le processeur et éventuellement une carte graphique. Il utilise notamment le format GGUF.",
+    "TGI": "Text Generation Inference : logiciel de Hugging Face pour faire fonctionner un modèle de génération de texte sur un serveur et le rendre accessible à des applications.",
+    "detected": "Un indice explicite a été trouvé dans le dépôt. Cela ne garantit pas que le modèle fonctionnera sur votre matériel avec votre version du logiciel.",
+    "probable": "Les caractéristiques du modèle suggèrent une compatibilité, mais elle reste à vérifier avec le logiciel choisi.",
+    "conversion": "Les fichiers doivent être transformés dans un autre format avant utilisation. La conversion et la prise en charge du modèle restent à vérifier.",
+    "not_detected": "Aucun indice suffisant n’a été trouvé. Le modèle peut néanmoins être compatible : consultez sa documentation.",
+}
+
+
+def _field_with_help(label: str, *, help_key: str | None = None) -> str:
+    """Ajouter une aide accessible au survol, au clavier et au toucher."""
+    key = help_key or label
+    explanation = _FIELD_HELP.get(key, "Format ou logiciel mentionné dans les informations du modèle. Consultez sa documentation pour connaître son utilisation.")
+    safe_label = html.escape(label)
+    safe_help = html.escape(explanation)
+    return (
+        f'<span class="hf-field-label">{safe_label} '
+        f'<button type="button" class="hf-field-help" '
+        f'aria-label="Aide pour {safe_label} : {safe_help}">ⓘ'
+        f'<span class="hf-field-tooltip" role="tooltip">{safe_help}</span>'
+        '</button></span>'
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class DetailsTabComponents:
     """Composants accessibles depuis les autres onglets."""
@@ -293,7 +349,7 @@ def format_identity_section(details: ModelDetails) -> str:
         ("Accès restreint", _format_gated(summary.gated)),
     ]
     table = "\n".join(
-        f"| **{label}** | {_escape_markdown(_display_value(value))} |" for label, value in rows
+        f"| {_field_with_help(label)} | {_escape_markdown(_display_value(value))} |" for label, value in rows
     )
     tags = " ".join(f"`{_escape_inline_code(tag)}`" for tag in summary.tags[:16])
 
@@ -303,7 +359,7 @@ def format_identity_section(details: ModelDetails) -> str:
         "| Champ | Valeur |\n"
         "|---|---|\n"
         f"{table}\n\n"
-        f"**Tags principaux :** {tags or '—'}"
+        f"{_field_with_help('Tags principaux')} : {tags or '—'}"
     )
 
 
@@ -319,7 +375,7 @@ def format_architecture_section(profile: TechnicalProfile) -> str:
         ("Quantification", profile.quantization),
     ]
     table = "\n".join(
-        f"| **{label}** | {_escape_markdown(_display_value(value))} |" for label, value in rows
+        f"| {_field_with_help(label)} | {_escape_markdown(_display_value(value))} |" for label, value in rows
     )
     return "### 🧠 Architecture\n\n| Champ | Valeur |\n|---|---|\n" + table
 
@@ -333,13 +389,13 @@ def format_compatibility_section(findings: tuple[CompatibilityFinding, ...]) -> 
         "not_detected": "⚪ Non détecté",
     }
     rows = "\n".join(
-        f"| **{_escape_markdown(item.name)}** | {labels[item.state]} | "
+        f"| {_field_with_help(item.name)} | {_field_with_help(labels[item.state], help_key=item.state)} | "
         f"{_escape_markdown(item.reason)} |"
         for item in findings
     )
     return (
         "### 🧩 Compatibilité\n\n"
-        "| Format / moteur | Statut | Indice |\n"
+        f"| {_field_with_help('Format / moteur')} | {_field_with_help('Statut')} | {_field_with_help('Indice')} |\n"
         "|---|---|---|\n"
         f"{rows}\n\n"
         "_« Non détecté » ne signifie pas incompatible. Ces indices ne remplacent pas une validation "
