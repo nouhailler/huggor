@@ -81,3 +81,26 @@ python -m unittest discover -s tests -v
 ## Capture d'écran
 
 _À ajouter avec l'interface Gradio._
+
+## Paquet Debian / Ubuntu
+
+Téléchargez le fichier `.deb` depuis les [releases GitHub](https://github.com/nouhailler/huggor/releases), puis installez-le :
+
+```bash
+sudo apt install ./hf-explorer_0.1.0_all.deb
+hf-explorer
+```
+
+Python 3.10 ou supérieur est requis (par exemple Ubuntu 22.04+ ou Debian 12+).
+L’entrée **HF Explorer** du menu des applications ouvre aussi le lanceur dans un terminal.
+Au premier lancement, une connexion Internet est nécessaire pour télécharger les dépendances Python dans un environnement isolé. Gardez le terminal ouvert, puis ouvrez `http://127.0.0.1:7860` dans votre navigateur. Pour arrêter l’application, utilisez `Ctrl+C`.
+
+Le lanceur conserve son environnement Python et les données dans `${XDG_DATA_HOME:-~/.local/share}/hf-explorer/`. Aucune donnée personnelle n’est incluse dans le paquet. Les mises à jour conservent les favoris et l’historique. La désinstallation du paquet conserve également ces données. Pour utiliser un token, lancez `export HF_TOKEN=…` avant `hf-explorer` ou utilisez `hf auth login`.
+
+Pour reconstruire le paquet depuis les sources avec Python et `dpkg-deb` :
+
+```bash
+python3 scripts/build_deb.py --version 0.1.0
+```
+
+Le résultat est écrit dans `dist/`. `HF_EXPLORER_DATA_DIR` permet de choisir un autre emplacement pour les données.

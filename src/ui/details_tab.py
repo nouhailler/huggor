@@ -6,9 +6,10 @@ import html
 import json
 from dataclasses import dataclass, field
 from functools import partial
-from pathlib import Path
 from typing import Any
 from urllib.parse import quote
+
+from src.paths import data_directory
 
 import gradio as gr
 
@@ -25,7 +26,6 @@ from src.model_analysis import (
 from src.utils.favorites import FavoritesError, FavoritesStore
 from src.utils.formatters import format_bytes, format_count
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 
@@ -106,7 +106,7 @@ def build_details_tab(
     repo_id: gr.Textbox | None = None,
 ) -> DetailsTabComponents:
     """Construire la fiche modèle et câbler ses actions."""
-    favorites_store = favorites or FavoritesStore(_PROJECT_ROOT / "data" / "favorites.json")
+    favorites_store = favorites or FavoritesStore(data_directory() / "favorites.json")
 
     gr.Markdown(
         "## Examiner un modèle\n"

@@ -1,0 +1,23 @@
+#!/bin/bash
+set -euo pipefail
+app_dir="${HF_EXPLORER_APP_DIR:-/usr/share/hf-explorer}"
+user_dir="${XDG_DATA_HOME:-$HOME/.local/share}/hf-explorer"
+export HF_EXPLORER_DATA_DIR="${HF_EXPLORER_DATA_DIR:-$user_dir/data}"
+export PYTHONDONTWRITEBYTECODE=1
+mkdir -p "$user_dir" "$HF_EXPLORER_DATA_DIR"
+exec 9>"$user_dir/setup.lock"
+flock 9
+venv_dir="$user_dir/venv"
+if [[ ! -x "$venv_dir/bin/python" ]]; then
+    python3 -m venv "$venv_dir"
+fi
+if ! cmp -s "$app_dir/requirements.txt" "$user_dir/requirements-installed.txt"; then
+    echo "HF Explorer : installation des dépendances Python (connexion Internet nécessaire)…"
+    "$venv_dir/bin/python" -m pip install -r "$app_dir/requirements.txt"
+    cp "$app_dir/requirements.txt" "$user_dir/requirements-installed.txt"
+fi
+flock -u 9
+exec 9>&-
+cd "$user_dir"
+echo "HF Explorer : ouvrez http://127.0.0.1:${GRADIO_SERVER_PORT:-7860} dans votre navigateur."
+exec "$venv_dir/bin/python" "$app_dir/app.py"

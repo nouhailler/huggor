@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=HF Explorer
+Comment=Rechercher et examiner les modèles du Hugging Face Hub
+Exec=hf-explorer
+Icon=applications-science
+Terminal=true
+Categories=Development;Science;

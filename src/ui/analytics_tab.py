@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import html
 from functools import partial
-from pathlib import Path
+
+from src.paths import data_directory
 
 import gradio as gr
 import pandas as pd
@@ -14,12 +15,11 @@ from src.analytics import ANALYTICS_COLUMNS, AnalyticsHistory, analytics_figures
 from src.api_client import HuggingFaceClient, HuggingFaceClientError, SearchFilters
 from src.ui.search_tab import LANGUAGE_CHOICES, LICENSE_CHOICES, PIPELINE_CHOICES
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def build_analytics_tab(client: HuggingFaceClient) -> None:
     """Construire les filtres et les quatre graphiques interactifs."""
-    history = AnalyticsHistory(_PROJECT_ROOT / "data" / "analytics", scope=client.cache_scope)
+    history = AnalyticsHistory(data_directory() / "analytics", scope=client.cache_scope)
     gr.Markdown(
         "## Analyser le Hub\n\nAnalyse des **50 modèles les plus téléchargés correspondant aux filtres**. "
         "Les répartitions concernent cet échantillon, pas l’ensemble du Hub."

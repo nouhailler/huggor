@@ -10,6 +10,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Literal
 
+from src.paths import data_directory
+
 from dotenv import load_dotenv
 from huggingface_hub import HfApi, ModelCard, get_token, hf_hub_download
 from huggingface_hub.errors import EntryNotFoundError, GatedRepoError, HfHubHTTPError, RepositoryNotFoundError
@@ -263,7 +265,7 @@ class HuggingFaceClient:
         load_dotenv(_PROJECT_ROOT / ".env")
         self._token = token
         self._api = api or HfApi(token=token, library_name="hf-explorer")
-        self._cache = cache or JsonCache(_PROJECT_ROOT / "data" / "cache", default_ttl=cache_ttl)
+        self._cache = cache or JsonCache(data_directory() / "cache", default_ttl=cache_ttl)
 
     @property
     def has_token(self) -> bool:

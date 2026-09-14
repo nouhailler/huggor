@@ -8,3 +8,4 @@ htmlcov/
 data/cache/*.json
 !data/cache/.gitkeep
 data/analytics/
+dist/
