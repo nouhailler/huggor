@@ -18,7 +18,9 @@ Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, 
 - Model Card complète, inventaire annoté et arborescence des fichiers avec leurs tailles
 - Génération de snippets pour une utilisation locale et avec `InferenceClient`
 - Ajout local d'un modèle aux favoris
-- Comparaison de 2 à 4 modèles : tableau technique et radar des quantités relatives
+- Fiche technique : verdict d'adéquation matérielle (« Model Advisor ») estimant la RAM/VRAM nécessaire selon la précision
+- [Onglet 💻 Hardware](src/ui/hardware_tab.py) : calculateur de ressources indiquant, selon votre RAM/VRAM déclarée, quelles précisions (FP32 à Q4_K_M) tiennent réellement, avec une estimation de vitesse et de contexte clairement présentée comme théorique
+- Comparaison décisionnelle de 2 à 4 modèles : tableau critère par critère (paramètres, popularité, contexte, licence, couverture FR déclarée, adéquation locale, GGUF) et recommandation motivée du meilleur compromis pour un usage local, en plus du tableau technique complet et du radar des quantités relatives
 - Analytics filtrées : top 50 téléchargements, répartition des tâches et licences
 - Évolution des compteurs du top 5 actuel à partir d’observations locales quotidiennes
 

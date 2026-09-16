@@ -77,6 +77,7 @@ class HardwareAdvice:
     ram_estimates: tuple[MemoryEstimate, ...]
     vram_recommended: MemoryEstimate | None
     criteria: tuple[HardwareCriterion, ...]
+    ram_comfortable_gib: int | None
     verdict_emoji: str
     verdict_headline: str
     verdict_detail: str
@@ -88,6 +89,7 @@ class HardwareAdvice:
             "ram_estimates": [item.to_dict() for item in self.ram_estimates],
             "vram_recommended": self.vram_recommended.to_dict() if self.vram_recommended else None,
             "criteria": [item.to_dict() for item in self.criteria],
+            "ram_comfortable_gib": self.ram_comfortable_gib,
             "verdict_emoji": self.verdict_emoji,
             "verdict_headline": self.verdict_headline,
             "verdict_detail": self.verdict_detail,
@@ -116,6 +118,7 @@ def advise_hardware(
                 _compatibility_criterion("Ollama", findings.get("Ollama")),
                 _compatibility_criterion("GGUF", findings.get("GGUF")),
             ),
+            ram_comfortable_gib=None,
             verdict_emoji="⚪",
             verdict_headline="Estimation impossible",
             verdict_detail=unknown_detail,
@@ -175,6 +178,7 @@ def advise_hardware(
         ram_estimates=ram_estimates,
         vram_recommended=vram_recommended,
         criteria=criteria,
+        ram_comfortable_gib=ram_comfortable_gib,
         verdict_emoji=verdict_emoji,
         verdict_headline=verdict_headline,
         verdict_detail=verdict_detail,

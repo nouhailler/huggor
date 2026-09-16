@@ -6,7 +6,13 @@ import unittest
 from dataclasses import replace
 
 from src.api_client import HuggingFaceClientError, ModelFile
-from src.comparison import comparison_radar, comparison_table, file_storage, validate_comparison_ids
+from src.comparison import (
+    build_comparison_decision,
+    comparison_radar,
+    comparison_table,
+    file_storage,
+    validate_comparison_ids,
+)
 from src.ui.compare_tab import compare_for_ui
 from test_details_tab import NoopProgress, make_details
 
@@ -76,23 +82,59 @@ class ComparisonTests(unittest.TestCase):
     def test_handler_loads_at_most_four_models(self) -> None:
         """La sélection maximale effectue exactement quatre appels."""
         client = CompareClient()
-        status, table, radar = compare_for_ui(client, "acme/a", "acme/b", "acme/c", "acme/d", progress=NoopProgress())
+        status, decision_table, recommendation, table, radar = compare_for_ui(
+            client, "acme/a", "acme/b", "acme/c", "acme/d", progress=NoopProgress()
+        )
         self.assertEqual(len(client.calls), 4)
         self.assertEqual(len(table), 4)
         self.assertIn("4 modèles", status)
         self.assertIsNotNone(radar)
+        self.assertIn("Comparaison décisionnelle", decision_table)
+        self.assertIn("Recommandation", recommendation)
 
     def test_invalid_input_does_not_call_the_client(self) -> None:
         """La validation précède le réseau."""
         client = CompareClient()
-        status, table, radar = compare_for_ui(client, "acme/a", "acme/a", progress=NoopProgress())
+        status, decision_table, recommendation, table, radar = compare_for_ui(
+            client, "acme/a", "acme/a", progress=NoopProgress()
+        )
         self.assertFalse(client.calls)
         self.assertTrue(table.empty)
         self.assertIsNone(radar)
+        self.assertEqual(decision_table, "")
+        self.assertEqual(recommendation, "")
 
     def test_network_error_clears_the_previous_comparison(self) -> None:
         """L'interface retourne un état vide et un message sûr."""
-        status, table, radar = compare_for_ui(CompareClient(HuggingFaceClientError("Hub indisponible")), "acme/a", "acme/b", progress=NoopProgress())
+        status, decision_table, recommendation, table, radar = compare_for_ui(
+            CompareClient(HuggingFaceClientError("Hub indisponible")), "acme/a", "acme/b", progress=NoopProgress()
+        )
         self.assertIn("Hub indisponible", status)
         self.assertTrue(table.empty)
         self.assertIsNone(radar)
+        self.assertEqual(decision_table, "")
+        self.assertEqual(recommendation, "")
+
+    def test_decision_recommends_the_best_local_compromise(self) -> None:
+        """Le modèle le plus léger et compatible GGUF doit être recommandé pour le local."""
+        light = make_details()  # 1.5 Md paramètres, langues fr/en déclarées.
+        heavy = replace(
+            light,
+            summary=replace(light.summary, repo_id="acme/heavy", parameters=70_000_000_000),
+        )
+        decision = build_comparison_decision([light, heavy])
+        rows = {row.repo_id: row for row in decision.rows}
+
+        self.assertEqual(rows["acme/modele"].fr_stars, 5)
+        self.assertGreater(rows["acme/modele"].local_stars, rows["acme/heavy"].local_stars)
+        self.assertEqual(decision.recommended_repo_id, "acme/modele")
+        self.assertIn("téléchargements", decision.recommendation_reason)
+
+    def test_decision_without_any_known_parameters_cannot_recommend(self) -> None:
+        """Sans paramètres connus pour aucun modèle, aucune recommandation ne doit être inventée."""
+        details = make_details()
+        unknown = replace(details, summary=replace(details.summary, repo_id="acme/unknown", parameters=None))
+        decision = build_comparison_decision([unknown, unknown])
+
+        self.assertIsNone(decision.recommended_repo_id)
+        self.assertIn("non renseignés", decision.recommendation_reason)
