@@ -13,17 +13,19 @@ from src.paths import data_directory
 
 import gradio as gr
 
-from src.api_client import HuggingFaceClient, HuggingFaceClientError, ModelDetails, ModelFile
+from src.api_client import HuggingFaceClient, HuggingFaceClientError, ModelDetails, ModelFile, SearchFilters
 from src.hardware_advisor import HardwareAdvice, MemoryEstimate, advise_hardware
 from src.model_analysis import (
     CompatibilityFinding,
     DownloadRecommendation,
     TechnicalProfile,
     classify_file,
+    detect_precision_formats,
     extract_technical_profile,
     inspect_compatibility,
     recommend_download,
 )
+from src.quantization_search import QuantizedVariant, extract_base_name, find_quantized_variants
 from src.utils.favorites import FavoritesError, FavoritesStore
 from src.utils.formatters import (
     escape_inline_code as _escape_inline_code,
@@ -78,6 +80,17 @@ _FIELD_HELP = {
     "GPU 8 Go": "Capacité à charger une version quantifiée du modèle sur une carte graphique disposant de 8 Go de mémoire vidéo.",
     "GPU 4 Go": "Capacité à charger une version quantifiée du modèle sur une carte graphique d’entrée de gamme disposant de 4 Go de mémoire vidéo.",
     "CPU seul (sans GPU)": "Capacité à se passer complètement d’une carte graphique dédiée, avec une machine bien pourvue en mémoire vive.",
+    "FP32": "Nombres à virgule flottante sur 32 bits : la précision la plus complète, mais aussi la plus gourmande en mémoire.",
+    "FP16": "Nombres à virgule flottante sur 16 bits : réduit la mémoire par rapport au FP32, avec une perte de précision généralement mineure.",
+    "BF16": "Variante du FP16 utilisée pour l’entraînement et l’inférence, avec la même mémoire que le FP16 mais une plage de valeurs proche du FP32.",
+    "INT8": "Nombres entiers sur 8 bits : une quantification qui réduit fortement la mémoire, distincte des variantes GGUF Q8.",
+    "Q8": "Variante de quantification GGUF proche de 8 bits par paramètre, parmi les moins compressées de ce format.",
+    "Q6": "Variante de quantification GGUF autour de 6 bits par paramètre.",
+    "Q5": "Variante de quantification GGUF autour de 5 bits par paramètre.",
+    "Q4": "Variante de quantification GGUF autour de 4 bits par paramètre : un compromis courant entre mémoire et qualité.",
+    "Q3": "Variante de quantification GGUF autour de 3 bits par paramètre, très compressée.",
+    "Q2": "Variante de quantification GGUF autour de 2 bits par paramètre, la plus compressée : la qualité peut être fortement affectée.",
+    "EXL2": "Format de quantification utilisé par ExLlamaV2, pensé pour l’inférence rapide sur carte graphique.",
 }
 
 _HARDWARE_STATUS_LABELS = {
@@ -154,6 +167,8 @@ def build_details_tab(
         architecture = gr.Markdown("", elem_classes=["hf-tech-card", "hf-architecture-card"])
 
     compatibility = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
+    precision_formats = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
+    quantized_variants = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
     hardware_advice = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
     download_advice = gr.Markdown("", elem_classes="hf-download-advice")
 
@@ -221,6 +236,8 @@ def build_details_tab(
         identity,
         architecture,
         compatibility,
+        precision_formats,
+        quantized_variants,
         hardware_advice,
         download_advice,
         raw_metadata,
@@ -285,6 +302,8 @@ def load_details_for_ui(
     str,
     str,
     str,
+    str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -312,8 +331,10 @@ def load_details_for_ui(
     progress(0.8, desc="Préparation de la fiche…")
     profile = extract_technical_profile(details)
     compatibility = inspect_compatibility(details)
+    precision_findings = detect_precision_formats(details, profile, compatibility)
     recommendation = recommend_download(details)
     hardware = advise_hardware(profile, compatibility)
+    variants = _search_quantized_variants(client, details.summary.repo_id)
     local_snippet, inference_snippet = generate_code_snippets(details)
     progress(1, desc="Fiche prête")
     return (
@@ -322,9 +343,11 @@ def load_details_for_ui(
         format_identity_section(details),
         format_architecture_section(profile),
         format_compatibility_section(compatibility),
+        format_precision_section(precision_findings),
+        format_quantized_variants(variants, details.summary.repo_id),
         format_hardware_advice(hardware),
         format_download_recommendation(recommendation),
-        build_raw_metadata(details, profile, compatibility, recommendation, hardware),
+        build_raw_metadata(details, profile, compatibility, recommendation, hardware, precision_findings),
         card,
         build_file_inventory(details, recommendation),
         format_file_tree(details),
@@ -333,6 +356,17 @@ def load_details_for_ui(
         gr.Button(interactive=True),
         "",
     )
+
+
+def _search_quantized_variants(client: HuggingFaceClient, repo_id: str) -> tuple[QuantizedVariant, ...]:
+    """Chercher des variantes quantifiées sans jamais faire échouer le chargement de la fiche."""
+    try:
+        candidates = client.search_models(
+            SearchFilters(query=extract_base_name(repo_id), sort="downloads", limit=50)
+        )
+        return find_quantized_variants(candidates, repo_id)
+    except Exception:
+        return ()
 
 
 def add_favorite_for_ui(store: FavoritesStore, repo_id: str) -> str:
@@ -404,26 +438,88 @@ def format_architecture_section(profile: TechnicalProfile) -> str:
     return "### 🧠 Architecture\n\n| Champ | Valeur |\n|---|---|\n" + table
 
 
+_FINDING_STATUS_LABELS = {
+    "detected": "✅ Détecté",
+    "probable": "🟡 Probable",
+    "conversion": "🔄 Conversion",
+    "not_detected": "⚪ Non détecté",
+}
+
+
 def format_compatibility_section(findings: tuple[CompatibilityFinding, ...]) -> str:
     """Afficher les compatibilités avec une légende empêchant les faux positifs."""
-    labels = {
-        "detected": "✅ Détecté",
-        "probable": "🟡 Probable",
-        "conversion": "🔄 Conversion",
-        "not_detected": "⚪ Non détecté",
-    }
+    return _format_finding_table(
+        findings,
+        title="### 🧩 Compatibilité",
+        column_label="Format / moteur",
+        footer=(
+            "_« Non détecté » ne signifie pas incompatible. Ces indices ne remplacent pas une validation "
+            "de l’architecture avec la version du moteur que vous utilisez._"
+        ),
+    )
+
+
+def format_precision_section(findings: tuple[CompatibilityFinding, ...]) -> str:
+    """Afficher les précisions et quantifications trouvées dans le dépôt, sans juger leur qualité."""
+    return _format_finding_table(
+        findings,
+        title="### 🎛️ Précisions et quantifications détectées",
+        column_label="Format",
+        footer=(
+            "_Ce tableau signale des représentations trouvées dans les fichiers ou la configuration du dépôt, "
+            "pas une recommandation d’usage. Voir le Model Advisor et l’onglet Hardware pour choisir laquelle "
+            "télécharger selon votre machine._"
+        ),
+    )
+
+
+def _format_finding_table(
+    findings: tuple[CompatibilityFinding, ...],
+    *,
+    title: str,
+    column_label: str,
+    footer: str,
+) -> str:
+    """Factoriser le rendu tabulaire commun aux compatibilités et aux précisions détectées."""
     rows = "\n".join(
-        f"| {_field_with_help(item.name)} | {_field_with_help(labels[item.state], help_key=item.state)} | "
+        f"| {_field_with_help(item.name)} | "
+        f"{_field_with_help(_FINDING_STATUS_LABELS[item.state], help_key=item.state)} | "
         f"{_escape_markdown(item.reason)} |"
         for item in findings
     )
     return (
-        "### 🧩 Compatibilité\n\n"
-        f"| {_field_with_help('Format / moteur')} | {_field_with_help('Statut')} | {_field_with_help('Indice')} |\n"
+        f"{title}\n\n"
+        f"| {_field_with_help(column_label)} | {_field_with_help('Statut')} | {_field_with_help('Indice')} |\n"
         "|---|---|---|\n"
         f"{rows}\n\n"
-        "_« Non détecté » ne signifie pas incompatible. Ces indices ne remplacent pas une validation "
-        "de l’architecture avec la version du moteur que vous utilisez._"
+        f"{footer}"
+    )
+
+
+def format_quantized_variants(variants: tuple[QuantizedVariant, ...], source_repo_id: str) -> str:
+    """Répondre à « ce modèle existe-t-il déjà en version quantifiée ? »."""
+    header = "### 🔎 Versions quantifiées existantes\n\n"
+    if not variants:
+        return (
+            f"{header}_Aucune variante quantifiée trouvée automatiquement par recherche du nom du modèle. "
+            "Elle peut exister sous un nom différent, ou dans un dépôt que la recherche du Hub ne fait pas "
+            "remonter : consultez la Model Card ou cherchez manuellement._"
+        )
+
+    rows = "\n".join(
+        f"| [{_escape_markdown(item.summary.repo_id)}]"
+        f"(https://huggingface.co/{quote(item.summary.repo_id, safe='/')}) | "
+        f"{', '.join(item.formats)} | {format_count(item.summary.downloads)} | {format_count(item.summary.likes)} |"
+        for item in variants[:10]
+    )
+    return (
+        f"{header}D’autres dépôts semblent proposer une version compressée de "
+        f"**{_escape_markdown(source_repo_id)}** :\n\n"
+        "| Dépôt | Format(s) détecté(s) | Téléchargements | Likes |\n"
+        "|---|---|---|---|\n"
+        f"{rows}\n\n"
+        "_Détection par recherche de texte sur le nom du modèle : vérifiez toujours qu’il s’agit bien du même "
+        "modèle avant de l’utiliser, un nom proche ne suffit pas à le garantir._"
     )
 
 
@@ -508,18 +604,23 @@ def build_raw_metadata(
     compatibility: tuple[CompatibilityFinding, ...] | None = None,
     recommendation: DownloadRecommendation | None = None,
     hardware: HardwareAdvice | None = None,
+    precision_formats: tuple[CompatibilityFinding, ...] | None = None,
 ) -> dict[str, Any]:
     """Rassembler les informations techniques sans les objets internes du SDK."""
     technical_profile = profile or extract_technical_profile(details)
     compatibility_findings = compatibility or inspect_compatibility(details)
     download_recommendation = recommendation or recommend_download(details)
     hardware_advice = hardware or advise_hardware(technical_profile, compatibility_findings)
+    precision_findings = precision_formats or detect_precision_formats(
+        details, technical_profile, compatibility_findings
+    )
     return {
         "model": details.summary.to_dict(),
         "used_storage": details.used_storage,
         "tensor_dtypes": details.tensor_dtypes,
         "technical_profile": technical_profile.to_dict(),
         "compatibility": [item.to_dict() for item in compatibility_findings],
+        "precision_formats": [item.to_dict() for item in precision_findings],
         "download_recommendation": download_recommendation.to_dict(),
         "hardware_advice": hardware_advice.to_dict(),
         "card_data": details.card_data,
@@ -609,6 +710,8 @@ def _empty_details_response(
     str,
     str,
     str,
+    str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -622,6 +725,8 @@ def _empty_details_response(
     return (
         "",
         message,
+        "",
+        "",
         "",
         "",
         "",

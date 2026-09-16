@@ -9,6 +9,7 @@ from dataclasses import replace
 from src.api_client import ModelDetails, ModelFile, ModelSummary
 from src.model_analysis import (
     classify_file,
+    detect_precision_formats,
     extract_technical_profile,
     inspect_compatibility,
     recommend_download,
@@ -249,6 +250,80 @@ class CompatibilityTests(unittest.TestCase):
         self.assertEqual(findings["Safetensors"].state, "detected")
         self.assertEqual(findings["vLLM"].state, "probable")
         self.assertEqual(findings["TGI"].state, "probable")
+
+    def test_exl2_marker_is_detected(self) -> None:
+        """Un dépôt ExLlamaV2 doit être reconnu comme EXL2."""
+        details = make_details(
+            (ModelFile("output-exl2/config.json", 100, None),),
+            tags=("exl2",),
+        )
+
+        findings = {item.name: item for item in inspect_compatibility(details)}
+
+        self.assertEqual(findings["EXL2"].state, "detected")
+
+
+class PrecisionFormatTests(unittest.TestCase):
+    """Vérifier le tableau de précisions et quantifications demandé par l'utilisateur."""
+
+    def test_declared_dtype_without_tensor_confirmation_is_probable(self) -> None:
+        """Une config déclarant bfloat16 sans preuve Safetensors reste seulement probable."""
+        details = make_details(
+            (ModelFile("model.safetensors", 1_000, None),),
+            config={"architectures": ["LlamaForCausalLM"], "model_type": "llama", "torch_dtype": "bfloat16"},
+        )
+
+        findings = {item.name: item for item in detect_precision_formats(details)}
+
+        self.assertEqual(findings["BF16"].state, "probable")
+        self.assertEqual(findings["FP16"].state, "not_detected")
+
+    def test_gguf_quant_buckets_are_detected_independently(self) -> None:
+        """Plusieurs variantes GGUF dans un même dépôt doivent toutes être signalées."""
+        details = make_details(
+            (
+                ModelFile("model-Q4_K_M.gguf", 4_500, None),
+                ModelFile("model-Q8_0.gguf", 8_000, None),
+                ModelFile("model-Q2_K.gguf", 2_000, None),
+            ),
+            library_name=None,
+        )
+
+        findings = {item.name: item for item in detect_precision_formats(details)}
+
+        self.assertEqual(findings["Q4"].state, "detected")
+        self.assertEqual(findings["Q8"].state, "detected")
+        self.assertEqual(findings["Q2"].state, "detected")
+        self.assertEqual(findings["Q6"].state, "not_detected")
+        self.assertEqual(findings["Q5"].state, "not_detected")
+        self.assertEqual(findings["Q3"].state, "not_detected")
+        self.assertEqual(findings["GGUF"].state, "detected")
+
+    def test_int8_is_distinguished_from_gguf_q8(self) -> None:
+        """La quantification 8 bits Transformers ne doit pas être confondue avec un GGUF Q8."""
+        details = make_details(
+            (ModelFile("model.safetensors", 1_000, None),),
+            config={
+                "architectures": ["LlamaForCausalLM"],
+                "model_type": "llama",
+                "quantization_config": {"quant_method": "bitsandbytes", "load_in_8bit": True},
+            },
+        )
+
+        findings = {item.name: item for item in detect_precision_formats(details)}
+
+        self.assertEqual(findings["INT8"].state, "detected")
+        self.assertEqual(findings["Q8"].state, "not_detected")
+        self.assertEqual(findings["GGUF"].state, "not_detected")
+
+    def test_no_gguf_file_marks_every_quant_bucket_absent(self) -> None:
+        """Sans fichier GGUF, aucune variante Qn ne doit être annoncée."""
+        details = make_details((ModelFile("model.safetensors", 1_000, None),))
+
+        findings = {item.name: item for item in detect_precision_formats(details)}
+
+        for digit in ("8", "6", "5", "4", "3", "2"):
+            self.assertEqual(findings[f"Q{digit}"].state, "not_detected")
 
 
 if __name__ == "__main__":

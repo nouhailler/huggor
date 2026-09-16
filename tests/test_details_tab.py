@@ -8,11 +8,13 @@ from pathlib import Path
 
 from src.api_client import HuggingFaceClientError, ModelDetails, ModelFile, ModelSummary
 from src.model_analysis import (
+    detect_precision_formats,
     extract_technical_profile,
     inspect_compatibility,
     recommend_download,
 )
 from src.hardware_advisor import advise_hardware
+from src.quantization_search import QuantizedVariant
 from src.ui.details_tab import (
     add_favorite_for_ui,
     build_file_inventory,
@@ -23,6 +25,8 @@ from src.ui.details_tab import (
     format_file_tree,
     format_hardware_advice,
     format_identity_section,
+    format_precision_section,
+    format_quantized_variants,
     generate_code_snippets,
     load_details_for_ui,
 )
@@ -100,10 +104,12 @@ class DetailsFormattingTests(unittest.TestCase):
         findings = inspect_compatibility(details)
         recommendation = recommend_download(details)
         hardware = advise_hardware(profile, findings)
+        precision_findings = detect_precision_formats(details, profile, findings)
 
         identity = format_identity_section(details)
         architecture = format_architecture_section(profile)
         compatibility = format_compatibility_section(findings)
+        precision_section = format_precision_section(precision_findings)
         hardware_section = format_hardware_advice(hardware)
         advice = format_download_recommendation(recommendation)
         raw = build_raw_metadata(details)
@@ -112,12 +118,32 @@ class DetailsFormattingTests(unittest.TestCase):
         self.assertIn("BertForSequenceClassification", architecture)
         self.assertIn("4 096 tokens", architecture)
         self.assertIn("Transformers", compatibility)
+        self.assertIn("FP16", precision_section)
+        self.assertIn("GGUF", precision_section)
         self.assertIn("Verdict", hardware_section)
         self.assertIn("VRAM recommandée", hardware_section)
         self.assertIn("model.safetensors", advice)
         self.assertEqual(raw["config"]["model_type"], "bert")
         self.assertEqual(raw["technical_profile"]["family"], "BERT")
         self.assertIn("hardware_advice", raw)
+        self.assertIn("precision_formats", raw)
+
+    def test_quantized_variants_are_presented_or_explicitly_absent(self) -> None:
+        """La question « existe-t-il une version quantifiée ? » doit toujours avoir une réponse."""
+        empty = format_quantized_variants((), "acme/modele")
+        self.assertIn("Aucune variante quantifiée trouvée", empty)
+
+        variant = QuantizedVariant(
+            summary=ModelSummary(
+                repo_id="acme/modele-GGUF", author="acme", likes=5, downloads=1_000,
+                pipeline_tag=None, library_name=None, tags=(), created_at=None,
+                last_modified=None, parameters=None, private=False, gated=False,
+            ),
+            formats=("GGUF",),
+        )
+        present = format_quantized_variants((variant,), "acme/modele")
+        self.assertIn("acme/modele-GGUF", present)
+        self.assertIn("GGUF", present)
 
     def test_file_inventory_marks_runtime_files(self) -> None:
         """L'inventaire doit expliquer les rôles et signaler les fichiers conseillés."""
@@ -167,11 +193,13 @@ class DetailsHandlerTests(unittest.TestCase):
         self.assertIn("apache", response[2])
         self.assertIn("BertForSequenceClassification", response[3])
         self.assertIn("Transformers", response[4])
-        self.assertIn("Model Advisor", response[5])
-        self.assertIn("réellement télécharger", response[6])
-        self.assertEqual(response[8], "# Carte complète")
-        self.assertIn("model.safetensors", response[10])
-        self.assertTrue(response[13].interactive)
+        self.assertIn("Précisions et quantifications", response[5])
+        self.assertIn("Versions quantifiées existantes", response[6])
+        self.assertIn("Model Advisor", response[7])
+        self.assertIn("réellement télécharger", response[8])
+        self.assertEqual(response[10], "# Carte complète")
+        self.assertIn("model.safetensors", response[12])
+        self.assertTrue(response[15].interactive)
 
     def test_handler_turns_client_error_into_clear_state(self) -> None:
         """Une erreur métier doit vider une éventuelle ancienne fiche."""
@@ -183,7 +211,7 @@ class DetailsHandlerTests(unittest.TestCase):
 
         self.assertEqual(response[0], "")
         self.assertIn("Hub indisponible", response[1])
-        self.assertFalse(response[13].interactive)
+        self.assertFalse(response[15].interactive)
 
     def test_favorite_action_is_idempotent(self) -> None:
         """L'action UI doit distinguer ajout et favori déjà présent."""

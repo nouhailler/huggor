@@ -153,6 +153,11 @@ def inspect_compatibility(details: ModelDetails) -> tuple[CompatibilityFinding, 
     has_gptq = "gptq" in quantization or _contains_marker(paths, tags, "gptq")
     has_awq = "awq" in quantization or _contains_marker(paths, tags, "awq")
     has_mlx = library == "mlx" or _contains_marker(paths, tags, "mlx")
+    has_exl2 = (
+        library == "exllamav2"
+        or _contains_marker(paths, tags, "exl2")
+        or _contains_marker(paths, tags, "exllamav2")
+    )
     is_causal_lm = "causallm" in classes or details.summary.pipeline_tag == "text-generation"
 
     has_transformers_layout = bool(profile.model_classes) and (
@@ -210,6 +215,12 @@ def inspect_compatibility(details: ModelDetails) -> tuple[CompatibilityFinding, 
             "Format, bibliothèque ou tag MLX détecté.",
             "Aucun indice MLX détecté.",
         ),
+        _binary_finding(
+            "EXL2",
+            has_exl2,
+            "Format, bibliothèque ou tag EXL2 (ExLlamaV2) détecté.",
+            "Aucun indice EXL2 détecté.",
+        ),
     ]
 
     if "ollama" in tags or "modelfile" in basenames:
@@ -241,6 +252,88 @@ def inspect_compatibility(details: ModelDetails) -> tuple[CompatibilityFinding, 
         findings.append(CompatibilityFinding("TGI", "not_detected", "Compatibilité non déclarée."))
 
     return tuple(findings)
+
+
+_GGUF_QUANT_DIGITS = ("8", "6", "5", "4", "3", "2")
+_REUSED_RUNTIME_FORMATS = ("GGUF", "GPTQ", "AWQ", "EXL2", "MLX")
+
+
+def detect_precision_formats(
+    details: ModelDetails,
+    profile: TechnicalProfile | None = None,
+    compatibility: tuple[CompatibilityFinding, ...] | None = None,
+) -> tuple[CompatibilityFinding, ...]:
+    """Vérifier la présence de chaque précision ou quantification listée dans ce dépôt.
+
+    Contrairement à `inspect_compatibility`, qui évalue des moteurs d'exécution, cette
+    fonction répond à une question plus directe : quelles représentations numériques ce
+    dépôt fournit-il réellement, fichier par fichier ou configuration par configuration ?
+    """
+    technical_profile = profile or extract_technical_profile(details)
+    runtime_findings = {item.name: item for item in (compatibility or inspect_compatibility(details))}
+    paths = [item.path.casefold() for item in details.files]
+    tags = {tag.casefold() for tag in details.summary.tags}
+    dtype = technical_profile.dtype.casefold()
+    tensor_dtypes = {value.casefold() for value in details.tensor_dtypes}
+    gguf_paths = [path for path in paths if path.endswith(".gguf") and "mmproj" not in path]
+    quantization_config = _first_config_value(details.config, "quantization_config", "quantization")
+
+    findings = [
+        _dtype_finding("FP32", "float32", "f32", dtype, tensor_dtypes),
+        _dtype_finding("FP16", "float16", "f16", dtype, tensor_dtypes),
+        _dtype_finding("BF16", "bfloat16", "bf16", dtype, tensor_dtypes),
+        _int8_finding(quantization_config, paths, tags),
+    ]
+    findings.extend(_gguf_bucket_finding(digit, gguf_paths) for digit in _GGUF_QUANT_DIGITS)
+    findings.extend(
+        runtime_findings.get(name, CompatibilityFinding(name, "not_detected", "Aucun indice détecté."))
+        for name in _REUSED_RUNTIME_FORMATS
+    )
+    return tuple(findings)
+
+
+def _dtype_finding(
+    name: str,
+    config_marker: str,
+    tensor_marker: str,
+    dtype: str,
+    tensor_dtypes: set[str],
+) -> CompatibilityFinding:
+    """Confirmer une précision par les tenseurs Safetensors avant de se fier à la config seule."""
+    if tensor_marker in tensor_dtypes:
+        return CompatibilityFinding(name, "detected", f"Tenseurs Safetensors déclarés en {name}.")
+    # Lookbehind pour ne pas confondre "float16" avec le suffixe de "bfloat16".
+    if re.search(rf"(?<![a-z]){re.escape(config_marker)}\b", dtype):
+        return CompatibilityFinding(
+            name, "probable", f"Précision {name} déclarée dans la configuration, sans confirmation par les tenseurs."
+        )
+    return CompatibilityFinding(name, "not_detected", f"Aucun indice de précision {name} détecté.")
+
+
+def _int8_finding(quantization_config: Any, paths: list[str], tags: set[str]) -> CompatibilityFinding:
+    """Distinguer une quantification 8 bits Transformers/bitsandbytes des variantes GGUF."""
+    if isinstance(quantization_config, dict):
+        bits = quantization_config.get("bits") or quantization_config.get("num_bits")
+        method = str(quantization_config.get("quant_method") or "").casefold()
+        if (bits == 8 or quantization_config.get("load_in_8bit")) and "gguf" not in method:
+            return CompatibilityFinding("INT8", "detected", "Quantification 8 bits déclarée dans la configuration.")
+    if _contains_marker(paths, tags, "int8") or _contains_marker(paths, tags, "8bit"):
+        return CompatibilityFinding("INT8", "probable", "Marqueur 8 bits présent dans le nom des fichiers ou les tags.")
+    return CompatibilityFinding(
+        "INT8", "not_detected", "Aucune quantification 8 bits (Transformers/bitsandbytes) détectée."
+    )
+
+
+def _gguf_bucket_finding(digit: str, gguf_paths: list[str]) -> CompatibilityFinding:
+    """Repérer une variante GGUF Qn parmi les fichiers, sans deviner sur les autres formats."""
+    name = f"Q{digit}"
+    if not gguf_paths:
+        return CompatibilityFinding(name, "not_detected", "Aucun fichier GGUF dans ce dépôt.")
+    pattern = re.compile(rf"\bq{digit}(?:_[a-z0-9]+)*\b", flags=re.IGNORECASE)
+    matches = sorted({match.group(0).upper() for path in gguf_paths for match in pattern.finditer(path)})
+    if matches:
+        return CompatibilityFinding(name, "detected", "Variante(s) trouvée(s) : " + ", ".join(matches[:6]) + ".")
+    return CompatibilityFinding(name, "not_detected", f"Aucune variante {name}_* parmi les GGUF de ce dépôt.")
 
 
 def recommend_download(details: ModelDetails) -> DownloadRecommendation:
