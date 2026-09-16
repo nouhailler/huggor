@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 from datetime import date, datetime
 from typing import Any
 
@@ -38,4 +39,17 @@ def to_iso8601(value: Any) -> str | None:
     if isinstance(value, (datetime, date)):
         return value.isoformat()
     return str(value)
+
+
+def escape_markdown(value: str) -> str:
+    """Neutraliser les caractères Markdown d'une valeur distante ou saisie par l'utilisateur."""
+    escaped = html.escape(value).replace("\n", " ").replace("\r", " ")
+    for character in "\\`*_{}[]<>()#+-.!|":
+        escaped = escaped.replace(character, f"\\{character}")
+    return escaped
+
+
+def escape_inline_code(value: str) -> str:
+    """Empêcher une valeur distante de fermer son fragment de code Markdown."""
+    return html.escape(value).replace("`", "ˋ").replace("\n", " ").replace("\r", " ")
 

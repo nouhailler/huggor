@@ -424,6 +424,15 @@ def classify_file(
     return role, file_format, selected
 
 
+def config_value(config: dict[str, Any], *keys: str) -> Any:
+    """Lire une clé de configuration à la racine ou dans ses sous-configurations usuelles.
+
+    Point d'entrée public réutilisé par d'autres modules (comme le calculateur de ressources)
+    qui doivent lire des champs d'architecture sans dupliquer la traversée des sous-configs.
+    """
+    return _first_config_value(config, *keys)
+
+
 def _first_config_value(config: dict[str, Any], *keys: str) -> Any:
     """Chercher une clé à la racine puis dans les sous-configurations usuelles."""
     sections = [config]

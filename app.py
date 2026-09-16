@@ -11,6 +11,7 @@ from src.ui.analytics_tab import build_analytics_tab
 from src.ui.compare_tab import build_compare_tab
 from src.ui.details_tab import build_details_tab, create_repo_id_input
 from src.ui.favorites_tab import build_favorites_tab
+from src.ui.hardware_tab import build_hardware_tab
 from src.ui.search_tab import build_search_tab
 from src.ui.test_tab import build_test_tab
 
@@ -150,6 +151,16 @@ APP_CSS = """
 .hf-field-help:focus > .hf-field-tooltip {
     display: block;
 }
+.hf-hardware-card {
+    border-left: 5px solid #10b981;
+}
+.hf-hardware-disclaimer {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    margin: 0.5rem 0 1rem;
+    padding: 0.7rem 1rem;
+}
 .hf-download-advice {
     background: var(--block-background-fill);
     border: 1px solid #a5b4fc;
@@ -228,6 +239,8 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                 pass
             with gr.Tab("📄 Détails", id="details"):
                 details = build_details_tab(hub_client, repo_id=details_repo_id)
+            with gr.Tab("💻 Hardware", id="hardware"):
+                build_hardware_tab(hub_client)
             with gr.Tab("🆚 Comparateur", id="compare"):
                 build_compare_tab(hub_client)
             with gr.Tab("🧪 Test", id="test"):

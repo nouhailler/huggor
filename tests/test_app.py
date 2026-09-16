@@ -21,8 +21,8 @@ class StubClient:
 class AppStructureTests(unittest.TestCase):
     """Vérifier que le squelette contient tous les éléments attendus."""
 
-    def test_create_app_builds_six_named_tabs(self) -> None:
-        """Les six onglets fonctionnels du cahier des charges doivent exister."""
+    def test_create_app_builds_seven_named_tabs(self) -> None:
+        """Les sept onglets fonctionnels du cahier des charges doivent exister."""
         demo = create_app(StubClient(has_token=False))  # type: ignore[arg-type]
         labels = [
             component.get("props", {}).get("label")
@@ -33,7 +33,15 @@ class AppStructureTests(unittest.TestCase):
         self.assertIsInstance(demo, gr.Blocks)
         self.assertEqual(
             labels,
-            ["🔍 Recherche", "📄 Détails", "🆚 Comparateur", "🧪 Test", "📈 Analytics", "⭐ Favoris"],
+            [
+                "🔍 Recherche",
+                "📄 Détails",
+                "💻 Hardware",
+                "🆚 Comparateur",
+                "🧪 Test",
+                "📈 Analytics",
+                "⭐ Favoris",
+            ],
         )
 
     def test_connection_badge_never_contains_a_secret(self) -> None:

@@ -12,6 +12,7 @@ from src.model_analysis import (
     inspect_compatibility,
     recommend_download,
 )
+from src.hardware_advisor import advise_hardware
 from src.ui.details_tab import (
     add_favorite_for_ui,
     build_file_inventory,
@@ -20,6 +21,7 @@ from src.ui.details_tab import (
     format_compatibility_section,
     format_download_recommendation,
     format_file_tree,
+    format_hardware_advice,
     format_identity_section,
     generate_code_snippets,
     load_details_for_ui,
@@ -97,10 +99,12 @@ class DetailsFormattingTests(unittest.TestCase):
         profile = extract_technical_profile(details)
         findings = inspect_compatibility(details)
         recommendation = recommend_download(details)
+        hardware = advise_hardware(profile, findings)
 
         identity = format_identity_section(details)
         architecture = format_architecture_section(profile)
         compatibility = format_compatibility_section(findings)
+        hardware_section = format_hardware_advice(hardware)
         advice = format_download_recommendation(recommendation)
         raw = build_raw_metadata(details)
 
@@ -108,9 +112,12 @@ class DetailsFormattingTests(unittest.TestCase):
         self.assertIn("BertForSequenceClassification", architecture)
         self.assertIn("4 096 tokens", architecture)
         self.assertIn("Transformers", compatibility)
+        self.assertIn("Verdict", hardware_section)
+        self.assertIn("VRAM recommandée", hardware_section)
         self.assertIn("model.safetensors", advice)
         self.assertEqual(raw["config"]["model_type"], "bert")
         self.assertEqual(raw["technical_profile"]["family"], "BERT")
+        self.assertIn("hardware_advice", raw)
 
     def test_file_inventory_marks_runtime_files(self) -> None:
         """L'inventaire doit expliquer les rôles et signaler les fichiers conseillés."""
@@ -160,10 +167,11 @@ class DetailsHandlerTests(unittest.TestCase):
         self.assertIn("apache", response[2])
         self.assertIn("BertForSequenceClassification", response[3])
         self.assertIn("Transformers", response[4])
-        self.assertIn("réellement télécharger", response[5])
-        self.assertEqual(response[7], "# Carte complète")
-        self.assertIn("model.safetensors", response[9])
-        self.assertTrue(response[12].interactive)
+        self.assertIn("Model Advisor", response[5])
+        self.assertIn("réellement télécharger", response[6])
+        self.assertEqual(response[8], "# Carte complète")
+        self.assertIn("model.safetensors", response[10])
+        self.assertTrue(response[13].interactive)
 
     def test_handler_turns_client_error_into_clear_state(self) -> None:
         """Une erreur métier doit vider une éventuelle ancienne fiche."""
@@ -175,7 +183,7 @@ class DetailsHandlerTests(unittest.TestCase):
 
         self.assertEqual(response[0], "")
         self.assertIn("Hub indisponible", response[1])
-        self.assertFalse(response[12].interactive)
+        self.assertFalse(response[13].interactive)
 
     def test_favorite_action_is_idempotent(self) -> None:
         """L'action UI doit distinguer ajout et favori déjà présent."""

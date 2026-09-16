@@ -14,6 +14,7 @@ from src.paths import data_directory
 import gradio as gr
 
 from src.api_client import HuggingFaceClient, HuggingFaceClientError, ModelDetails, ModelFile
+from src.hardware_advisor import HardwareAdvice, MemoryEstimate, advise_hardware
 from src.model_analysis import (
     CompatibilityFinding,
     DownloadRecommendation,
@@ -24,7 +25,12 @@ from src.model_analysis import (
     recommend_download,
 )
 from src.utils.favorites import FavoritesError, FavoritesStore
-from src.utils.formatters import format_bytes, format_count
+from src.utils.formatters import (
+    escape_inline_code as _escape_inline_code,
+    escape_markdown as _escape_markdown,
+    format_bytes,
+    format_count,
+)
 
 
 
@@ -66,6 +72,19 @@ _FIELD_HELP = {
     "probable": "Les caractéristiques du modèle suggèrent une compatibilité, mais elle reste à vérifier avec le logiciel choisi.",
     "conversion": "Les fichiers doivent être transformés dans un autre format avant utilisation. La conversion et la prise en charge du modèle restent à vérifier.",
     "not_detected": "Aucun indice suffisant n’a été trouvé. Le modèle peut néanmoins être compatible : consultez sa documentation.",
+    "RAM estimée": "Mémoire vive approximative nécessaire pour charger les poids du modèle à cette précision, marge d’exécution incluse. C’est un ordre de grandeur, pas une mesure exacte.",
+    "VRAM recommandée": "Mémoire de carte graphique conseillée pour exécuter une version quantifiée du modèle avec un contexte d’usage courant.",
+    "CPU (16 Go RAM)": "Capacité à faire tourner une version quantifiée du modèle sur un ordinateur équipé de 16 Go de mémoire vive, sans carte graphique dédiée.",
+    "GPU 8 Go": "Capacité à charger une version quantifiée du modèle sur une carte graphique disposant de 8 Go de mémoire vidéo.",
+    "GPU 4 Go": "Capacité à charger une version quantifiée du modèle sur une carte graphique d’entrée de gamme disposant de 4 Go de mémoire vidéo.",
+    "CPU seul (sans GPU)": "Capacité à se passer complètement d’une carte graphique dédiée, avec une machine bien pourvue en mémoire vive.",
+}
+
+_HARDWARE_STATUS_LABELS = {
+    "ok": "✅",
+    "warning": "⚠️",
+    "no": "❌",
+    "unknown": "⚪",
 }
 
 
@@ -135,6 +154,7 @@ def build_details_tab(
         architecture = gr.Markdown("", elem_classes=["hf-tech-card", "hf-architecture-card"])
 
     compatibility = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
+    hardware_advice = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
     download_advice = gr.Markdown("", elem_classes="hf-download-advice")
 
     with gr.Tabs():
@@ -201,6 +221,7 @@ def build_details_tab(
         identity,
         architecture,
         compatibility,
+        hardware_advice,
         download_advice,
         raw_metadata,
         model_card,
@@ -263,6 +284,7 @@ def load_details_for_ui(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -291,6 +313,7 @@ def load_details_for_ui(
     profile = extract_technical_profile(details)
     compatibility = inspect_compatibility(details)
     recommendation = recommend_download(details)
+    hardware = advise_hardware(profile, compatibility)
     local_snippet, inference_snippet = generate_code_snippets(details)
     progress(1, desc="Fiche prête")
     return (
@@ -299,8 +322,9 @@ def load_details_for_ui(
         format_identity_section(details),
         format_architecture_section(profile),
         format_compatibility_section(compatibility),
+        format_hardware_advice(hardware),
         format_download_recommendation(recommendation),
-        build_raw_metadata(details, profile, compatibility, recommendation),
+        build_raw_metadata(details, profile, compatibility, recommendation, hardware),
         card,
         build_file_inventory(details, recommendation),
         format_file_tree(details),
@@ -403,6 +427,36 @@ def format_compatibility_section(findings: tuple[CompatibilityFinding, ...]) -> 
     )
 
 
+def format_hardware_advice(advice: HardwareAdvice) -> str:
+    """Traduire l'estimation matérielle en fiche lisible : le « Model Advisor »."""
+    header = "### 🖥️ Model Advisor — Adéquation matérielle\n\n"
+    if advice.parameters is None:
+        return (
+            f"{header}{advice.verdict_emoji} **{_escape_markdown(advice.verdict_headline)}**\n\n"
+            f"{_escape_markdown(advice.verdict_detail)}"
+        )
+
+    rows: list[tuple[str, str]] = [("Paramètres", format_count(advice.parameters))]
+    for estimate in advice.ram_estimates:
+        if estimate.label == "FP32":
+            continue
+        rows.append((f"RAM estimée · {estimate.label}", _format_memory_range(estimate)))
+    if advice.vram_recommended is not None:
+        rows.append(("VRAM recommandée", _format_memory_range(advice.vram_recommended)))
+    for criterion in advice.criteria:
+        rows.append((criterion.name, _HARDWARE_STATUS_LABELS[criterion.status]))
+
+    table = "\n".join(
+        f"| {_field_with_help(label, help_key=_hardware_help_key(label))} | {value} |"
+        for label, value in rows
+    )
+    verdict = (
+        f"#### Verdict\n\n{advice.verdict_emoji} **{_escape_markdown(advice.verdict_headline)}**\n\n"
+        f"{_escape_markdown(advice.verdict_detail)}"
+    )
+    return f"{header}| Critère | Analyse |\n|---|---|\n{table}\n\n{verdict}"
+
+
 def format_download_recommendation(recommendation: DownloadRecommendation) -> str:
     """Répondre clairement à la question du fichier réellement nécessaire."""
     primary = _format_recommended_files(recommendation.primary_files)
@@ -453,11 +507,13 @@ def build_raw_metadata(
     profile: TechnicalProfile | None = None,
     compatibility: tuple[CompatibilityFinding, ...] | None = None,
     recommendation: DownloadRecommendation | None = None,
+    hardware: HardwareAdvice | None = None,
 ) -> dict[str, Any]:
     """Rassembler les informations techniques sans les objets internes du SDK."""
     technical_profile = profile or extract_technical_profile(details)
     compatibility_findings = compatibility or inspect_compatibility(details)
     download_recommendation = recommendation or recommend_download(details)
+    hardware_advice = hardware or advise_hardware(technical_profile, compatibility_findings)
     return {
         "model": details.summary.to_dict(),
         "used_storage": details.used_storage,
@@ -465,6 +521,7 @@ def build_raw_metadata(
         "technical_profile": technical_profile.to_dict(),
         "compatibility": [item.to_dict() for item in compatibility_findings],
         "download_recommendation": download_recommendation.to_dict(),
+        "hardware_advice": hardware_advice.to_dict(),
         "card_data": details.card_data,
         "config": details.config,
     }
@@ -551,6 +608,7 @@ def _empty_details_response(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -564,6 +622,7 @@ def _empty_details_response(
     return (
         "",
         message,
+        "",
         "",
         "",
         "",
@@ -662,6 +721,18 @@ def _inference_client_call(task: str) -> str:
     return calls.get(task, '# Adaptez la méthode à la tâche du modèle.\nprint(client)')
 
 
+def _hardware_help_key(label: str) -> str:
+    """Regrouper les libellés dynamiques de RAM sous une seule entrée d'aide."""
+    return "RAM estimée" if label.startswith("RAM estimée") else label
+
+
+def _format_memory_range(estimate: MemoryEstimate) -> str:
+    """Afficher une estimation mémoire en valeur unique ou en intervalle lisible."""
+    low = format_bytes(estimate.low_bytes)
+    high = format_bytes(estimate.high_bytes)
+    return f"≈ {low}" if low == high else f"≈ {low} – {high}"
+
+
 def _format_gated(value: bool | str) -> str:
     """Afficher clairement le niveau de restriction du dépôt."""
     if value is True:
@@ -694,19 +765,6 @@ def _display_value(value: Any) -> str:
     if isinstance(value, dict):
         return ", ".join(f"{key}: {_display_value(item)}" for key, item in value.items())
     return str(value)
-
-
-def _escape_markdown(value: str) -> str:
-    """Neutraliser les caractères Markdown d'une métadonnée distante."""
-    escaped = html.escape(value).replace("\n", " ").replace("\r", " ")
-    for character in "\\`*_{}[]<>()#+-.!|":
-        escaped = escaped.replace(character, f"\\{character}")
-    return escaped
-
-
-def _escape_inline_code(value: str) -> str:
-    """Empêcher un tag de fermer son fragment de code Markdown."""
-    return html.escape(value).replace("`", "ˋ").replace("\n", " ").replace("\r", " ")
 
 
 def _escape_code_text(value: str) -> str:
