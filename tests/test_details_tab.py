@@ -18,6 +18,7 @@ from src.huggor_score import compute_huggor_score
 from src.quantization_search import QuantizedVariant
 from src.similar_models import SimilarModel
 from src.ui.details_tab import (
+    _format_cache_status,
     add_favorite_for_ui,
     build_file_inventory,
     build_raw_metadata,
@@ -80,15 +81,19 @@ class FakeDetailsClient:
         """Préparer la réponse ou l'erreur du double."""
         self.error = error
 
-    def get_model_info(self, _repo_id: str) -> ModelDetails:
+    def get_model_info(self, _repo_id: str, *, force_refresh: bool = False) -> ModelDetails:
         """Renvoyer les métadonnées synthétiques."""
         if self.error is not None:
             raise self.error
         return make_details()
 
-    def get_model_card(self, _repo_id: str) -> str:
+    def get_model_card(self, _repo_id: str, *, force_refresh: bool = False) -> str:
         """Renvoyer une Model Card synthétique."""
         return "# Carte complète"
+
+    def model_info_age_seconds(self, _repo_id: str) -> float | None:
+        """Simuler une fiche fraîchement mise en cache."""
+        return 5.0
 
 
 class NoopProgress:
@@ -96,6 +101,21 @@ class NoopProgress:
 
     def __call__(self, *_args: object, **_kwargs: object) -> None:
         """Ignorer les mises à jour de progression."""
+
+
+class CacheStatusFormattingTests(unittest.TestCase):
+    """Vérifier que l'âge du cache reste lisible et honnête, jamais un chiffre inventé."""
+
+    def test_unknown_age_reports_a_fresh_fetch(self) -> None:
+        """Sans âge mesurable, le message doit rester cohérent avec un chargement qui vient d'avoir lieu."""
+        self.assertIn("fraîchement récupérée", _format_cache_status(None))
+
+    def test_age_buckets_are_human_readable(self) -> None:
+        """Chaque palier (minutes, heures, jours) doit produire un libellé simple."""
+        self.assertIn("à l'instant", _format_cache_status(10))
+        self.assertIn("12 min", _format_cache_status(12 * 60))
+        self.assertIn("3 h", _format_cache_status(3 * 3600))
+        self.assertIn("2 j", _format_cache_status(2 * 86400))
 
 
 class DetailsFormattingTests(unittest.TestCase):
@@ -217,18 +237,20 @@ class DetailsHandlerTests(unittest.TestCase):
 
         self.assertEqual(response[0], "acme/modele")
         self.assertIn("chargée", response[1])
-        self.assertIn("apache", response[2])
-        self.assertIn("BertForSequenceClassification", response[3])
-        self.assertIn("Huggor Score", response[4])
-        self.assertIn("Transformers", response[5])
-        self.assertIn("Précisions et quantifications", response[6])
-        self.assertIn("Versions quantifiées existantes", response[7])
-        self.assertIn("Modèles similaires", response[8])
-        self.assertIn("Model Advisor", response[9])
-        self.assertIn("réellement télécharger", response[10])
-        self.assertEqual(response[12], "# Carte complète")
-        self.assertIn("model.safetensors", response[14])
-        self.assertTrue(response[17].interactive)
+        self.assertIn("Dernière mise à jour", response[2])
+        self.assertIn("apache", response[3])
+        self.assertIn("BertForSequenceClassification", response[4])
+        self.assertIn("Huggor Score", response[5])
+        self.assertIn("Transformers", response[6])
+        self.assertIn("Précisions et quantifications", response[7])
+        self.assertIn("Versions quantifiées existantes", response[8])
+        self.assertIn("Modèles similaires", response[9])
+        self.assertIn("Model Advisor", response[10])
+        self.assertIn("réellement télécharger", response[11])
+        self.assertEqual(response[13], "# Carte complète")
+        self.assertIn("model.safetensors", response[15])
+        self.assertTrue(response[18].interactive)
+        self.assertTrue(response[19].interactive)
 
     def test_handler_turns_client_error_into_clear_state(self) -> None:
         """Une erreur métier doit vider une éventuelle ancienne fiche."""
@@ -240,7 +262,33 @@ class DetailsHandlerTests(unittest.TestCase):
 
         self.assertEqual(response[0], "")
         self.assertIn("Hub indisponible", response[1])
-        self.assertFalse(response[17].interactive)
+        self.assertFalse(response[18].interactive)
+        self.assertFalse(response[19].interactive)
+
+    def test_refresh_button_forwards_force_refresh_to_the_client(self) -> None:
+        """Le rafraîchissement doit atteindre le client, pas seulement exister dans l'UI."""
+
+        class RecordingClient(FakeDetailsClient):
+            """Double journalisant les valeurs de force_refresh reçues."""
+
+            def __init__(self) -> None:
+                super().__init__()
+                self.info_calls: list[bool] = []
+                self.card_calls: list[bool] = []
+
+            def get_model_info(self, repo_id: str, *, force_refresh: bool = False) -> ModelDetails:
+                self.info_calls.append(force_refresh)
+                return super().get_model_info(repo_id, force_refresh=force_refresh)
+
+            def get_model_card(self, repo_id: str, *, force_refresh: bool = False) -> str:
+                self.card_calls.append(force_refresh)
+                return super().get_model_card(repo_id, force_refresh=force_refresh)
+
+        client = RecordingClient()
+        load_details_for_ui(client, "acme/modele", progress=NoopProgress(), force_refresh=True)  # type: ignore[arg-type]
+
+        self.assertEqual(client.info_calls, [True])
+        self.assertEqual(client.card_calls, [True])
 
     def test_favorite_action_is_idempotent(self) -> None:
         """L'action UI doit distinguer ajout et favori déjà présent."""

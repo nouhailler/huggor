@@ -95,6 +95,45 @@ class JsonCache:
                     removed += 1
         return removed
 
+    def age_seconds(self, namespace: str, key: str) -> float | None:
+        """Âge en secondes de l'entrée si elle existe et n'est pas expirée, sinon ``None``."""
+        path = self._path_for(namespace, key)
+        with self._lock:
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    entry = json.load(handle)
+                if not isinstance(entry, dict) or entry.get("version") != 1:
+                    return None
+                if float(entry["expires_at"]) <= time.time():
+                    return None
+                return max(time.time() - float(entry["created_at"]), 0.0)
+            except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError, ValueError, OSError):
+                return None
+
+    def iter_entries(self, namespace: str | None = None) -> list[tuple[float, int]]:
+        """Lister (date de création, taille en octets) de chaque entrée valide du namespace.
+
+        Pensé pour l'administration du cache (statistiques, purge ciblée), pas pour la lecture
+        normale : une entrée expirée ou corrompue est simplement ignorée, jamais supprimée ici.
+        """
+        prefix = "" if namespace is None else f"{self._safe_namespace(namespace)}-"
+        entries: list[tuple[float, int]] = []
+        with self._lock:
+            for path in self.directory.glob(f"{prefix}*.json"):
+                if not path.is_file():
+                    continue
+                try:
+                    with path.open("r", encoding="utf-8") as handle:
+                        entry = json.load(handle)
+                    if not isinstance(entry, dict) or entry.get("version") != 1:
+                        continue
+                    if float(entry["expires_at"]) <= time.time():
+                        continue
+                    entries.append((float(entry["created_at"]), path.stat().st_size))
+                except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError):
+                    continue
+        return entries
+
     def _path_for(self, namespace: str, key: str) -> Path:
         """Produire un chemin stable sans réutiliser directement l'entrée utilisateur."""
         digest = hashlib.sha256(key.encode("utf-8")).hexdigest()

@@ -299,13 +299,18 @@ class HuggingFaceClient:
         self._cache.set("search", cache_key, [model.to_dict() for model in summaries])
         return summaries
 
-    def get_model_info(self, repo_id: str) -> ModelDetails:
-        """Récupérer les métadonnées et tailles de fichiers d'un dépôt de modèle."""
+    def get_model_info(self, repo_id: str, *, force_refresh: bool = False) -> ModelDetails:
+        """Récupérer les métadonnées et tailles de fichiers d'un dépôt de modèle.
+
+        ``force_refresh`` ignore une entrée de cache existante (le bouton « Actualiser depuis
+        Hugging Face » de la fiche) mais réécrit tout de même le résultat frais dans le cache.
+        """
         safe_repo_id = _validate_repo(repo_id)
-        cache_key = self._cache_key({"repo_id": safe_repo_id, "details_schema": 3})
-        cached = self._cache.get("model", cache_key)
-        if isinstance(cached, dict):
-            return ModelDetails.from_dict(cached)
+        cache_key = self._model_info_cache_key(safe_repo_id)
+        if not force_refresh:
+            cached = self._cache.get("model", cache_key)
+            if isinstance(cached, dict):
+                return ModelDetails.from_dict(cached)
 
         try:
             model = self._api.model_info(safe_repo_id, files_metadata=True)
@@ -350,13 +355,14 @@ class HuggingFaceClient:
             tensor_dtypes=details.tensor_dtypes,
         )
 
-    def get_model_card(self, repo_id: str) -> str:
+    def get_model_card(self, repo_id: str, *, force_refresh: bool = False) -> str:
         """Récupérer la Model Card complète au format Markdown."""
         safe_repo_id = _validate_repo(repo_id)
         cache_key = self._cache_key({"repo_id": safe_repo_id})
-        cached = self._cache.get("card", cache_key)
-        if isinstance(cached, str):
-            return cached
+        if not force_refresh:
+            cached = self._cache.get("card", cache_key)
+            if isinstance(cached, str):
+                return cached
 
         try:
             card = ModelCard.load(safe_repo_id, token=self._token)
@@ -375,6 +381,15 @@ class HuggingFaceClient:
     def clear_cache(self) -> int:
         """Vider uniquement les entrées gérées par l'application."""
         return self._cache.clear()
+
+    def model_info_age_seconds(self, repo_id: str) -> float | None:
+        """Âge de la fiche en cache pour ce dépôt, ou ``None`` si absente ou expirée."""
+        safe_repo_id = _validate_repo(repo_id)
+        return self._cache.age_seconds("model", self._model_info_cache_key(safe_repo_id))
+
+    def _model_info_cache_key(self, safe_repo_id: str) -> str:
+        """Clé de cache des métadonnées, partagée entre lecture, écriture et âge."""
+        return self._cache_key({"repo_id": safe_repo_id, "details_schema": 3})
 
     def _cache_key(self, payload: Mapping[str, Any]) -> str:
         """Créer une clé stable incluant une empreinte non réversible du contexte auth."""

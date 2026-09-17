@@ -212,6 +212,39 @@ class HuggingFaceClientTests(unittest.TestCase):
             self.client.get_model_info("a/b/c")
         self.assertEqual(self.fake_api.info_calls, [])
 
+    def test_force_refresh_bypasses_the_cache_but_repopulates_it(self) -> None:
+        """« Actualiser depuis Hugging Face » doit ignorer le cache, pas le désactiver durablement."""
+        self.client.get_model_info("acme/modele")
+        self.client.get_model_info("acme/modele", force_refresh=True)
+        self.client.get_model_info("acme/modele")
+
+        self.assertEqual(len(self.fake_api.info_calls), 2)  # Le 3e appel réutilise le cache réécrit.
+
+    def test_model_info_age_seconds_is_none_before_any_fetch(self) -> None:
+        """Sans fiche jamais chargée, il ne doit pas y avoir de « dernière mise à jour »."""
+        self.assertIsNone(self.client.model_info_age_seconds("acme/jamais-charge"))
+
+    def test_model_info_age_seconds_reflects_the_cached_fetch(self) -> None:
+        """Après un chargement, l'âge doit être mesurable et très récent."""
+        self.client.get_model_info("acme/modele")
+
+        age = self.client.model_info_age_seconds("acme/modele")
+
+        self.assertIsNotNone(age)
+        self.assertLess(age, 5.0)
+
+    def test_model_card_force_refresh_bypasses_the_cache(self) -> None:
+        """Le rafraîchissement doit aussi s'appliquer à la Model Card, pas seulement aux métadonnées."""
+        with patch("src.api_client.ModelCard.load") as load:
+            load.side_effect = ["# Ancienne", "# Nouvelle"]
+
+            first = self.client.get_model_card("acme/modele")
+            refreshed = self.client.get_model_card("acme/modele", force_refresh=True)
+
+        self.assertEqual(first, "# Ancienne")
+        self.assertEqual(refreshed, "# Nouvelle")
+        self.assertEqual(load.call_count, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

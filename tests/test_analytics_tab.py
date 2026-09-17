@@ -9,13 +9,19 @@ from datetime import date
 
 from src.analytics import ANALYTICS_COLUMNS, RisingModel, TrendTracker
 from src.api_client import HuggingFaceClientError, SearchFilters
+from src.cache_manager import CacheManager
 from src.ui.analytics_tab import (
     TREND_LENSES,
+    _CLEAR_ALL_KEY,
+    clear_cache_for_ui,
+    format_cache_overview,
     format_rising_models,
     format_trend_list,
     load_rising_models_for_ui,
     load_trend_for_ui,
+    refresh_cache_overview_for_ui,
 )
+from src.utils.cache import JsonCache
 from test_details_tab import NoopProgress, make_details
 
 
@@ -151,6 +157,68 @@ class FormattingTests(unittest.TestCase):
         import pandas as pd
 
         self.assertIn("Aucun résultat", format_trend_list(pd.DataFrame(columns=ANALYTICS_COLUMNS)))
+
+
+class CacheManagementPanelTests(unittest.TestCase):
+    """Vérifier l'aperçu et la purge du cache exposés dans l'onglet Analytics."""
+
+    def setUp(self) -> None:
+        """Préparer un répertoire de données isolé pour chaque test."""
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.manager = CacheManager(self.directory.name)
+
+    def test_overview_lists_every_domain_including_untouched_ones(self) -> None:
+        """L'aperçu doit toujours montrer les cinq domaines, même vides."""
+        overview = format_cache_overview(self.manager)
+
+        for label in ("Recherches", "Détails de modèles", "Model cards", "Statistiques", "Benchmarks"):
+            with self.subTest(label=label):
+                self.assertIn(label, overview)
+        self.assertIn("pas encore implémenté", overview)
+
+    def test_clear_specific_domain_only_reports_that_domain(self) -> None:
+        """Vider un domaine précis ne doit affecter ni annoncer les autres domaines."""
+        api_cache = JsonCache(f"{self.directory.name}/cache", default_ttl=900)
+        api_cache.set("search", "a", {})
+        api_cache.set("model", "b", {})
+        manager = CacheManager(self.directory.name)
+
+        message, _overview = clear_cache_for_ui(manager, "recherches")
+
+        self.assertIn("1 entrée", message)
+        self.assertIn("Recherches", message)
+        self.assertEqual(manager.stats("recherches").entry_count, 0)
+        self.assertEqual(manager.stats("details").entry_count, 1)  # Détails n'est pas affecté.
+
+    def test_clear_all_reports_the_total_across_domains(self) -> None:
+        """« Tout vider » doit annoncer le total réel, pas un domaine isolé."""
+        api_cache = JsonCache(f"{self.directory.name}/cache", default_ttl=900)
+        api_cache.set("search", "a", {})
+        api_cache.set("model", "b", {})
+        manager = CacheManager(self.directory.name)
+
+        message, _overview = clear_cache_for_ui(manager, _CLEAR_ALL_KEY)
+
+        self.assertIn("2 entrée", message)
+        for key in manager.domain_keys():
+            self.assertEqual(manager.stats(key).entry_count, 0)
+
+    def test_unknown_domain_is_reported_without_crashing(self) -> None:
+        """Une clé de domaine invalide ne doit jamais lever d'exception jusqu'à l'UI."""
+        message, overview = clear_cache_for_ui(self.manager, "does-not-exist")
+
+        self.assertIn("⚠️", message)
+        self.assertIsInstance(overview, str)
+
+    def test_refresh_overview_reflects_new_cache_entries(self) -> None:
+        """Actualiser l'affichage doit refléter des entrées ajoutées après la construction du manager."""
+        before = refresh_cache_overview_for_ui(self.manager)
+        JsonCache(f"{self.directory.name}/cache", default_ttl=900).set("search", "a", {})
+
+        after = refresh_cache_overview_for_ui(self.manager)
+
+        self.assertNotEqual(before, after)
 
 
 if __name__ == "__main__":

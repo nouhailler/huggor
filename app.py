@@ -98,6 +98,11 @@ APP_CSS = """
 .hf-favorite-status {
     min-height: 1.5rem;
 }
+.hf-cache-status {
+    align-self: center;
+    color: #64748b;
+    font-size: 0.88rem;
+}
 .hf-tech-card {
     background: var(--block-background-fill);
     border: 1px solid var(--border-color-primary);

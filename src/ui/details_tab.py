@@ -166,6 +166,16 @@ def build_details_tab(
             min_width=180,
         )
 
+    with gr.Row():
+        cache_status = gr.Markdown("", elem_classes="hf-cache-status")
+        refresh_button = gr.Button(
+            "🔄 Actualiser depuis Hugging Face",
+            interactive=False,
+            scale=0,
+            min_width=220,
+            size="sm",
+        )
+
     status = gr.Markdown(
         "Saisissez un identifiant de modèle pour afficher sa fiche.",
         elem_classes="hf-details-status",
@@ -244,6 +254,7 @@ def build_details_tab(
     load_outputs = [
         loaded_repo_id,
         status,
+        cache_status,
         identity,
         architecture,
         huggor_score,
@@ -260,6 +271,7 @@ def build_details_tab(
         local_code,
         inference_code,
         favorite_button,
+        refresh_button,
         favorite_status,
     ]
     load_button.click(
@@ -274,6 +286,15 @@ def build_details_tab(
     )
     repo_id.submit(
         fn=partial(load_details_for_ui, client),
+        inputs=repo_id,
+        outputs=load_outputs,
+        api_visibility="private",
+        show_progress="minimal",
+        concurrency_limit=2,
+        concurrency_id="hub-details",
+    )
+    refresh_button.click(
+        fn=partial(load_details_for_ui, client, force_refresh=True),
         inputs=repo_id,
         outputs=load_outputs,
         api_visibility="private",
@@ -307,7 +328,10 @@ def load_details_for_ui(
     client: HuggingFaceClient,
     repo_id: str,
     progress: gr.Progress = gr.Progress(),
+    *,
+    force_refresh: bool = False,
 ) -> tuple[
+    str,
     str,
     str,
     str,
@@ -326,14 +350,19 @@ def load_details_for_ui(
     str,
     str,
     gr.Button,
+    gr.Button,
     str,
 ]:
-    """Charger et formater toutes les parties visibles de la fiche modèle."""
+    """Charger et formater toutes les parties visibles de la fiche modèle.
+
+    ``force_refresh`` ignore le cache local pour ce chargement précis (bouton « Actualiser
+    depuis Hugging Face ») sans le désactiver pour les chargements suivants.
+    """
     progress(0.1, desc="Validation du modèle…")
     try:
-        details = client.get_model_info(repo_id or "")
+        details = client.get_model_info(repo_id or "", force_refresh=force_refresh)
         progress(0.55, desc="Chargement de la Model Card…")
-        card = client.get_model_card(details.summary.repo_id)
+        card = client.get_model_card(details.summary.repo_id, force_refresh=force_refresh)
     except ValueError as error:
         return _empty_details_response(f"⚠️ **Identifiant invalide :** {html.escape(str(error))}")
     except HuggingFaceClientError as error:
@@ -355,10 +384,12 @@ def load_details_for_ui(
         details, profile, compatibility, hardware, card, has_known_quantized_variants=bool(variants)
     )
     local_snippet, inference_snippet = generate_code_snippets(details)
+    cache_age = client.model_info_age_seconds(details.summary.repo_id)
     progress(1, desc="Fiche prête")
     return (
         details.summary.repo_id,
         f"✅ Fiche de **{_escape_markdown(details.summary.repo_id)}** chargée.",
+        _format_cache_status(cache_age),
         format_identity_section(details),
         format_architecture_section(profile),
         format_huggor_score(score),
@@ -374,6 +405,7 @@ def load_details_for_ui(
         format_file_tree(details),
         local_snippet,
         inference_snippet,
+        gr.Button(interactive=True),
         gr.Button(interactive=True),
         "",
     )
@@ -812,12 +844,14 @@ def _empty_details_response(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
     str,
     str,
     str,
+    gr.Button,
     gr.Button,
     str,
 ]:
@@ -834,12 +868,14 @@ def _empty_details_response(
         "",
         "",
         "",
+        "",
         {},
         "_Model Card indisponible._",
         [],
         "_Fichiers indisponibles._",
         "",
         "",
+        gr.Button(interactive=False),
         gr.Button(interactive=False),
         "",
     )
@@ -938,6 +974,21 @@ def _format_memory_range(estimate: MemoryEstimate) -> str:
     low = format_bytes(estimate.low_bytes)
     high = format_bytes(estimate.high_bytes)
     return f"≈ {low}" if low == high else f"≈ {low} – {high}"
+
+
+def _format_cache_status(age_seconds: float | None) -> str:
+    """Traduire l'âge de la fiche en cache en un repère de fraîcheur lisible."""
+    if age_seconds is None:
+        return "⏱ Fiche fraîchement récupérée depuis Hugging Face."
+    if age_seconds < 60:
+        label = "à l'instant"
+    elif age_seconds < 3600:
+        label = f"{int(age_seconds // 60)} min"
+    elif age_seconds < 86400:
+        label = f"{int(age_seconds // 3600)} h"
+    else:
+        label = f"{int(age_seconds // 86400)} j"
+    return f"⏱ Dernière mise à jour : {label}"
 
 
 def _format_gated(value: bool | str) -> str:

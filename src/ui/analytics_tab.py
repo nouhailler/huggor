@@ -23,8 +23,11 @@ from src.analytics import (
     analytics_table,
 )
 from src.api_client import HuggingFaceClient, HuggingFaceClientError, SearchFilters
+from src.cache_manager import CacheManager
 from src.ui.search_tab import LANGUAGE_CHOICES, LICENSE_CHOICES, PIPELINE_CHOICES
-from src.utils.formatters import escape_markdown, format_count
+from src.utils.formatters import escape_markdown, format_bytes, format_count
+
+_CLEAR_ALL_KEY = "__all__"
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,6 +75,7 @@ def build_analytics_tab(client: HuggingFaceClient) -> None:
     """Construire l'observatoire de tendances et les filtres/graphiques détaillés."""
     history = AnalyticsHistory(data_directory() / "analytics", scope=client.cache_scope)
     tracker = TrendTracker(data_directory() / "analytics", scope=client.cache_scope)
+    cache_manager = CacheManager(data_directory())
 
     gr.Markdown(
         "## 🔭 Observatoire du Hub\n\n"
@@ -142,6 +146,35 @@ def build_analytics_tab(client: HuggingFaceClient) -> None:
             fn=partial(analytics_for_ui, client, history, tracker), inputs=[query, task, language, license_name],
             outputs=[status, table, downloads, tasks, licenses, evolution], api_name="model_analytics",
             show_progress="minimal", concurrency_limit=1, concurrency_id="hub-analytics",
+        )
+
+    with gr.Accordion("🗄️ Gestion du cache", open=False):
+        gr.Markdown(
+            "Le cache local évite de recontacter le Hub à chaque affichage. Chaque domaine peut être "
+            "vidé indépendamment, et une actualisation ne concerne que ce que vous rechargez ensuite."
+        )
+        cache_overview = gr.Markdown(format_cache_overview(cache_manager))
+        with gr.Row():
+            cache_domain_choice = gr.Dropdown(
+                choices=_cache_domain_choices(cache_manager), value=_CLEAR_ALL_KEY,
+                label="Domaine à vider", scale=2,
+            )
+            clear_cache_button = gr.Button("🗑 Vider le cache", variant="stop", scale=1)
+            refresh_overview_button = gr.Button("🔄 Actualiser l'affichage", scale=1)
+        cache_status = gr.Markdown("", elem_classes="hf-search-status")
+
+        clear_cache_button.click(
+            fn=partial(clear_cache_for_ui, cache_manager),
+            inputs=cache_domain_choice,
+            outputs=[cache_status, cache_overview],
+            api_visibility="private",
+            show_progress="hidden",
+        )
+        refresh_overview_button.click(
+            fn=partial(refresh_cache_overview_for_ui, cache_manager),
+            outputs=cache_overview,
+            api_visibility="private",
+            show_progress="hidden",
         )
 
 
@@ -233,6 +266,64 @@ def format_rising_models(models: list[RisingModel]) -> str:
             f"({ratio_label}, +{format_count(item.growth)}) entre le {item.first_date} et le {item.last_date}"
         )
     return "\n".join(lines)
+
+
+def _cache_domain_choices(manager: CacheManager) -> list[tuple[str, str]]:
+    """Lister les domaines de cache pour le menu de purge, avec un choix « tout vider »."""
+    choices = [("🗑 Tout vider", _CLEAR_ALL_KEY)]
+    choices.extend((manager.stats(key).label, key) for key in manager.domain_keys())
+    return choices
+
+
+def format_cache_overview(manager: CacheManager) -> str:
+    """Présenter chaque domaine de cache avec ses statistiques, sans en cacher aucun."""
+    rows = "\n".join(
+        f"| {stats.label} | {stats.entry_count} | {format_bytes(stats.total_bytes)} | "
+        f"{_format_age(stats.newest_age_seconds)} | {_format_age(stats.oldest_age_seconds)} |"
+        + (f" _{escape_markdown(stats.note)}_" if stats.note else "")
+        for stats in manager.all_stats()
+    )
+    last_updated = _format_age(manager.last_updated_age_seconds())
+    return (
+        "### 🗄️ Cache local\n\n"
+        f"⏱ Dernière mise à jour : {last_updated}\n\n"
+        "| Domaine | Entrées | Taille | Plus récente | Plus ancienne |\n"
+        "|---|---|---|---|---|\n"
+        f"{rows}"
+    )
+
+
+def clear_cache_for_ui(manager: CacheManager, domain_choice: str) -> tuple[str, str]:
+    """Vider un domaine (ou tout) et rafraîchir immédiatement l'aperçu affiché."""
+    try:
+        if domain_choice == _CLEAR_ALL_KEY:
+            removed = manager.clear_all()
+            message = f"🗑 **{removed} entrée(s)** supprimée(s) dans tous les domaines."
+        else:
+            removed = manager.clear(domain_choice)
+            label = manager.stats(domain_choice).label
+            message = f"🗑 **{removed} entrée(s)** supprimée(s) pour « {label} »."
+    except KeyError:
+        return "⚠️ Domaine de cache inconnu.", format_cache_overview(manager)
+    return message, format_cache_overview(manager)
+
+
+def refresh_cache_overview_for_ui(manager: CacheManager) -> str:
+    """Recalculer l'aperçu du cache sans contacter le Hub : une simple lecture locale."""
+    return format_cache_overview(manager)
+
+
+def _format_age(age_seconds: float | None) -> str:
+    """Traduire un âge en secondes en repère lisible, jamais un chiffre inventé si absent."""
+    if age_seconds is None:
+        return "—"
+    if age_seconds < 60:
+        return "à l'instant"
+    if age_seconds < 3600:
+        return f"{int(age_seconds // 60)} min"
+    if age_seconds < 86400:
+        return f"{int(age_seconds // 3600)} h"
+    return f"{int(age_seconds // 86400)} j"
 
 
 def analytics_for_ui(
