@@ -226,7 +226,10 @@ def build_search_tab(
     with gr.Row():
         query = gr.Textbox(
             label="Mot-clé",
+            value="Gemma",
             placeholder="Ex. llama, bert, transcription…",
+            lines=1,
+            max_lines=1,
             scale=3,
         )
         domain = gr.Dropdown(
