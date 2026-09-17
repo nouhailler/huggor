@@ -47,6 +47,72 @@ class FavoritesStoreTests(unittest.TestCase):
 
             self.assertEqual(path.read_text(encoding="utf-8"), "{invalide")
 
+    def test_update_changes_only_the_provided_fields(self) -> None:
+        """Un champ omis lors d'une mise à jour doit conserver sa valeur précédente."""
+        with tempfile.TemporaryDirectory() as directory:
+            store = FavoritesStore(Path(directory) / "favorites.json")
+            store.add("acme/modele", note="Première note")
+
+            store.update("acme/modele", collection="Coding", tags=["python", "chat"], score=4)
+            updated = store.update("acme/modele", status="recommandé")
+
+            self.assertEqual(updated.note, "Première note")
+            self.assertEqual(updated.collection, "Coding")
+            self.assertEqual(updated.tags, ("python", "chat"))
+            self.assertEqual(updated.score, 4)
+            self.assertEqual(updated.status, "recommandé")
+
+    def test_update_unknown_repo_id_is_rejected(self) -> None:
+        """On ne peut pas modifier un favori qui n'existe pas."""
+        with tempfile.TemporaryDirectory() as directory:
+            store = FavoritesStore(Path(directory) / "favorites.json")
+
+            with self.assertRaises(ValueError):
+                store.update("acme/absent", note="test")
+
+    def test_score_out_of_range_is_rejected(self) -> None:
+        """La note personnelle doit rester entre 1 et 5."""
+        with tempfile.TemporaryDirectory() as directory:
+            store = FavoritesStore(Path(directory) / "favorites.json")
+            store.add("acme/modele")
+
+            with self.assertRaises(ValueError):
+                store.update("acme/modele", score=6)
+
+    def test_clear_score_removes_the_previous_rating(self) -> None:
+        """clear_score doit permettre de revenir à « non noté », contrairement à score=None."""
+        with tempfile.TemporaryDirectory() as directory:
+            store = FavoritesStore(Path(directory) / "favorites.json")
+            store.add("acme/modele")
+            store.update("acme/modele", score=3)
+
+            cleared = store.update("acme/modele", clear_score=True)
+
+            self.assertIsNone(cleared.score)
+
+    def test_remove_reports_whether_the_favorite_existed(self) -> None:
+        """Retirer un favori absent ne doit pas être confondu avec un retrait réel."""
+        with tempfile.TemporaryDirectory() as directory:
+            store = FavoritesStore(Path(directory) / "favorites.json")
+            store.add("acme/modele")
+
+            self.assertTrue(store.remove("acme/modele"))
+            self.assertFalse(store.remove("acme/modele"))
+            self.assertEqual(store.list_favorites(), [])
+
+    def test_list_collections_is_sorted_and_deduplicated(self) -> None:
+        """Les collections affichées ne doivent contenir ni doublon ni entrée vide."""
+        with tempfile.TemporaryDirectory() as directory:
+            store = FavoritesStore(Path(directory) / "favorites.json")
+            store.add("acme/a")
+            store.add("acme/b")
+            store.add("acme/c")
+            store.update("acme/a", collection="Coding")
+            store.update("acme/b", collection="Coding")
+            store.update("acme/c", collection="Vision")
+
+            self.assertEqual(store.list_collections(), ["Coding", "Vision"])
+
 
 if __name__ == "__main__":
     unittest.main()

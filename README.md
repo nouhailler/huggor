@@ -17,7 +17,7 @@ Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, 
 - Recommandation explicite des poids, shards ou adapters à télécharger
 - Model Card complète, inventaire annoté et arborescence des fichiers avec leurs tailles
 - Génération de snippets pour une utilisation locale et avec `InferenceClient`
-- Ajout local d'un modèle aux favoris
+- [Onglet ⭐ Favoris](src/ui/favorites_tab.py) : collections personnalisées, tags, statut, note personnelle (1 à 5), date du dernier test et commentaire libre pour chaque modèle enregistré, avec filtrage par collection et retrait direct
 - Fiche technique : tableau des précisions et quantifications détectées (FP32/FP16/BF16/INT8, paliers GGUF Q8 à Q2, GPTQ, AWQ, EXL2, MLX)
 - Fiche technique : recherche automatique des versions déjà quantifiées d'un modèle sur le Hub (GGUF, GPTQ, AWQ, EXL2, MLX), triées par popularité
 - Fiche technique : verdict d'adéquation matérielle (« Model Advisor ») estimant la RAM/VRAM nécessaire selon la précision

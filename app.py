@@ -251,7 +251,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             with gr.Tab("📈 Analytics", id="analytics"):
                 build_analytics_tab(hub_client)
             with gr.Tab("⭐ Favoris", id="favorites"):
-                build_favorites_tab()
+                build_favorites_tab(hub_client, details, tabs)
 
         with search_tab:
             build_search_tab(hub_client, details, tabs)
