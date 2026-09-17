@@ -6,7 +6,14 @@ import unittest
 
 import gradio as gr
 
-from app import connection_badge, create_app, create_theme
+from app import (
+    NAV_CATEGORIES,
+    connection_badge,
+    create_app,
+    create_theme,
+    select_tab_from_menu,
+    toggle_nav_menu,
+)
 
 
 class StubClient:
@@ -53,6 +60,36 @@ class AppStructureTests(unittest.TestCase):
     def test_theme_is_soft(self) -> None:
         """L'application doit utiliser le thème Soft imposé."""
         self.assertIsInstance(create_theme(), gr.themes.Soft)
+
+
+class HamburgerMenuTests(unittest.TestCase):
+    """Vérifier que le menu hamburger couvre bien les huit onglets, par catégorie."""
+
+    def test_every_tab_is_reachable_from_exactly_one_category(self) -> None:
+        """Aucun onglet ne doit manquer ou apparaître deux fois dans le menu."""
+        expected_ids = {"search", "usage", "details", "hardware", "compare", "test", "analytics", "favorites"}
+        menu_ids = [tab_id for _category, items in NAV_CATEGORIES for tab_id, _label in items]
+
+        self.assertEqual(set(menu_ids), expected_ids)
+        self.assertEqual(len(menu_ids), len(set(menu_ids)))
+
+    def test_toggle_opens_then_closes(self) -> None:
+        """Le bouton hamburger doit inverser l'état à chaque clic."""
+        opened_state, opened_column = toggle_nav_menu(False)
+        closed_state, closed_column = toggle_nav_menu(True)
+
+        self.assertTrue(opened_state)
+        self.assertTrue(opened_column.visible)
+        self.assertFalse(closed_state)
+        self.assertFalse(closed_column.visible)
+
+    def test_selecting_a_tab_closes_the_menu_and_selects_it(self) -> None:
+        """Choisir un onglet dans le menu doit naviguer puis refermer le panneau."""
+        selected_tabs, is_open, column = select_tab_from_menu("hardware")
+
+        self.assertEqual(selected_tabs.selected, "hardware")
+        self.assertFalse(is_open)
+        self.assertFalse(column.visible)
 
 
 if __name__ == "__main__":

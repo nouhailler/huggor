@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from functools import partial
 
 import gradio as gr
 
@@ -193,10 +194,47 @@ APP_CSS = """
     max-height: 680px;
     overflow: auto;
 }
+.hf-header-right {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.6rem;
+}
+.hf-hamburger {
+    display: none !important;
+    font-size: 1.25rem !important;
+    min-width: 2.6rem !important;
+}
+.hf-nav-menu {
+    background: var(--block-background-fill);
+    border: 1px solid var(--border-color-primary);
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    padding: 0.9rem 1rem 0.4rem;
+}
+.hf-nav-category {
+    color: #475569;
+    margin-top: 0.6rem;
+}
+.hf-nav-category:first-child {
+    margin-top: 0;
+}
+.hf-nav-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
 @media (max-width: 640px) {
     .hf-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+}
+@media (max-width: 768px) {
+    .hf-hamburger {
+        display: inline-flex !important;
+    }
+    .hf-main-tabs [role="tablist"] {
+        display: none;
     }
 }
 """
@@ -210,6 +248,44 @@ def create_theme() -> gr.themes.Soft:
         neutral_hue=gr.themes.colors.slate,
         radius_size=gr.themes.sizes.radius_lg,
     )
+
+
+NAV_CATEGORIES: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
+    (
+        "🔍 Explorer",
+        (
+            ("search", "🔍 Recherche"),
+            ("usage", "🎯 Mon usage"),
+        ),
+    ),
+    (
+        "🔬 Analyser un modèle",
+        (
+            ("details", "📄 Détails"),
+            ("hardware", "💻 Hardware"),
+            ("compare", "🆚 Comparateur"),
+            ("test", "🧪 Test"),
+        ),
+    ),
+    (
+        "📊 Suivre et organiser",
+        (
+            ("analytics", "📈 Analytics"),
+            ("favorites", "⭐ Favoris"),
+        ),
+    ),
+)
+
+
+def toggle_nav_menu(is_open: bool) -> tuple[bool, gr.Column]:
+    """Ouvrir ou fermer le menu hamburger selon son état actuel."""
+    new_state = not is_open
+    return new_state, gr.Column(visible=new_state)
+
+
+def select_tab_from_menu(tab_id: str) -> tuple[gr.Tabs, bool, gr.Column]:
+    """Naviguer vers l'onglet choisi dans le menu hamburger, puis le refermer."""
+    return gr.Tabs(selected=tab_id), False, gr.Column(visible=False)
 
 
 def connection_badge(has_token: bool) -> str:
@@ -243,10 +319,25 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                 </div>
                 """
             )
-            gr.HTML(connection_badge(hub_client.has_token))
+            with gr.Row(elem_classes="hf-header-right"):
+                gr.HTML(connection_badge(hub_client.has_token))
+                menu_toggle = gr.Button(
+                    "☰", elem_classes="hf-hamburger", size="sm", min_width=1
+                )
+
+        menu_open = gr.State(False)
+        nav_buttons: dict[str, gr.Button] = {}
+        with gr.Column(visible=False, elem_classes="hf-nav-menu") as nav_menu:
+            for category_label, items in NAV_CATEGORIES:
+                gr.Markdown(f"**{category_label}**", elem_classes="hf-nav-category")
+                with gr.Row(elem_classes="hf-nav-row"):
+                    for tab_id, tab_label in items:
+                        nav_buttons[tab_id] = gr.Button(
+                            tab_label, elem_classes="hf-nav-item", size="sm"
+                        )
 
         details_repo_id = create_repo_id_input(render=False)
-        with gr.Tabs() as tabs:
+        with gr.Tabs(elem_classes="hf-main-tabs") as tabs:
             with gr.Tab("🔍 Recherche", id="search") as search_tab:
                 pass
             with gr.Tab("🎯 Mon usage", id="usage") as usage_tab:
@@ -268,6 +359,12 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             build_search_tab(hub_client, details, tabs)
         with usage_tab:
             build_usage_tab(hub_client, details, tabs)
+
+        menu_toggle.click(toggle_nav_menu, inputs=menu_open, outputs=[menu_open, nav_menu])
+        for tab_id, nav_button in nav_buttons.items():
+            nav_button.click(
+                partial(select_tab_from_menu, tab_id), outputs=[tabs, menu_open, nav_menu]
+            )
 
         gr.Markdown(
             "Données fournies par le [Hugging Face Hub](https://huggingface.co/models).",
