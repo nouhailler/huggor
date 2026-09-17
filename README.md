@@ -23,6 +23,7 @@ Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, 
 - Fiche technique : verdict d'adéquation matérielle (« Model Advisor ») estimant la RAM/VRAM nécessaire selon la précision
 - Fiche technique : modèles similaires rapprochés par famille, tâche, taille, langue déclarée, licence et disponibilité quantifiée, en excluant les simples quantifications du modèle affiché
 - [Onglet 💻 Hardware](src/ui/hardware_tab.py) : calculateur de ressources indiquant, selon votre RAM/VRAM déclarée, quelles précisions (FP32 à Q4_K_M) tiennent réellement, avec une estimation de vitesse et de contexte clairement présentée comme théorique
+- [Onglet 🎯 Mon usage](src/ui/usage_tab.py) : recherche par objectif (Chatbot, Coding, RAG, Embeddings, Traduction, Vision, Speech, Génération d'images) plutôt que par jargon Hugging Face, croisée avec votre RAM/VRAM pour ne remonter que des modèles jouables sur votre machine, verdict de précision et de vitesse à l'appui
 - Comparaison décisionnelle de 2 à 4 modèles : tableau critère par critère (paramètres, popularité, contexte, licence, couverture FR déclarée, adéquation locale, GGUF) et recommandation motivée du meilleur compromis pour un usage local, en plus du tableau technique complet et du radar des quantités relatives
 - Analytics filtrées : top 50 téléchargements, répartition des tâches et licences
 - Évolution des compteurs du top 5 actuel à partir d’observations locales quotidiennes

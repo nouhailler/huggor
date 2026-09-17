@@ -21,8 +21,8 @@ class StubClient:
 class AppStructureTests(unittest.TestCase):
     """Vérifier que le squelette contient tous les éléments attendus."""
 
-    def test_create_app_builds_seven_named_tabs(self) -> None:
-        """Les sept onglets fonctionnels du cahier des charges doivent exister."""
+    def test_create_app_builds_eight_named_tabs(self) -> None:
+        """Les huit onglets fonctionnels du cahier des charges doivent exister."""
         demo = create_app(StubClient(has_token=False))  # type: ignore[arg-type]
         labels = [
             component.get("props", {}).get("label")
@@ -35,6 +35,7 @@ class AppStructureTests(unittest.TestCase):
             labels,
             [
                 "🔍 Recherche",
+                "🎯 Mon usage",
                 "📄 Détails",
                 "💻 Hardware",
                 "🆚 Comparateur",

@@ -13,6 +13,7 @@ from src.ui.details_tab import build_details_tab, create_repo_id_input
 from src.ui.favorites_tab import build_favorites_tab
 from src.ui.hardware_tab import build_hardware_tab
 from src.ui.search_tab import build_search_tab
+from src.ui.usage_tab import build_usage_tab
 from src.ui.test_tab import build_test_tab
 
 APP_CSS = """
@@ -237,6 +238,8 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
         with gr.Tabs() as tabs:
             with gr.Tab("🔍 Recherche", id="search") as search_tab:
                 pass
+            with gr.Tab("🎯 Mon usage", id="usage") as usage_tab:
+                pass
             with gr.Tab("📄 Détails", id="details"):
                 details = build_details_tab(hub_client, repo_id=details_repo_id)
             with gr.Tab("💻 Hardware", id="hardware"):
@@ -252,6 +255,8 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
 
         with search_tab:
             build_search_tab(hub_client, details, tabs)
+        with usage_tab:
+            build_usage_tab(hub_client, details, tabs)
 
         gr.Markdown(
             "Données fournies par le [Hugging Face Hub](https://huggingface.co/models).",
