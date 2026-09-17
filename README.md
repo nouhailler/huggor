@@ -128,6 +128,8 @@ Le résultat est écrit dans `dist/`. `HF_EXPLORER_DATA_DIR` permet de choisir u
 
 Aucune modification du code n'est nécessaire : l'application lit déjà `GRADIO_SERVER_NAME`/`GRADIO_SERVER_PORT` (fournis automatiquement par l'environnement d'un Space) et résout le token Hugging Face via les mécanismes standards de `huggingface_hub` (variable d'environnement ou `hf auth login`). Le bloc YAML en tête de ce fichier (`sdk: gradio`, `app_file: app.py`) est la seule configuration requise par Spaces.
 
+**Attention au matériel choisi à la création** : à ce jour, héberger un Space Gradio (non statique) sur le matériel gratuit **CPU Basic** nécessite un abonnement PRO — malgré ce qu'affiche `hf spaces hardware`. Seul **ZeroGPU** reste accessible sans abonnement pour ce type de Space, mais il exige au moins une fonction décorée `@spaces.GPU` pour démarrer, ce que Huggor n'a pas et n'a pas besoin d'avoir (aucun calcul GPU). Sans abonnement PRO, Spaces n'est donc pas une option gratuite viable pour cette application : voir la section [Déploiement sur Render](#déploiement-sur-render) ci-dessous pour une alternative gratuite sans cette contrainte. Le reste de cette section reste valable pour qui dispose déjà d'un compte PRO ou accepte ZeroGPU.
+
 1. Créez un Space sur <https://huggingface.co/new-space> avec le SDK **Gradio**, en visibilité publique ou privée selon vos besoins.
 2. Ajoutez son dépôt Git comme remote et poussez la branche `main` :
    ```bash
@@ -140,3 +142,18 @@ Aucune modification du code n'est nécessaire : l'application lit déjà `GRADIO
 Le stockage est éphémère par défaut : `data/cache/`, `data/analytics/` et `data/favorites.json` sont réinitialisés à chaque redémarrage du conteneur (mise en veille après inactivité, ou nouveau déploiement), sauf si un stockage persistant est activé dans les paramètres payants du Space. Le mode hors connexion et le cache restent pleinement fonctionnels dans l'intervalle, mais ne survivent pas à un redémarrage sans ce stockage persistant.
 
 Gradio active automatiquement le mode PWA (installable, avec un shell mis en cache pour un chargement instantané même hors ligne) dès que l'application tourne sur un Space — aucun paramètre `pwa=` n'est nécessaire dans `app.py`.
+
+## Déploiement sur Render
+
+Alternative gratuite à Hugging Face Spaces, sans la restriction PRO ci-dessus : Render héberge un vrai processus Python persistant (pas seulement du statique), avec un tier gratuit qui se met simplement en veille après inactivité — comme un Space — plutôt que de refuser l'hébergement.
+
+Le fichier [`render.yaml`](render.yaml) à la racine décrit le service (Blueprint Render) : aucune modification du code n'a été nécessaire. La seule subtilité est que Render fournit le port à écouter via la variable `$PORT` (pas via `GRADIO_SERVER_PORT`), donc la commande de démarrage fait le pont :
+```yaml
+startCommand: GRADIO_SERVER_NAME=0.0.0.0 GRADIO_SERVER_PORT=$PORT python app.py
+```
+
+1. Sur <https://dashboard.render.com>, **New → Blueprint**, connectez le dépôt GitHub `nouhailler/huggor`. Render détecte `render.yaml` automatiquement.
+2. Dans les paramètres du service créé, renseignez le secret `HF_TOKEN` si des ressources privées ou protégées doivent être accessibles (déclaré dans `render.yaml` avec `sync: false` pour ne jamais l'exposer dans le dépôt).
+3. Render installe `requirements.txt`, lance la commande de démarrage, et expose l'interface sur une URL `https://<nom-du-service>.onrender.com` publique par défaut.
+
+Mêmes réserves que pour Spaces : stockage éphémère (`data/cache/`, `data/analytics/`, `data/favorites.json` réinitialisés à chaque redémarrage ou mise en veille, sauf disque persistant payant), et une mise en veille après 15 minutes d'inactivité sur le tier gratuit qui ajoute un délai de démarrage (30 à 50 secondes) au prochain visiteur. Le mode PWA de Gradio n'est en revanche pas activé automatiquement ici (ce comportement est spécifique à la détection d'un Space Hugging Face) ; il peut être activé explicitement avec `pwa=True` dans l'appel à `launch()` si souhaité.
