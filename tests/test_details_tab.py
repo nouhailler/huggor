@@ -15,6 +15,7 @@ from src.model_analysis import (
 )
 from src.hardware_advisor import advise_hardware
 from src.quantization_search import QuantizedVariant
+from src.similar_models import SimilarModel
 from src.ui.details_tab import (
     add_favorite_for_ui,
     build_file_inventory,
@@ -27,6 +28,7 @@ from src.ui.details_tab import (
     format_identity_section,
     format_precision_section,
     format_quantized_variants,
+    format_similar_models,
     generate_code_snippets,
     load_details_for_ui,
 )
@@ -145,6 +147,24 @@ class DetailsFormattingTests(unittest.TestCase):
         self.assertIn("acme/modele-GGUF", present)
         self.assertIn("GGUF", present)
 
+    def test_similar_models_are_presented_or_explicitly_absent(self) -> None:
+        """L'onglet doit toujours répondre, même sans résultat, plutôt que rester vide."""
+        empty = format_similar_models(())
+        self.assertIn("Aucun modèle similaire trouvé", empty)
+
+        similar = SimilarModel(
+            summary=ModelSummary(
+                repo_id="mistralai/Mistral-7B-Instruct-v0.3", author="mistralai", likes=100, downloads=50_000,
+                pipeline_tag="text-generation", library_name="transformers", tags=(), created_at=None,
+                last_modified=None, parameters=7_200_000_000, private=False, gated=False,
+            ),
+            score=4.0,
+            reasons=("Même tâche", "Taille proche (7.2 Md paramètres)"),
+        )
+        present = format_similar_models((similar,))
+        self.assertIn("Mistral-7B-Instruct-v0.3", present)
+        self.assertIn("Taille proche", present)
+
     def test_file_inventory_marks_runtime_files(self) -> None:
         """L'inventaire doit expliquer les rôles et signaler les fichiers conseillés."""
         details = make_details()
@@ -195,11 +215,12 @@ class DetailsHandlerTests(unittest.TestCase):
         self.assertIn("Transformers", response[4])
         self.assertIn("Précisions et quantifications", response[5])
         self.assertIn("Versions quantifiées existantes", response[6])
-        self.assertIn("Model Advisor", response[7])
-        self.assertIn("réellement télécharger", response[8])
-        self.assertEqual(response[10], "# Carte complète")
-        self.assertIn("model.safetensors", response[12])
-        self.assertTrue(response[15].interactive)
+        self.assertIn("Modèles similaires", response[7])
+        self.assertIn("Model Advisor", response[8])
+        self.assertIn("réellement télécharger", response[9])
+        self.assertEqual(response[11], "# Carte complète")
+        self.assertIn("model.safetensors", response[13])
+        self.assertTrue(response[16].interactive)
 
     def test_handler_turns_client_error_into_clear_state(self) -> None:
         """Une erreur métier doit vider une éventuelle ancienne fiche."""
@@ -211,7 +232,7 @@ class DetailsHandlerTests(unittest.TestCase):
 
         self.assertEqual(response[0], "")
         self.assertIn("Hub indisponible", response[1])
-        self.assertFalse(response[15].interactive)
+        self.assertFalse(response[16].interactive)
 
     def test_favorite_action_is_idempotent(self) -> None:
         """L'action UI doit distinguer ajout et favori déjà présent."""

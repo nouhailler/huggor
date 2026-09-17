@@ -26,6 +26,7 @@ from src.model_analysis import (
     recommend_download,
 )
 from src.quantization_search import QuantizedVariant, extract_base_name, find_quantized_variants
+from src.similar_models import SimilarModel, find_similar_models
 from src.utils.favorites import FavoritesError, FavoritesStore
 from src.utils.formatters import (
     escape_inline_code as _escape_inline_code,
@@ -169,6 +170,7 @@ def build_details_tab(
     compatibility = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
     precision_formats = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
     quantized_variants = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
+    similar_models = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
     hardware_advice = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
     download_advice = gr.Markdown("", elem_classes="hf-download-advice")
 
@@ -238,6 +240,7 @@ def build_details_tab(
         compatibility,
         precision_formats,
         quantized_variants,
+        similar_models,
         hardware_advice,
         download_advice,
         raw_metadata,
@@ -304,6 +307,7 @@ def load_details_for_ui(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -335,6 +339,7 @@ def load_details_for_ui(
     recommendation = recommend_download(details)
     hardware = advise_hardware(profile, compatibility)
     variants = _search_quantized_variants(client, details.summary.repo_id)
+    similar = _search_similar_models(client, details, profile)
     local_snippet, inference_snippet = generate_code_snippets(details)
     progress(1, desc="Fiche prête")
     return (
@@ -345,6 +350,7 @@ def load_details_for_ui(
         format_compatibility_section(compatibility),
         format_precision_section(precision_findings),
         format_quantized_variants(variants, details.summary.repo_id),
+        format_similar_models(similar),
         format_hardware_advice(hardware),
         format_download_recommendation(recommendation),
         build_raw_metadata(details, profile, compatibility, recommendation, hardware, precision_findings),
@@ -365,6 +371,23 @@ def _search_quantized_variants(client: HuggingFaceClient, repo_id: str) -> tuple
             SearchFilters(query=extract_base_name(repo_id), sort="downloads", limit=50)
         )
         return find_quantized_variants(candidates, repo_id)
+    except Exception:
+        return ()
+
+
+def _search_similar_models(
+    client: HuggingFaceClient,
+    details: ModelDetails,
+    profile: TechnicalProfile,
+) -> tuple[SimilarModel, ...]:
+    """Chercher des modèles similaires sans jamais faire échouer le chargement de la fiche."""
+    if not details.summary.pipeline_tag:
+        return ()
+    try:
+        candidates = client.search_models(
+            SearchFilters(pipeline_tag=details.summary.pipeline_tag, sort="downloads", limit=100)
+        )
+        return find_similar_models(details.summary, profile, details.card_data, candidates)
     except Exception:
         return ()
 
@@ -520,6 +543,29 @@ def format_quantized_variants(variants: tuple[QuantizedVariant, ...], source_rep
         f"{rows}\n\n"
         "_Détection par recherche de texte sur le nom du modèle : vérifiez toujours qu’il s’agit bien du même "
         "modèle avant de l’utiliser, un nom proche ne suffit pas à le garantir._"
+    )
+
+
+def format_similar_models(results: tuple[SimilarModel, ...]) -> str:
+    """Répondre à « quels autres modèles pourraient m’intéresser ? »."""
+    header = "### 🧭 Modèles similaires\n\n"
+    if not results:
+        return (
+            f"{header}_Aucun modèle similaire trouvé automatiquement pour cette tâche. "
+            "Essayez une recherche manuelle depuis l’onglet Recherche._"
+        )
+    rows = "\n".join(
+        f"- [{_escape_markdown(item.summary.repo_id)}]"
+        f"(https://huggingface.co/{quote(item.summary.repo_id, safe='/')}) — "
+        f"{_escape_markdown(', '.join(item.reasons))}"
+        for item in results
+    )
+    return (
+        f"{header}Rapprochés par famille, tâche, taille, langue déclarée, licence et disponibilité "
+        f"quantifiée :\n\n"
+        f"{rows}\n\n"
+        "_Rapprochement heuristique à partir des métadonnées publiques du Hub, pas un classement de "
+        "qualité : vérifiez toujours la Model Card avant de choisir._"
     )
 
 
@@ -712,6 +758,7 @@ def _empty_details_response(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -725,6 +772,7 @@ def _empty_details_response(
     return (
         "",
         message,
+        "",
         "",
         "",
         "",
