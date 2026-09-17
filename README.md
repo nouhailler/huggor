@@ -1,3 +1,14 @@
+---
+title: HF Explorer
+emoji: 🤗
+colorFrom: indigo
+colorTo: blue
+sdk: gradio
+sdk_version: 6.26.0
+app_file: app.py
+pinned: false
+---
+
 # HF Explorer
 
 HF Explorer est une application Python destinée à rechercher, examiner, comparer et tester les modèles du Hugging Face Hub depuis une interface Gradio.
@@ -112,3 +123,20 @@ python3 scripts/build_deb.py --version 0.1.0
 ```
 
 Le résultat est écrit dans `dist/`. `HF_EXPLORER_DATA_DIR` permet de choisir un autre emplacement pour les données.
+
+## Déploiement sur Hugging Face Spaces
+
+Aucune modification du code n'est nécessaire : l'application lit déjà `GRADIO_SERVER_NAME`/`GRADIO_SERVER_PORT` (fournis automatiquement par l'environnement d'un Space) et résout le token Hugging Face via les mécanismes standards de `huggingface_hub` (variable d'environnement ou `hf auth login`). Le bloc YAML en tête de ce fichier (`sdk: gradio`, `app_file: app.py`) est la seule configuration requise par Spaces.
+
+1. Créez un Space sur <https://huggingface.co/new-space> avec le SDK **Gradio**, en visibilité publique ou privée selon vos besoins.
+2. Ajoutez son dépôt Git comme remote et poussez la branche `main` :
+   ```bash
+   git remote add space https://huggingface.co/spaces/<votre-compte>/<nom-du-space>
+   git push space main
+   ```
+3. Si des ressources privées ou protégées doivent être accessibles, renseignez `HF_TOKEN` dans **Settings → Repository secrets** du Space (jamais dans le code ni dans ce dépôt).
+4. Le Space installe `requirements.txt`, lance `python app.py`, et expose l'interface sur son URL publique — partageable telle quelle, sans compte Hugging Face requis pour la consulter si le Space est public.
+
+Le stockage est éphémère par défaut : `data/cache/`, `data/analytics/` et `data/favorites.json` sont réinitialisés à chaque redémarrage du conteneur (mise en veille après inactivité, ou nouveau déploiement), sauf si un stockage persistant est activé dans les paramètres payants du Space. Le mode hors connexion et le cache restent pleinement fonctionnels dans l'intervalle, mais ne survivent pas à un redémarrage sans ce stockage persistant.
+
+Gradio active automatiquement le mode PWA (installable, avec un shell mis en cache pour un chargement instantané même hors ligne) dès que l'application tourne sur un Space — aucun paramètre `pwa=` n'est nécessaire dans `app.py`.
