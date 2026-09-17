@@ -10,10 +10,12 @@ from urllib.parse import quote
 import gradio as gr
 
 from src.api_client import HuggingFaceClient, ModelSummary, SearchFilters
+from src.paths import data_directory
 from src.resource_calculator import HardwareProfile, calculate_resources
-from src.ui.details_tab import DetailsTabComponents, load_details_for_ui
+from src.ui.details_tab import DetailsTabComponents, add_favorite_for_ui, load_details_for_ui
 from src.ui.search_tab import select_model_for_details
 from src.use_case_search import USE_CASES
+from src.utils.favorites import FavoritesStore
 from src.utils.formatters import escape_markdown, format_count
 
 _RESULTS_PER_SEARCH = 25
@@ -24,8 +26,11 @@ def build_usage_tab(
     client: HuggingFaceClient,
     details: DetailsTabComponents,
     app_tabs: gr.Tabs,
+    favorites: FavoritesStore | None = None,
 ) -> None:
     """Construire le formulaire objectif + machine et la liste de modèles compatibles."""
+    favorites_store = favorites or FavoritesStore(data_directory() / "favorites.json")
+
     gr.Markdown(
         "## 🎯 Recherche pour mon usage\n"
         "Dites ce que vous voulez faire et indiquez votre machine : Huggor cherche des modèles "
@@ -90,14 +95,26 @@ def build_usage_tab(
                             container=False,
                             elem_classes="hf-result-content",
                         )
-                        details_button = gr.Button(
-                            "Voir détails →",
-                            variant="secondary",
-                            size="sm",
-                            min_width=135,
-                            scale=0,
-                            key=f"usage-details-{key_suffix}",
-                        )
+                        with gr.Column(scale=0, min_width=135):
+                            details_button = gr.Button(
+                                "Voir détails →",
+                                variant="secondary",
+                                size="sm",
+                                min_width=135,
+                                key=f"usage-details-{key_suffix}",
+                            )
+                            pin_button = gr.Button(
+                                "⭐ Pin",
+                                variant="secondary",
+                                size="sm",
+                                min_width=135,
+                                key=f"usage-pin-{key_suffix}",
+                            )
+                            pin_status = gr.Markdown(
+                                "",
+                                elem_classes="hf-favorite-status",
+                                key=f"usage-pin-status-{key_suffix}",
+                            )
                     details_button.click(
                         fn=partial(select_model_for_details, repo_id),
                         outputs=[details.repo_id, app_tabs],
@@ -112,6 +129,13 @@ def build_usage_tab(
                         api_visibility="private",
                         concurrency_limit=2,
                         concurrency_id="hub-details",
+                    )
+                    pin_button.click(
+                        fn=partial(add_favorite_for_ui, favorites_store, repo_id),
+                        outputs=pin_status,
+                        queue=False,
+                        show_progress="hidden",
+                        api_visibility="private",
                     )
 
 
