@@ -14,6 +14,7 @@ from src.model_analysis import (
     recommend_download,
 )
 from src.hardware_advisor import advise_hardware
+from src.huggor_score import compute_huggor_score
 from src.quantization_search import QuantizedVariant
 from src.similar_models import SimilarModel
 from src.ui.details_tab import (
@@ -25,6 +26,7 @@ from src.ui.details_tab import (
     format_download_recommendation,
     format_file_tree,
     format_hardware_advice,
+    format_huggor_score,
     format_identity_section,
     format_precision_section,
     format_quantized_variants,
@@ -107,12 +109,14 @@ class DetailsFormattingTests(unittest.TestCase):
         recommendation = recommend_download(details)
         hardware = advise_hardware(profile, findings)
         precision_findings = detect_precision_formats(details, profile, findings)
+        score = compute_huggor_score(details, profile, findings, hardware, "# Carte complète")
 
         identity = format_identity_section(details)
         architecture = format_architecture_section(profile)
         compatibility = format_compatibility_section(findings)
         precision_section = format_precision_section(precision_findings)
         hardware_section = format_hardware_advice(hardware)
+        score_section = format_huggor_score(score)
         advice = format_download_recommendation(recommendation)
         raw = build_raw_metadata(details)
 
@@ -124,11 +128,14 @@ class DetailsFormattingTests(unittest.TestCase):
         self.assertIn("GGUF", precision_section)
         self.assertIn("Verdict", hardware_section)
         self.assertIn("VRAM recommandée", hardware_section)
+        self.assertIn(f"{score.total} / {score.max_total}", score_section)
+        self.assertIn("Popularité", score_section)
         self.assertIn("model.safetensors", advice)
         self.assertEqual(raw["config"]["model_type"], "bert")
         self.assertEqual(raw["technical_profile"]["family"], "BERT")
         self.assertIn("hardware_advice", raw)
         self.assertIn("precision_formats", raw)
+        self.assertIn("huggor_score", raw)
 
     def test_quantized_variants_are_presented_or_explicitly_absent(self) -> None:
         """La question « existe-t-il une version quantifiée ? » doit toujours avoir une réponse."""
@@ -212,15 +219,16 @@ class DetailsHandlerTests(unittest.TestCase):
         self.assertIn("chargée", response[1])
         self.assertIn("apache", response[2])
         self.assertIn("BertForSequenceClassification", response[3])
-        self.assertIn("Transformers", response[4])
-        self.assertIn("Précisions et quantifications", response[5])
-        self.assertIn("Versions quantifiées existantes", response[6])
-        self.assertIn("Modèles similaires", response[7])
-        self.assertIn("Model Advisor", response[8])
-        self.assertIn("réellement télécharger", response[9])
-        self.assertEqual(response[11], "# Carte complète")
-        self.assertIn("model.safetensors", response[13])
-        self.assertTrue(response[16].interactive)
+        self.assertIn("Huggor Score", response[4])
+        self.assertIn("Transformers", response[5])
+        self.assertIn("Précisions et quantifications", response[6])
+        self.assertIn("Versions quantifiées existantes", response[7])
+        self.assertIn("Modèles similaires", response[8])
+        self.assertIn("Model Advisor", response[9])
+        self.assertIn("réellement télécharger", response[10])
+        self.assertEqual(response[12], "# Carte complète")
+        self.assertIn("model.safetensors", response[14])
+        self.assertTrue(response[17].interactive)
 
     def test_handler_turns_client_error_into_clear_state(self) -> None:
         """Une erreur métier doit vider une éventuelle ancienne fiche."""
@@ -232,7 +240,7 @@ class DetailsHandlerTests(unittest.TestCase):
 
         self.assertEqual(response[0], "")
         self.assertIn("Hub indisponible", response[1])
-        self.assertFalse(response[16].interactive)
+        self.assertFalse(response[17].interactive)
 
     def test_favorite_action_is_idempotent(self) -> None:
         """L'action UI doit distinguer ajout et favori déjà présent."""

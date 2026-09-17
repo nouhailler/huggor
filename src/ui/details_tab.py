@@ -15,6 +15,7 @@ import gradio as gr
 
 from src.api_client import HuggingFaceClient, HuggingFaceClientError, ModelDetails, ModelFile, SearchFilters
 from src.hardware_advisor import HardwareAdvice, MemoryEstimate, advise_hardware
+from src.huggor_score import HuggorScore, compute_huggor_score
 from src.model_analysis import (
     CompatibilityFinding,
     DownloadRecommendation,
@@ -92,6 +93,13 @@ _FIELD_HELP = {
     "Q3": "Variante de quantification GGUF autour de 3 bits par paramètre, très compressée.",
     "Q2": "Variante de quantification GGUF autour de 2 bits par paramètre, la plus compressée : la qualité peut être fortement affectée.",
     "EXL2": "Format de quantification utilisé par ExLlamaV2, pensé pour l’inférence rapide sur carte graphique.",
+    "Popularité": "Nombre de téléchargements et de likes sur le Hub : un indice d’usage réel, pas une mesure de qualité.",
+    "Fraîcheur": "Ancienneté de la dernière mise à jour du dépôt. Un dépôt inactif depuis longtemps peut être moins bien maintenu, sans que ce soit systématique.",
+    "Documentation": "Longueur de la Model Card et présence d’exemples de code. Une mesure de quantité, pas de qualité rédactionnelle.",
+    "Quantification disponible": "Disponibilité d’une version compressée (GGUF, GPTQ, AWQ, EXL2, MLX), dans ce dépôt ou trouvée ailleurs sur le Hub.",
+    "Compatibilité locale": "Palier de RAM confortable repris du Model Advisor, pour exécuter le modèle sur votre propre machine.",
+    "Taille": "Indique seulement si le nombre de paramètres est connu, pas s’il s’agit d’une taille jugée adaptée.",
+    "Maturité": "Ancienneté du dépôt combinée à son niveau d’adoption. Un dépôt très récent reste à valider dans la durée, quel que soit son potentiel.",
 }
 
 _HARDWARE_STATUS_LABELS = {
@@ -167,6 +175,7 @@ def build_details_tab(
         identity = gr.Markdown("", elem_classes=["hf-tech-card", "hf-identity-card"])
         architecture = gr.Markdown("", elem_classes=["hf-tech-card", "hf-architecture-card"])
 
+    huggor_score = gr.Markdown("", elem_classes=["hf-tech-card", "hf-huggor-score-card"])
     compatibility = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
     precision_formats = gr.Markdown("", elem_classes=["hf-tech-card", "hf-compatibility-card"])
     quantized_variants = gr.Markdown("", elem_classes=["hf-tech-card", "hf-hardware-card"])
@@ -237,6 +246,7 @@ def build_details_tab(
         status,
         identity,
         architecture,
+        huggor_score,
         compatibility,
         precision_formats,
         quantized_variants,
@@ -308,6 +318,7 @@ def load_details_for_ui(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -340,6 +351,9 @@ def load_details_for_ui(
     hardware = advise_hardware(profile, compatibility)
     variants = _search_quantized_variants(client, details.summary.repo_id)
     similar = _search_similar_models(client, details, profile)
+    score = compute_huggor_score(
+        details, profile, compatibility, hardware, card, has_known_quantized_variants=bool(variants)
+    )
     local_snippet, inference_snippet = generate_code_snippets(details)
     progress(1, desc="Fiche prête")
     return (
@@ -347,13 +361,14 @@ def load_details_for_ui(
         f"✅ Fiche de **{_escape_markdown(details.summary.repo_id)}** chargée.",
         format_identity_section(details),
         format_architecture_section(profile),
+        format_huggor_score(score),
         format_compatibility_section(compatibility),
         format_precision_section(precision_findings),
         format_quantized_variants(variants, details.summary.repo_id),
         format_similar_models(similar),
         format_hardware_advice(hardware),
         format_download_recommendation(recommendation),
-        build_raw_metadata(details, profile, compatibility, recommendation, hardware, precision_findings),
+        build_raw_metadata(details, profile, compatibility, recommendation, hardware, precision_findings, score),
         card,
         build_file_inventory(details, recommendation),
         format_file_tree(details),
@@ -459,6 +474,38 @@ def format_architecture_section(profile: TechnicalProfile) -> str:
         f"| {_field_with_help(label)} | {_escape_markdown(_display_value(value))} |" for label, value in rows
     )
     return "### 🧠 Architecture\n\n| Champ | Valeur |\n|---|---|\n" + table
+
+
+def format_huggor_score(score: HuggorScore) -> str:
+    """Afficher le Huggor Score avec toutes ses composantes : jamais un total sans le détail."""
+    emoji, tier_label = _huggor_score_tier(score.total)
+    rows = "\n".join(
+        f"| {_field_with_help(component.name)} | {component.points} / {component.max_points} | "
+        f"{_escape_markdown(component.reason)} |"
+        for component in score.components
+    )
+    return (
+        "### 🏆 Huggor Score\n\n"
+        f"## {emoji} {score.total} / {score.max_total} — {tier_label}\n\n"
+        "| Composante | Points | Détail |\n"
+        "|---|---|---|\n"
+        f"{rows}\n\n"
+        "_Score indicatif composé de neuf signaux publics détectés automatiquement (popularité, fraîcheur, "
+        "documentation, licence, Safetensors, quantification, compatibilité locale, taille, maturité). Il ne "
+        "mesure pas la qualité réelle des réponses du modèle et ne remplace pas votre propre évaluation : "
+        "consultez toujours la Model Card._"
+    )
+
+
+def _huggor_score_tier(total: int) -> tuple[str, str]:
+    """Traduire le total en repère visuel neutre, sans porter de jugement de qualité absolu."""
+    if total >= 80:
+        return "🟢", "Signaux très favorables"
+    if total >= 60:
+        return "🟡", "Signaux favorables"
+    if total >= 40:
+        return "🟠", "Signaux mitigés"
+    return "🔴", "Peu de signaux favorables détectés"
 
 
 _FINDING_STATUS_LABELS = {
@@ -651,6 +698,7 @@ def build_raw_metadata(
     recommendation: DownloadRecommendation | None = None,
     hardware: HardwareAdvice | None = None,
     precision_formats: tuple[CompatibilityFinding, ...] | None = None,
+    huggor_score: HuggorScore | None = None,
 ) -> dict[str, Any]:
     """Rassembler les informations techniques sans les objets internes du SDK."""
     technical_profile = profile or extract_technical_profile(details)
@@ -660,6 +708,9 @@ def build_raw_metadata(
     precision_findings = precision_formats or detect_precision_formats(
         details, technical_profile, compatibility_findings
     )
+    # Sans Model Card ni recherche de variantes déjà en main, ce recalcul par défaut reste prudent :
+    # il ne prétend pas connaître la documentation ou les quantifications trouvées ailleurs sur le Hub.
+    score = huggor_score or compute_huggor_score(details, technical_profile, compatibility_findings, hardware_advice, "")
     return {
         "model": details.summary.to_dict(),
         "used_storage": details.used_storage,
@@ -669,6 +720,7 @@ def build_raw_metadata(
         "precision_formats": [item.to_dict() for item in precision_findings],
         "download_recommendation": download_recommendation.to_dict(),
         "hardware_advice": hardware_advice.to_dict(),
+        "huggor_score": score.to_dict(),
         "card_data": details.card_data,
         "config": details.config,
     }
@@ -759,6 +811,7 @@ def _empty_details_response(
     str,
     str,
     str,
+    str,
     dict[str, Any],
     str,
     list[list[str]],
@@ -772,6 +825,7 @@ def _empty_details_response(
     return (
         "",
         message,
+        "",
         "",
         "",
         "",

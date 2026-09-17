@@ -155,6 +155,12 @@ APP_CSS = """
 .hf-hardware-card {
     border-left: 5px solid #10b981;
 }
+.hf-huggor-score-card {
+    border-left: 5px solid #f59e0b;
+}
+.hf-huggor-score-card h2 {
+    margin-top: 0.25rem;
+}
 .hf-hardware-disclaimer {
     background: #fffbeb;
     border: 1px solid #fde68a;
