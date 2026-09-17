@@ -8,7 +8,7 @@ Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, 
 
 ### Fonctionnalités disponibles
 
-- Recherche par mot-clé, type de tâche, langue et licence
+- Recherche par mot-clé, domaine et tâche précise (navigation pédagogique 🧠 LLM, 👁️ Vision, 🖼️ Image, 🎙️ Audio, 🗣️ Speech, 🔤 Embeddings, 🌐 Multimodal, 🧩 Reranking, chacune détaillée en tâches réellement couvertes par le Hub), langue et licence
 - Filtrage par plage de paramètres et limite de 5 à 100 résultats
 - Tri par téléchargements, likes, date de création ou pertinence
 - Cartes synthétiques avec lien direct vers le Hub

@@ -6,6 +6,9 @@ import unittest
 
 from src.api_client import HuggingFaceClientError, ModelSummary, SearchFilters
 from src.ui.search_tab import (
+    TASK_DOMAINS,
+    _domain_task_choices,
+    _parse_task_value,
     format_model_card,
     search_for_ui,
     select_model_for_details,
@@ -98,6 +101,48 @@ class SearchHandlerTests(unittest.TestCase):
         self.assertEqual(payload, [])
         self.assertIn("Service indisponible", status)
 
+    def test_composite_task_value_adds_the_keyword_to_the_query(self) -> None:
+        """Une tâche pédagogique (ex. Code) doit filtrer par pipeline_tag ET mot-clé combinés."""
+        client = RecordingClient()
+
+        search_for_ui(
+            client,  # type: ignore[arg-type]
+            "python",
+            "text-generation::code",
+            "",
+            "",
+            0,
+            0,
+            "downloads",
+            20,
+            progress=NoopProgress(),  # type: ignore[arg-type]
+        )
+
+        assert client.filters is not None
+        self.assertEqual(client.filters.pipeline_tag, "text-generation")
+        self.assertEqual(client.filters.query, "python code")
+
+    def test_plain_task_value_has_no_implicit_keyword(self) -> None:
+        """Une tâche directement reliée à un pipeline_tag ne doit rien ajouter à la requête."""
+        client = RecordingClient()
+
+        search_for_ui(
+            client,  # type: ignore[arg-type]
+            "",
+            "translation",
+            "",
+            "",
+            0,
+            0,
+            "downloads",
+            20,
+            progress=NoopProgress(),  # type: ignore[arg-type]
+        )
+
+        assert client.filters is not None
+        self.assertEqual(client.filters.pipeline_tag, "translation")
+        self.assertEqual(client.filters.query, "")
+
     def test_invalid_limit_is_reported_without_calling_client(self) -> None:
         """Une limite hors bornes doit être présentée comme une erreur de filtre."""
         client = RecordingClient()
@@ -118,6 +163,37 @@ class SearchHandlerTests(unittest.TestCase):
         self.assertEqual(payload, [])
         self.assertIn("Filtres invalides", status)
         self.assertIsNone(client.filters)
+
+
+class TaskTaxonomyTests(unittest.TestCase):
+    """Vérifier la navigation par domaine et la valeur composite tâche/mot-clé."""
+
+    def test_parse_task_value_splits_pipeline_and_keyword(self) -> None:
+        """Une valeur composite doit se décomposer en pipeline_tag réel et mot-clé."""
+        self.assertEqual(_parse_task_value("text-generation::chat"), ("text-generation", "chat"))
+        self.assertEqual(_parse_task_value("translation"), ("translation", ""))
+        self.assertEqual(_parse_task_value(""), (None, ""))
+
+    def test_every_domain_task_maps_to_a_non_empty_pipeline_tag(self) -> None:
+        """Chaque tâche pédagogique doit être reliée à une tâche Hub réelle, jamais vide."""
+        for domain in TASK_DOMAINS:
+            for task in domain.tasks:
+                with self.subTest(domain=domain.key, task=task.label):
+                    self.assertTrue(task.pipeline_tag)
+
+    def test_domain_choices_are_scoped_to_that_domain(self) -> None:
+        """Choisir un domaine ne doit proposer que ses propres tâches, pas celles d'un autre."""
+        llm_choices = dict(_domain_task_choices("llm"))
+
+        self.assertIn("Chat", llm_choices)
+        self.assertNotIn("Détection d'objets", llm_choices)
+
+    def test_all_domains_choice_prefixes_tasks_with_their_domain_emoji(self) -> None:
+        """Sans domaine choisi, chaque tâche doit rester identifiable par son domaine d'origine."""
+        all_choices = dict(_domain_task_choices(""))
+
+        self.assertIn("🧠 Chat", all_choices)
+        self.assertIn("👁️ Détection d'objets", all_choices)
 
 
 class SearchRenderingTests(unittest.TestCase):
