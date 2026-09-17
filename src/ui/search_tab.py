@@ -437,10 +437,10 @@ def search_for_ui(
     progress(1, desc="Résultats prêts")
     payload = [model.to_dict() for model in models]
     if not payload:
-        return [], "Aucun modèle ne correspond à ces critères."
+        return [], f"{client.offline_notice}Aucun modèle ne correspond à ces critères."
 
     suffix = "modèle trouvé" if len(payload) == 1 else "modèles trouvés"
-    return payload, f"**{len(payload)} {suffix}.**"
+    return payload, f"{client.offline_notice}**{len(payload)} {suffix}.**"
 
 
 def format_model_card(model: dict[str, Any]) -> str:

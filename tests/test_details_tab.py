@@ -80,6 +80,7 @@ class FakeDetailsClient:
     def __init__(self, error: Exception | None = None) -> None:
         """Préparer la réponse ou l'erreur du double."""
         self.error = error
+        self.offline_notice = ""
 
     def get_model_info(self, _repo_id: str, *, force_refresh: bool = False) -> ModelDetails:
         """Renvoyer les métadonnées synthétiques."""
@@ -251,6 +252,19 @@ class DetailsHandlerTests(unittest.TestCase):
         self.assertIn("model.safetensors", response[15])
         self.assertTrue(response[18].interactive)
         self.assertTrue(response[19].interactive)
+
+    def test_offline_notice_is_prefixed_to_the_status_when_the_client_is_offline(self) -> None:
+        """Une fiche servie depuis le secours hors connexion doit rester visible pour l'utilisateur."""
+        client = FakeDetailsClient()
+        client.offline_notice = "🟠 **Mode hors connexion** — "
+
+        response = load_details_for_ui(
+            client,  # type: ignore[arg-type]
+            "acme/modele",
+            progress=NoopProgress(),  # type: ignore[arg-type]
+        )
+
+        self.assertTrue(response[1].startswith("🟠 **Mode hors connexion** — "))
 
     def test_handler_turns_client_error_into_clear_state(self) -> None:
         """Une erreur métier doit vider une éventuelle ancienne fiche."""

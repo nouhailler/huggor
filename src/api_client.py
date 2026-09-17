@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -266,6 +267,7 @@ class HuggingFaceClient:
         self._token = token
         self._api = api or HfApi(token=token, library_name="hf-explorer")
         self._cache = cache or JsonCache(data_directory() / "cache", default_ttl=cache_ttl)
+        self._offline_since: float | None = None
 
     @property
     def has_token(self) -> bool:
@@ -281,10 +283,41 @@ class HuggingFaceClient:
         """Exposer une empreinte non réversible pour isoler les observations locales."""
         return self._authentication_scope()
 
+    @property
+    def is_offline(self) -> bool:
+        """Indiquer si la dernière tentative réseau a échoué pour une raison de connectivité.
+
+        Une réponse du Hub (même un refus : 404, 403, 429…) prouve au contraire qu'il est
+        joignable et remet l'état en ligne dès l'appel suivant qui réussit.
+        """
+        return self._offline_since is not None
+
+    @property
+    def offline_notice(self) -> str:
+        """Préfixe à afficher dans l'UI quand le mode hors connexion est actif, sinon vide."""
+        return "🟠 **Mode hors connexion** — " if self.is_offline else ""
+
+    def _mark_online(self) -> None:
+        """Réinitialiser l'état hors connexion après un appel réseau réussi."""
+        self._offline_since = None
+
+    def _mark_offline(self) -> None:
+        """Mémoriser le moment de la première panne de connectivité constatée."""
+        if self._offline_since is None:
+            self._offline_since = time.time()
+
+    @staticmethod
+    def _is_connectivity_error(error: Exception) -> bool:
+        """Distinguer une panne réseau d'une réponse légitime (même négative) du Hub."""
+        return not isinstance(error, (HuggingFaceClientError, GatedRepoError, RepositoryNotFoundError, HfHubHTTPError))
+
     def search_models(self, filters: SearchFilters | None = None) -> list[ModelSummary]:
         """Rechercher au plus 100 modèles, avec une limite de 20 par défaut."""
         safe_filters = filters or SearchFilters()
         cache_key = self._cache_key(asdict(safe_filters))
+        # Capturé avant l'appel à get() ci-dessous, qui supprime lui-même les entrées expirées :
+        # sans cette copie, une panne survenant après l'expiration du TTL perdrait le secours.
+        fallback = self._cache.get_allow_stale("search", cache_key)
         cached = self._cache.get("search", cache_key)
         if isinstance(cached, list):
             return [ModelSummary.from_dict(item) for item in cached]
@@ -293,7 +326,13 @@ class HuggingFaceClient:
             # La présence obligatoire de limit empêche toute itération globale du Hub.
             models = list(self._api.list_models(**safe_filters.to_api_kwargs()))
             summaries = [ModelSummary.from_hub(model) for model in models]
+            self._mark_online()
         except Exception as error:
+            if self._is_connectivity_error(error):
+                self._mark_offline()
+                if fallback is not None:
+                    value, _age = fallback
+                    return [ModelSummary.from_dict(item) for item in value]
             raise self._translate_error(error) from error
 
         self._cache.set("search", cache_key, [model.to_dict() for model in summaries])
@@ -307,6 +346,9 @@ class HuggingFaceClient:
         """
         safe_repo_id = _validate_repo(repo_id)
         cache_key = self._model_info_cache_key(safe_repo_id)
+        # Capturé avant l'appel à get() ci-dessous, qui supprime lui-même les entrées expirées :
+        # sans cette copie, une panne survenant après l'expiration du TTL perdrait le secours.
+        fallback = self._cache.get_allow_stale("model", cache_key)
         if not force_refresh:
             cached = self._cache.get("model", cache_key)
             if isinstance(cached, dict):
@@ -316,7 +358,13 @@ class HuggingFaceClient:
             model = self._api.model_info(safe_repo_id, files_metadata=True)
             details = ModelDetails.from_hub(model)
             details = self._with_full_config(details)
+            self._mark_online()
         except Exception as error:
+            if self._is_connectivity_error(error):
+                self._mark_offline()
+                if fallback is not None:
+                    value, _age = fallback
+                    return ModelDetails.from_dict(value)
             raise self._translate_error(error, repo_id=safe_repo_id) from error
 
         # Les métadonnées privées restent séparées par empreinte d'authentification.
@@ -359,6 +407,9 @@ class HuggingFaceClient:
         """Récupérer la Model Card complète au format Markdown."""
         safe_repo_id = _validate_repo(repo_id)
         cache_key = self._cache_key({"repo_id": safe_repo_id})
+        # Capturé avant l'appel à get() ci-dessous, qui supprime lui-même les entrées expirées :
+        # sans cette copie, une panne survenant après l'expiration du TTL perdrait le secours.
+        fallback = self._cache.get_allow_stale("card", cache_key)
         if not force_refresh:
             cached = self._cache.get("card", cache_key)
             if isinstance(cached, str):
@@ -367,12 +418,19 @@ class HuggingFaceClient:
         try:
             card = ModelCard.load(safe_repo_id, token=self._token)
             markdown = str(card)
+            self._mark_online()
         except EntryNotFoundError:
             markdown = (
                 f"# {safe_repo_id}\n\n"
                 "_Ce dépôt ne fournit pas encore de Model Card (fichier README.md)._"
             )
+            self._mark_online()
         except Exception as error:
+            if self._is_connectivity_error(error):
+                self._mark_offline()
+                if fallback is not None:
+                    value, _age = fallback
+                    return str(value)
             raise self._translate_error(error, repo_id=safe_repo_id) from error
 
         self._cache.set("card", cache_key, markdown, ttl=3600)

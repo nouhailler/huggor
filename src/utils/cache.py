@@ -42,6 +42,25 @@ class JsonCache:
                 # Un cache défectueux ne doit jamais bloquer un appel au Hub.
                 return None
 
+    def get_allow_stale(self, namespace: str, key: str) -> tuple[Any, float] | None:
+        """Relire une entrée même expirée, avec son âge : secours pour le mode hors connexion.
+
+        Contrairement à ``get()``, une entrée expirée n'est ni ignorée ni supprimée ici : elle
+        reste la meilleure donnée disponible quand le Hub est injoignable. Un appelant qui a
+        déjà réussi une requête réseau n'a aucune raison d'utiliser cette méthode.
+        """
+        path = self._path_for(namespace, key)
+        with self._lock:
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    entry = json.load(handle)
+                if not isinstance(entry, dict) or entry.get("version") != 1:
+                    return None
+                age = max(time.time() - float(entry["created_at"]), 0.0)
+                return entry.get("value"), age
+            except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError, ValueError, OSError):
+                return None
+
     def set(
         self,
         namespace: str,

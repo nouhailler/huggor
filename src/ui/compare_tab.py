@@ -86,7 +86,7 @@ def compare_for_ui(
     except Exception:
         return "⚠️ Comparaison impossible : une erreur inattendue est survenue.", "", "", empty, None
     progress(1, desc="Comparaison prête")
-    message = f"✅ **{len(models)} modèles comparés.**"
+    message = f"{client.offline_notice}✅ **{len(models)} modèles comparés.**"
     if radar is None:
         message += " Radar indisponible : moins de trois quantités communes renseignées."
     return message, format_decision_table(decision), format_recommendation(decision), table, radar

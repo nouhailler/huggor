@@ -388,7 +388,7 @@ def load_details_for_ui(
     progress(1, desc="Fiche prête")
     return (
         details.summary.repo_id,
-        f"✅ Fiche de **{_escape_markdown(details.summary.repo_id)}** chargée.",
+        f"{client.offline_notice}✅ Fiche de **{_escape_markdown(details.summary.repo_id)}** chargée.",
         _format_cache_status(cache_age),
         format_identity_section(details),
         format_architecture_section(profile),

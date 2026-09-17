@@ -22,6 +22,7 @@ class RecordingClient:
         """Préparer un résultat synthétique ou une erreur."""
         self.error = error
         self.filters: SearchFilters | None = None
+        self.offline_notice = ""
 
     def search_models(self, filters: SearchFilters) -> list[ModelSummary]:
         """Enregistrer les filtres et fournir un modèle de test."""
@@ -80,6 +81,26 @@ class SearchHandlerTests(unittest.TestCase):
         self.assertEqual(client.filters.min_parameters, 1_500_000_000)
         self.assertEqual(client.filters.max_parameters, 7_000_000_000)
         self.assertEqual(client.filters.limit, 25)
+
+    def test_offline_notice_is_prefixed_to_the_status_when_the_client_is_offline(self) -> None:
+        """Une recherche servie depuis le secours hors connexion doit rester visible pour l'utilisateur."""
+        client = RecordingClient()
+        client.offline_notice = "🟠 **Mode hors connexion** — "
+
+        _payload, status = search_for_ui(
+            client,  # type: ignore[arg-type]
+            "bert",
+            "",
+            "",
+            "",
+            0,
+            0,
+            "downloads",
+            20,
+            progress=NoopProgress(),  # type: ignore[arg-type]
+        )
+
+        self.assertTrue(status.startswith("🟠 **Mode hors connexion** — "))
 
     def test_client_error_becomes_a_clear_message(self) -> None:
         """Une erreur métier ne doit pas s'échapper du callback Gradio."""

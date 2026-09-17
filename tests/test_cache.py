@@ -92,6 +92,36 @@ class JsonCacheTests(unittest.TestCase):
             for _created_at, size in search_entries:
                 self.assertGreater(size, 0)
 
+    def test_get_allow_stale_returns_an_expired_entry_with_its_age(self) -> None:
+        """Le secours hors connexion doit resservir une entrée expirée plutôt que rien."""
+        with tempfile.TemporaryDirectory() as directory:
+            cache = JsonCache(directory, default_ttl=60)
+            path = cache._path_for("model", "cle")
+            path.write_text(
+                json.dumps(
+                    {"version": 1, "created_at": time.time() - 5_000, "expires_at": time.time() - 1, "value": {"a": 1}}
+                ),
+                encoding="utf-8",
+            )
+
+            # get_allow_stale() est interrogé en premier : get() supprime lui-même les entrées
+            # expirées (voir plus bas), ce qui priverait le secours hors connexion de sa donnée.
+            stale = cache.get_allow_stale("model", "cle")
+
+            self.assertIsNotNone(stale)
+            value, age = stale
+            self.assertEqual(value, {"a": 1})
+            self.assertGreater(age, 4_000)
+
+            self.assertIsNone(cache.get("model", "cle"))  # get() normal reste strict sur l'expiration.
+
+    def test_get_allow_stale_returns_none_when_never_cached(self) -> None:
+        """Sans entrée du tout, le secours ne doit rien inventer."""
+        with tempfile.TemporaryDirectory() as directory:
+            cache = JsonCache(directory, default_ttl=60)
+
+            self.assertIsNone(cache.get_allow_stale("model", "jamais-vu"))
+
     def test_iter_entries_never_deletes_expired_files(self) -> None:
         """L'inspection pour les statistiques ne doit jamais avoir d'effet de bord destructeur."""
         with tempfile.TemporaryDirectory() as directory:

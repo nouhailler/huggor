@@ -24,6 +24,7 @@ class CompareClient:
         """Préparer la réponse et les compteurs."""
         self.calls = []
         self.error = error
+        self.offline_notice = ""
 
     def get_model_info(self, repo_id: str):
         """Retourner une fiche distincte pour chaque identifiant."""

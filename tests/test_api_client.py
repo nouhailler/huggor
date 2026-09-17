@@ -23,10 +23,15 @@ class FakeApi:
         """Initialiser les compteurs du double."""
         self.search_calls: list[dict[str, object]] = []
         self.info_calls: list[tuple[str, bool]] = []
+        self.next_search_error: Exception | None = None
+        self.next_info_error: Exception | None = None
 
     def list_models(self, **kwargs: object) -> list[SimpleNamespace]:
-        """Renvoyer un modèle synthétique pour la recherche."""
+        """Renvoyer un modèle synthétique pour la recherche, ou lever l'erreur programmée."""
         self.search_calls.append(kwargs)
+        if self.next_search_error is not None:
+            error, self.next_search_error = self.next_search_error, None
+            raise error
         return [
             SimpleNamespace(
                 id="acme/modele",
@@ -45,8 +50,11 @@ class FakeApi:
         ]
 
     def model_info(self, repo_id: str, *, files_metadata: bool) -> SimpleNamespace:
-        """Renvoyer des détails synthétiques avec une taille de fichier."""
+        """Renvoyer des détails synthétiques avec une taille de fichier, ou lever l'erreur programmée."""
         self.info_calls.append((repo_id, files_metadata))
+        if self.next_info_error is not None:
+            error, self.next_info_error = self.next_info_error, None
+            raise error
         return SimpleNamespace(
             id=repo_id,
             author="acme",
@@ -244,6 +252,110 @@ class HuggingFaceClientTests(unittest.TestCase):
         self.assertEqual(first, "# Ancienne")
         self.assertEqual(refreshed, "# Nouvelle")
         self.assertEqual(load.call_count, 2)
+
+
+class OfflineModeTests(unittest.TestCase):
+    """Vérifier la détection de connectivité et la dégradation gracieuse hors connexion."""
+
+    def setUp(self) -> None:
+        """Créer un cache temporaire et un faux client pour chaque test."""
+        self.temporary_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary_directory.cleanup)
+        self.fake_api = FakeApi()
+        self.client = HuggingFaceClient(
+            token=False,
+            cache=JsonCache(self.temporary_directory.name),
+            api=self.fake_api,  # type: ignore[arg-type]
+        )
+
+    def test_client_starts_online_by_default(self) -> None:
+        """Avant toute tentative réseau, l'état ne doit jamais présumer une panne."""
+        self.assertFalse(self.client.is_offline)
+        self.assertEqual(self.client.offline_notice, "")
+
+    def test_connectivity_failure_with_no_cache_marks_offline_and_raises(self) -> None:
+        """Sans donnée locale disponible, la panne doit rester visible, pas masquée silencieusement."""
+        self.fake_api.next_info_error = ConnectionError("DNS indisponible")
+
+        with self.assertRaises(Exception):
+            self.client.get_model_info("acme/jamais-vu")
+
+        self.assertTrue(self.client.is_offline)
+        self.assertIn("Mode hors connexion", self.client.offline_notice)
+
+    def test_stale_model_info_is_served_when_offline(self) -> None:
+        """Une fiche déjà consultée doit rester consultable hors connexion, même expirée."""
+        self.client.get_model_info("acme/modele")
+        self.fake_api.next_info_error = ConnectionError("Coupure réseau")
+
+        details = self.client.get_model_info("acme/modele", force_refresh=True)
+
+        self.assertEqual(details.summary.repo_id, "acme/modele")
+        self.assertTrue(self.client.is_offline)
+
+    def test_naturally_expired_model_info_still_serves_as_fallback_when_offline(self) -> None:
+        """Une entrée expirée par le TTL normal (pas force_refresh) ne doit pas être perdue avant
+        que le secours hors connexion ait pu s'en servir : get() la supprimerait sinon lui-même."""
+        self.client.get_model_info("acme/modele")
+        cache_key = self.client._model_info_cache_key("acme/modele")
+        path = self.client._cache._path_for("model", cache_key)
+        entry = json.loads(path.read_text(encoding="utf-8"))
+        entry["expires_at"] = entry["created_at"] - 1
+        path.write_text(json.dumps(entry), encoding="utf-8")
+        self.fake_api.next_info_error = ConnectionError("Coupure réseau")
+
+        details = self.client.get_model_info("acme/modele")
+
+        self.assertEqual(details.summary.repo_id, "acme/modele")
+        self.assertTrue(self.client.is_offline)
+
+    def test_stale_search_results_are_served_when_offline(self) -> None:
+        """Une recherche déjà faite doit rester disponible hors connexion (« dernières recherches »)."""
+        filters = SearchFilters(query="modele", limit=20)
+        self.client.search_models(filters)
+        self.fake_api.next_search_error = ConnectionError("Coupure réseau")
+
+        # Une entrée fraîche est déjà servie par le cache normal ; on doit d'abord la faire
+        # expirer pour vérifier le secours hors connexion plutôt que le chemin heureux.
+        cache = JsonCache(self.temporary_directory.name)
+        cache_key = self.client._cache_key({
+            "query": "modele", "pipeline_tag": None, "language": None, "license": None,
+            "min_parameters": None, "max_parameters": None, "sort": "downloads", "limit": 20,
+        })
+        entry_path = cache._path_for("search", cache_key)
+        entry = json.loads(entry_path.read_text(encoding="utf-8"))
+        entry["expires_at"] = entry["created_at"] - 1
+        entry_path.write_text(json.dumps(entry), encoding="utf-8")
+
+        results = self.client.search_models(filters)
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].repo_id, "acme/modele")
+        self.assertTrue(self.client.is_offline)
+
+    def test_hub_level_rejection_does_not_mark_offline(self) -> None:
+        """Un 404/403 prouve que le Hub répond : ce n'est pas une panne de connectivité."""
+        import httpx
+        from huggingface_hub.errors import RepositoryNotFoundError
+
+        fake_response = httpx.Response(404, request=httpx.Request("GET", "https://huggingface.co"))
+        self.fake_api.next_info_error = RepositoryNotFoundError("introuvable", response=fake_response)
+
+        with self.assertRaises(Exception):
+            self.client.get_model_info("acme/absent")
+
+        self.assertFalse(self.client.is_offline)
+
+    def test_successful_call_after_failure_clears_offline_state(self) -> None:
+        """La connectivité doit se rétablir dès qu'un appel réseau réussit à nouveau."""
+        self.fake_api.next_info_error = ConnectionError("Coupure réseau")
+        with self.assertRaises(Exception):
+            self.client.get_model_info("acme/jamais-vu")
+        self.assertTrue(self.client.is_offline)
+
+        self.client.get_model_info("acme/modele")
+
+        self.assertFalse(self.client.is_offline)
 
 
 if __name__ == "__main__":
