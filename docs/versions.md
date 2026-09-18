@@ -4,10 +4,11 @@
 
 # Non publié (postérieur à v0.3.0)
 
-- Visite guidée (onboarding) en 5 étapes, affichée juste après l'acceptation de l'avertissement légal au premier lancement. Mémorisée localement dans le navigateur (`localStorage`, clé `onboarding_completed`), indépendamment de l'avertissement légal. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).
+- Visite guidée (onboarding) en 5 étapes, accessible à la demande depuis l'écran « ⚙️ Paramètres ». Mémorise sa complétion localement dans le navigateur (`localStorage`, clé `onboarding_completed`), indépendamment de l'avertissement légal. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).
 - Nouvel écran « ⚙️ Paramètres » (menu hamburger), regroupant les réglages généraux de l'application indépendants d'un onglet précis — pour l'instant, uniquement « 🧭 Revoir la visite guidée » (déplacé depuis l'écran « À propos », qui ne le propose plus).
 - Documentation de l'écran « ℹ️ À propos » (ajouté en v0.3.0 mais jamais documenté, sa doc ayant été volontairement différée à ce moment).
 - Correction : sur Render, l'écran « À propos » affichait un hash brut au lieu d'une version et « à renseigner » pour les liens dépôt/issues, à cause d'un clone Git superficiel sans tags ni remote côté Render. `src/app_info.py` utilise désormais les variables `RENDER_GIT_*` fournies par Render en priorité, avant de retomber sur Git local puis sur « — ». `render.yaml` déclare aussi `PYTHONUNBUFFERED=1`, sans quoi les logs de démarrage Python n'apparaissaient pas de façon fiable sur Render.
+- Correction : la visite guidée s'affichait initialement de façon automatique juste après l'acceptation de l'avertissement légal ; un chargement lent (Render en sortie de veille, notamment) laissait alors le bouton « Suivant » visuellement figé sans aucun retour, perçu comme cassé. L'affichage automatique a été retiré — la visite reste entièrement fonctionnelle, mais uniquement à la demande depuis « ⚙️ Paramètres ».
 
 # Version 0.3.0
 

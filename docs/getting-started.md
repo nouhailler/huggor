@@ -49,10 +49,6 @@ Avertissement légal (première visite de ce navigateur uniquement)
     ↓
 « J'ai compris » (ou « Voir les détails » d'abord)
     ↓
-Visite guidée en 5 étapes (première fois seulement, tant qu'elle n'a pas été vue)
-    ↓
-« 🚀 Commencer » (ou « Passer l'introduction » à tout moment)
-    ↓
 Écran principal (onglet « 🔍 Recherche » actif par défaut)
     ↓
 Champ « Mot-clé » déjà pré-rempli avec « Gemma » (exemple fonctionnel immédiat)
@@ -62,7 +58,7 @@ Appuyer sur Entrée ou cliquer « 🔍 Rechercher »
 Résultats affichés, chacun avec un bouton « Voir détails → »
 ```
 
-À la toute première visite d'un navigateur, un avertissement légal (« ⚠️ Information importante ») s'affiche avant l'écran principal — voir [Informations légales](legal.md). Juste après l'avoir accepté, une **visite guidée** en 5 étapes présente les fonctionnalités principales (Recherche/Mon usage, Fiche technique/Huggor Score, Comparateur/Hardware, Favoris/Analytics/mode hors connexion) ; elle peut être passée à tout moment (« Passer l'introduction ») et ne s'affiche qu'une fois. Ni l'avertissement ni la visite ne réapparaissent ensuite sur ce même navigateur (mémorisés dans son `localStorage`) ; l'avertissement légal reste consultable à tout moment depuis le pied de page ou l'écran [« ℹ️ À propos »](guide.md#a-propos), et la visite guidée rejouable depuis l'écran [« ⚙️ Paramètres »](guide.md#-paramètres) (bouton « 🧭 Revoir la visite guidée »). Aucune permission native de type caméra/GPS n'est utilisée — voir [Permissions](permissions.md). Le bandeau en haut de l'écran indique immédiatement si un token Hugging Face est configuré (« 🟢 Token HF configuré ») ou non (« Accès public »).
+À la toute première visite d'un navigateur, un avertissement légal (« ⚠️ Information importante ») s'affiche avant l'écran principal — voir [Informations légales](legal.md). Il ne réapparaît plus ensuite sur ce même navigateur (mémorisé dans son `localStorage`), et reste consultable à tout moment depuis le pied de page ou l'écran [« ℹ️ À propos »](guide.md#a-propos). Une **visite guidée** en 5 étapes est aussi disponible, mais uniquement à la demande depuis l'écran [« ⚙️ Paramètres »](guide.md#-paramètres) (« 🧭 Revoir la visite guidée ») — elle ne s'affiche jamais automatiquement. Aucune permission native de type caméra/GPS n'est utilisée — voir [Permissions](permissions.md). Le bandeau en haut de l'écran indique immédiatement si un token Hugging Face est configuré (« 🟢 Token HF configuré ») ou non (« Accès public »).
 
 Aucune configuration initiale n'est requise : l'application fonctionne sans compte, sans inscription, sans token. Le seul réglage possible est l'authentification Hugging Face (voir [Permissions](permissions.md)), qui peut être ajoutée à tout moment sans redémarrer l'application (relancer `python app.py` après avoir modifié `.env`, ou re-fournir `HF_TOKEN` côté serveur pour un déploiement).
 

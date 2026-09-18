@@ -365,9 +365,6 @@ def select_tab_from_menu(tab_id: str) -> tuple[gr.Tabs, bool, gr.Column]:
 
 # JS pur, exécuté côté client sans aller-retour serveur : l'acceptation des mentions légales
 # est strictement locale (localStorage), jamais transmise ni journalisée côté application.
-# La vérification au chargement et l'action du bouton « J'ai compris » tiennent aussi compte de
-# la visite guidée (onboarding) — voir _STARTUP_CHECK_JS et _LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS
-# plus bas, qui remplacent les anciennes versions ne gérant que les mentions légales seules.
 
 _LEGAL_OPEN_JS = """
 () => {
@@ -417,61 +414,36 @@ _ABOUT_TO_LEGAL_JS = _overlay_switch_js(hide_id="hf-about-overlay", show_id="hf-
 
 _ONBOARDING_LAST_INDEX = len(ONBOARDING_STEPS) - 1
 
-# Déclenché par « J'ai compris » côté avertissement légal : la visite guidée s'affiche juste
-# après, mais seulement si elle n'a pas déjà été vue (une acceptation légale ne doit jamais la
-# redéclencher pour quelqu'un qui l'a déjà terminée).
-_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS = f"""
-() => {{
-    try {{
+# La visite guidée ne se déclenche plus jamais automatiquement (voir historique Git) : un
+# déclenchement lors d'un chargement lent — Render en sortie de veille, notamment — laissait le
+# bouton « Suivant » visuellement figé sans le moindre retour, perçu comme cassé. Elle reste
+# entièrement fonctionnelle, mais uniquement à la demande depuis « ⚙️ Paramètres ».
+_LEGAL_ACCEPT_JS = """
+() => {
+    try {
         localStorage.setItem('legal_notice_acknowledged', 'true');
         localStorage.setItem('legal_notice_acknowledged_version', '1.0');
-    }} catch (error) {{
+    } catch (error) {
         // Stockage indisponible : on masque quand même le bandeau pour la session en cours.
-    }}
+    }
     const legal = document.getElementById('hf-legal-overlay');
-    if (legal) {{
+    if (legal) {
         legal.style.display = 'none';
-    }}
-    let onboardingDone = false;
-    try {{
-        onboardingDone = localStorage.getItem('onboarding_completed') === 'true';
-    }} catch (error) {{
-        onboardingDone = false;
-    }}
-    const onboarding = document.getElementById('hf-onboarding-overlay');
-    if (onboarding) {{
-        onboarding.style.display = onboardingDone ? 'none' : 'flex';
-    }}
-}}
+    }
+}
 """
 
-# Vérification unique au chargement : priorité aux mentions légales, puis la visite guidée,
-# jamais les deux affichées en même temps.
-_STARTUP_CHECK_JS = """
+_LEGAL_CHECK_JS = """
 () => {
-    let legalDone = false;
-    let onboardingDone = false;
+    let acknowledged = false;
     try {
-        legalDone = localStorage.getItem('legal_notice_acknowledged') === 'true';
+        acknowledged = localStorage.getItem('legal_notice_acknowledged') === 'true';
     } catch (error) {
-        legalDone = false;
+        acknowledged = false;
     }
-    try {
-        onboardingDone = localStorage.getItem('onboarding_completed') === 'true';
-    } catch (error) {
-        onboardingDone = false;
-    }
-    const legal = document.getElementById('hf-legal-overlay');
-    const onboarding = document.getElementById('hf-onboarding-overlay');
-    if (!legalDone) {
-        if (legal) { legal.style.display = 'flex'; }
-        if (onboarding) { onboarding.style.display = 'none'; }
-    } else if (!onboardingDone) {
-        if (legal) { legal.style.display = 'none'; }
-        if (onboarding) { onboarding.style.display = 'flex'; }
-    } else {
-        if (legal) { legal.style.display = 'none'; }
-        if (onboarding) { onboarding.style.display = 'none'; }
+    const overlay = document.getElementById('hf-legal-overlay');
+    if (overlay) {
+        overlay.style.display = acknowledged ? 'none' : 'flex';
     }
 }
 """
@@ -770,7 +742,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
         legal_back_button.click(
             hide_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         )
-        legal_accept_button.click(fn=None, js=_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS, queue=False)
+        legal_accept_button.click(fn=None, js=_LEGAL_ACCEPT_JS, queue=False)
 
         about_menu_button.click(
             toggle_nav_menu, inputs=menu_open, outputs=[menu_open, nav_menu], queue=False, show_progress="hidden"
@@ -821,7 +793,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             show_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         ).then(fn=None, js=_LEGAL_OPEN_JS, queue=False)
 
-        demo.load(fn=None, js=_STARTUP_CHECK_JS, queue=False)
+        demo.load(fn=None, js=_LEGAL_CHECK_JS, queue=False)
 
     return demo
 

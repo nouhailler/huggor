@@ -43,7 +43,7 @@ Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, 
 - Menu hamburger (☰) : sur petit écran, la barre des huit onglets laisse place à un menu déroulant regroupant les fonctionnalités par catégorie (🔍 Explorer, 🔬 Analyser un modèle, 📊 Suivre et organiser) — une seule interface responsive, sans mode séparé pour mobile et desktop
 - Avertissement légal au premier lancement (mémorisé localement dans le navigateur) et page « ⚖️ Mentions légales » accessible en permanence depuis le pied de page — voir [`src/legal_notice.py`](src/legal_notice.py)
 - Écran « ℹ️ À propos » tout en bas du menu hamburger : version et commit réels (dérivés de Git, jamais codés en dur), liens auteur/support/dépôt/signaler un bug, crédits des dépendances open source — voir [`src/app_info.py`](src/app_info.py)
-- Visite guidée en 5 étapes au premier lancement (juste après l'avertissement légal), rejouable à tout moment depuis l'écran « ⚙️ Paramètres » du menu hamburger — voir [`src/onboarding.py`](src/onboarding.py)
+- Visite guidée en 5 étapes présentant les fonctionnalités principales, accessible à la demande depuis l'écran « ⚙️ Paramètres » du menu hamburger — voir [`src/onboarding.py`](src/onboarding.py)
 
 Le radar n’est pas une mesure de qualité. Les statistiques portent uniquement sur les 50 résultats sélectionnés, pas sur tout le Hub. L’évolution commence au premier chargement, sans historique reconstruit. Les observations sont séparées par filtres et empreinte d’authentification dans `data/analytics/`, avec 90 jours observés conservés et une expiration après un an d’inactivité.
 

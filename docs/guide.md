@@ -149,9 +149,9 @@ Huit onglets composent l'application, plus un menu hamburger qui prend le relais
 
 ## Visite guidée (onboarding)
 
-**Objectif** : présenter les fonctionnalités principales à un nouvel utilisateur, juste après l'avertissement légal.
+**Objectif** : présenter les fonctionnalités principales de l'application.
 
-**Accès** : automatique à la première visite d'un navigateur (une fois l'avertissement légal accepté), ou rejouable à tout moment depuis [« ⚙️ Paramètres »](#-paramètres) (« 🧭 Revoir la visite guidée »).
+**Accès** : à la demande uniquement, depuis [« ⚙️ Paramètres »](#-paramètres) (« 🧭 Revoir la visite guidée »). Ne s'affiche jamais automatiquement.
 
 **Éléments d'interface** : 5 étapes (Bienvenue ; Recherche & Mon usage ; Fiche technique & Huggor Score ; Comparateur & Hardware ; Favoris, Analytics & mode hors connexion), un indicateur de progression (points), boutons **← Précédent**, **Suivant →** (devient **🚀 Commencer** sur la dernière étape) et **Passer l'introduction**.
 
