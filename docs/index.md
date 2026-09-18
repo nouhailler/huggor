@@ -2,7 +2,7 @@
 
 - **Application** : Huggor (nom du dépôt), affichée dans l'interface comme « 🤗 HF Explorer »
 - **Description** : rechercher, examiner, comparer et tester les modèles du [Hugging Face Hub](https://huggingface.co/models) depuis une interface Gradio, avec des verdicts de compatibilité matérielle honnêtes et jamais de boîte noire
-- **Version** : 0.1.0 (tag `v0.1.0`) — le développement s'est poursuivi depuis ce tag ; cette documentation reflète l'état actuel de la branche `main` (voir [Versions](versions.md))
+- **Version** : 0.2.0 (tag `v0.2.0`) — voir [Versions](versions.md) pour le détail complet
 - **Documentation** : dernière mise à jour 2026-09-18
 
 ## Accès rapides

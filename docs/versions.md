@@ -2,31 +2,27 @@
 
 # Versions
 
-Un seul tag Git existe à ce jour : `v0.1.0`. Le développement s'est poursuivi sur `main` après ce tag sans nouvelle version taguée — cette page documente donc l'ensemble des changements réels observés dans l'historique Git jusqu'à aujourd'hui, sous cette même version. **Recommandation** : tagger une nouvelle version (ex. `v0.2.0`) pour refléter l'ampleur des ajouts depuis `v0.1.0`.
+# Version 0.2.0
 
-# Version 0.1.0
-
-Date de première publication du paquet Debian : 2026-09-14. Développement continu documenté ci-dessous jusqu'au 2026-09-17.
+Date : 2026-09-18.
 
 ## Nouveautés
 
-- Accès au Hub, cache local, recherche par mot-clé/domaine/tâche/langue/licence
-- Onglet 🎯 Mon usage (recherche par objectif croisée avec RAM/VRAM)
-- Fiche technique complète : identité, architecture, quantification, compatibilités
-- Model Advisor (verdict RAM/VRAM), calculateur de ressources (onglet 💻 Hardware)
+- Onglet 🎯 Mon usage (recherche par objectif croisée avec RAM/VRAM), avec bouton « ⭐ Pin » vers les Favoris
+- Model Advisor (verdict RAM/VRAM) et calculateur de ressources (onglet 💻 Hardware)
 - Huggor Score (composite /100, 9 composantes toujours détaillées)
-- Détection de quantification et recherche de variantes déjà quantifiées
+- Détection de quantification et recherche de variantes déjà quantifiées sur le Hub
 - Recommandation de « Modèles similaires »
-- Comparateur décisionnel de 2 à 4 modèles avec recommandation motivée
-- Onglet ⭐ Favoris : collections, tags, statut, note, dernier test, commentaire
-- Bouton « ⭐ Pin » depuis Mon usage vers les Favoris
+- Comparateur transformé en tableau décisionnel avec recommandation motivée
+- Navigation pédagogique par domaine puis tâche précise dans la Recherche
+- Onglet ⭐ Favoris transformé en gestionnaire de collections (tags, statut, note, dernier test, commentaire)
 - Onglet 📈 Analytics : Observatoire du Hub (tendances curatées, détection de croissance « Rising models »)
 - Gestion du cache industrialisée par domaine, avec purge ciblée et actualisation forcée
 - Mode hors connexion : dégradation gracieuse quand le Hub devient injoignable
 - Menu hamburger catégorisé pour la navigation mobile (< 768px)
 - Pré-remplissage du champ de recherche avec « Gemma » et recherche déclenchable par la touche Entrée
-- Paquet d'installation Debian/Ubuntu (`.deb`)
 - Configuration de déploiement pour Hugging Face Spaces et pour Render
+- Documentation complète sous `/docs`, conforme à `DOCUMENTATION_SPEC.md`
 
 ## Corrections
 
@@ -41,7 +37,22 @@ Date de première publication du paquet Debian : 2026-09-14. Développement cont
 ## Changements de données
 
 - Ajout du domaine de cache « 🧪 Benchmarks » (vide, réservé pour la future fonctionnalité de test d'inférence — aucune donnée n'y est stockée à ce jour).
+- Ajout de `data/analytics/` (observations de tendances, 90 jours conservés, expiration après un an d'inactivité).
 
 ## Documentation mise à jour
 
-- Cette documentation (`/docs`) a été créée dans son intégralité à cette version, à partir du code réel, des tests et du README existant.
+- Création complète de `/docs` à partir du code réel, des tests et du README existant.
+
+---
+
+# Version 0.1.0
+
+Date : 2026-09-14 (première publication, paquet Debian).
+
+## Nouveautés
+
+- Accès au Hub, cache local, recherche par mot-clé et filtres (langue, licence, tri, plage de paramètres)
+- Fiche technique du modèle : identité, architecture, quantification, compatibilités d'exécution
+- Ouverture automatique de la fiche depuis les résultats de recherche
+- Comparateur de modèles, premières statistiques Analytics, infobulles explicatives
+- Paquet d'installation Debian/Ubuntu (`.deb`)
