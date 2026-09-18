@@ -393,36 +393,27 @@ def hide_legal_details() -> tuple[gr.Column, gr.Column, gr.Button, gr.Button]:
     return gr.Column(visible=True), gr.Column(visible=False), gr.Button(visible=True), gr.Button(visible=False)
 
 
-_ABOUT_CLOSE_JS = """
-() => {
-    const overlay = document.getElementById('hf-about-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-}
-"""
+def _overlay_switch_js(hide_id: str | None = None, show_id: str | None = None) -> str:
+    """Générer le JS masquant un overlay et/ou en affichant un autre, par identifiant DOM.
 
-_ABOUT_OPEN_JS = """
-() => {
-    const overlay = document.getElementById('hf-about-overlay');
-    if (overlay) {
-        overlay.style.display = 'flex';
-    }
-}
-"""
+    Évite de réécrire à la main la même paire « hide/show » pour chaque nouveau panneau
+    (mentions légales, à propos, visite guidée, paramètres…) — voir /mentions-legales,
+    /apropos et la commande ayant ajouté la visite guidée pour l'origine de ce motif.
+    """
+    lines = ["() => {"]
+    if hide_id:
+        lines.append(f"    const hidden_ = document.getElementById('{hide_id}');")
+        lines.append("    if (hidden_) { hidden_.style.display = 'none'; }")
+    if show_id:
+        lines.append(f"    const shown_ = document.getElementById('{show_id}');")
+        lines.append("    if (shown_) { shown_.style.display = 'flex'; }")
+    lines.append("}")
+    return "\n".join(lines)
 
-_ABOUT_TO_LEGAL_JS = """
-() => {
-    const about = document.getElementById('hf-about-overlay');
-    const legal = document.getElementById('hf-legal-overlay');
-    if (about) {
-        about.style.display = 'none';
-    }
-    if (legal) {
-        legal.style.display = 'flex';
-    }
-}
-"""
+
+_ABOUT_CLOSE_JS = _overlay_switch_js(hide_id="hf-about-overlay")
+_ABOUT_OPEN_JS = _overlay_switch_js(show_id="hf-about-overlay")
+_ABOUT_TO_LEGAL_JS = _overlay_switch_js(hide_id="hf-about-overlay", show_id="hf-legal-overlay")
 
 _ONBOARDING_LAST_INDEX = len(ONBOARDING_STEPS) - 1
 
@@ -500,18 +491,9 @@ _ONBOARDING_FINISH_JS = f"""
 }}
 """
 
-_ABOUT_TO_ONBOARDING_JS = """
-() => {
-    const about = document.getElementById('hf-about-overlay');
-    const onboarding = document.getElementById('hf-onboarding-overlay');
-    if (about) {
-        about.style.display = 'none';
-    }
-    if (onboarding) {
-        onboarding.style.display = 'flex';
-    }
-}
-"""
+_SETTINGS_CLOSE_JS = _overlay_switch_js(hide_id="hf-settings-overlay")
+_SETTINGS_OPEN_JS = _overlay_switch_js(show_id="hf-settings-overlay")
+_SETTINGS_TO_ONBOARDING_JS = _overlay_switch_js(hide_id="hf-settings-overlay", show_id="hf-onboarding-overlay")
 
 
 def _format_onboarding_step(index: int) -> str:
@@ -706,9 +688,22 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                     gr.Markdown(_build_about_markdown())
                     about_support_button = gr.Button("📧 Contacter le support", variant="secondary", size="sm")
                     about_legal_button = gr.Button("⚖️ Mentions légales", variant="secondary", size="sm")
-                    about_onboarding_button = gr.Button("🧭 Revoir la visite guidée", variant="secondary", size="sm")
                 with gr.Row(elem_classes="hf-legal-actions"):
                     about_close_button = gr.Button("Fermer", variant="primary", size="sm")
+
+        with gr.Column(visible=True, elem_classes="hf-legal-overlay", elem_id="hf-settings-overlay"):
+            with gr.Column(elem_classes="hf-legal-card"):
+                with gr.Column(elem_classes="hf-legal-scroll"):
+                    gr.Markdown(
+                        "## ⚙️ Paramètres\n\n"
+                        "Réglages généraux de l'application, indépendants d'un onglet précis."
+                    )
+                    gr.Markdown("**Visite guidée**")
+                    settings_onboarding_button = gr.Button(
+                        "🧭 Revoir la visite guidée", variant="secondary", size="sm"
+                    )
+                with gr.Row(elem_classes="hf-legal-actions"):
+                    settings_close_button = gr.Button("Fermer", variant="primary", size="sm")
 
         onboarding_step = gr.State(0)
         with gr.Column(visible=True, elem_classes="hf-legal-overlay", elem_id="hf-onboarding-overlay"):
@@ -735,6 +730,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                             tab_label, elem_classes="hf-nav-item", size="sm"
                         )
             with gr.Row(elem_classes="hf-nav-row hf-nav-footer"):
+                settings_menu_button = gr.Button("⚙️ Paramètres", elem_classes="hf-nav-item", size="sm")
                 about_menu_button = gr.Button("ℹ️ À propos", elem_classes="hf-nav-item", size="sm")
 
         details_repo_id = create_repo_id_input(render=False)
@@ -785,6 +781,11 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
         ).then(fn=None, js=_ABOUT_TO_LEGAL_JS, queue=False)
         about_support_button.click(fn=None, js=_build_support_mailto_js(), queue=False)
 
+        settings_menu_button.click(
+            toggle_nav_menu, inputs=menu_open, outputs=[menu_open, nav_menu], queue=False, show_progress="hidden"
+        ).then(fn=None, js=_SETTINGS_OPEN_JS, queue=False)
+        settings_close_button.click(fn=None, js=_SETTINGS_CLOSE_JS, queue=False)
+
         onboarding_outputs = [
             onboarding_step,
             onboarding_content,
@@ -803,9 +804,9 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
         )
         onboarding_finish_button.click(fn=None, js=_ONBOARDING_FINISH_JS, queue=False)
         onboarding_skip_button.click(fn=None, js=_ONBOARDING_FINISH_JS, queue=False)
-        about_onboarding_button.click(
+        settings_onboarding_button.click(
             onboarding_reset, outputs=onboarding_outputs, queue=False, show_progress="hidden"
-        ).then(fn=None, js=_ABOUT_TO_ONBOARDING_JS, queue=False)
+        ).then(fn=None, js=_SETTINGS_TO_ONBOARDING_JS, queue=False)
 
         with gr.Row(elem_classes="hf-footer"):
             gr.Markdown(

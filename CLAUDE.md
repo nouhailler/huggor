@@ -36,7 +36,7 @@ Système ajouté via la commande `/mentions-legales`. Contenu centralisé dans [
 
 ## Visite guidée (onboarding)
 
-Contenu centralisé dans [`src/onboarding.py`](src/onboarding.py) (5 étapes), affichée dans `app.py` juste après l'acceptation de l'avertissement légal au premier lancement, et rejouable depuis l'écran « ℹ️ À propos » (bouton « 🧭 Revoir la visite guidée »). Réutilise le même mécanisme d'overlay (`.hf-legal-overlay`/`.hf-legal-card`) que les mentions légales et l'écran « À propos » — voir le commentaire au-dessus de `.hf-legal-overlay` dans `app.py`. Détails complets : [`docs/guide.md`](docs/guide.md#visite-guidée-onboarding).
+Contenu centralisé dans [`src/onboarding.py`](src/onboarding.py) (5 étapes), affichée dans `app.py` juste après l'acceptation de l'avertissement légal au premier lancement, et rejouable depuis l'écran « ⚙️ Paramètres » (bouton « 🧭 Revoir la visite guidée », géré par `settings_onboarding_button`/`_SETTINGS_TO_ONBOARDING_JS`). Réutilise le même mécanisme d'overlay (`.hf-legal-overlay`/`.hf-legal-card`, généré via `_overlay_switch_js`) que les mentions légales et l'écran « À propos » — voir le commentaire au-dessus de `.hf-legal-overlay` dans `app.py`. Détails complets : [`docs/guide.md`](docs/guide.md#visite-guidée-onboarding).
 
 - **Stockage** : `localStorage` du navigateur, clé `onboarding_completed` (+ `onboarding_completed_version`), indépendante de `legal_notice_acknowledged`. 100 % côté client.
 - **Ordre d'affichage** : mentions légales toujours en premier si non acceptées ; la visite guidée ne s'affiche qu'ensuite (voir `_STARTUP_CHECK_JS` et `_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS` dans `app.py`), jamais les deux overlays en même temps.

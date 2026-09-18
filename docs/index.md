@@ -32,7 +32,7 @@
 </details>
 
 <details>
-<summary><strong>2. Guide utilisateur</strong> (11)</summary>
+<summary><strong>2. Guide utilisateur</strong> (12)</summary>
 
 - [🔍 Recherche](guide.md#-recherche)
 - [🎯 Mon usage](guide.md#-mon-usage)
@@ -43,6 +43,7 @@
 - [📈 Analytics](guide.md#-analytics)
 - [⭐ Favoris](guide.md#-favoris)
 - [☰ Menu hamburger (mobile)](guide.md#-menu-hamburger-mobile)
+- [⚙️ Paramètres](guide.md#-paramètres)
 - [ℹ️ À propos](guide.md#a-propos)
 - [Visite guidée (onboarding)](guide.md#visite-guidée-onboarding)
 </details>

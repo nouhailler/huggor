@@ -2,7 +2,7 @@
 
 # Paramètres
 
-Huggor n'a pas d'écran « Paramètres » unique et persistant : chaque onglet expose ses propres champs, appliqués immédiatement à la requête suivante (aucun n'est sauvegardé entre deux sessions, sauf indication contraire). Tous sont détaillés ci-dessous.
+Cette page couvre les champs propres à chaque onglet, appliqués immédiatement à la requête suivante (aucun n'est sauvegardé entre deux sessions, sauf indication contraire). Pour l'écran **⚙️ Paramètres** de l'application (réglages généraux, indépendants d'un onglet), accessible tout en bas du menu hamburger, voir [Guide → ⚙️ Paramètres](guide.md#-paramètres).
 
 ## Onglet 🔍 Recherche
 

@@ -121,18 +121,28 @@ Huit onglets composent l'application, plus un menu hamburger qui prend le relais
 **Actions** : cliquer une entrée navigue vers l'onglet correspondant et referme automatiquement le menu. Sur desktop (≥ 768px), le bouton reste masqué et la barre d'onglets classique fonctionne normalement — c'est la même interface, pas un mode séparé.
 
 <a id="a-propos"></a>
+## ⚙️ Paramètres
+
+**Objectif** : réglages généraux de l'application, indépendants d'un onglet précis.
+
+**Accès** : tout en bas du [menu hamburger](#-menu-hamburger-mobile), juste au-dessus de « ℹ️ À propos ».
+
+**Éléments d'interface** :
+- Bouton **🧭 Revoir la visite guidée** : relance la [visite guidée](#visite-guidée-onboarding) depuis le début, quel que soit son état d'avancement précédent
+
+**Navigation** : bouton **Fermer** pour revenir à l'écran en cours.
+
 ## ℹ️ À propos
 
 **Objectif** : identité de l'application, support et informations légales, accessibles en permanence.
 
-**Accès** : tout en bas du [menu hamburger](#-menu-hamburger-mobile), en dessous des trois catégories.
+**Accès** : tout en bas du [menu hamburger](#-menu-hamburger-mobile), en dessous de [⚙️ Paramètres](#-paramètres).
 
 **Éléments d'interface** :
 - Logo, nom, **version et commit** (dérivés de Git au démarrage, jamais codés en dur — « — » si indéterminable)
 - Lien **Notes de version**, liens **auteur/site/portfolio/dépôt/signaler un bug** (dérivés du remote Git réel du dépôt)
 - Bouton **📧 Contacter le support** : ouvre un brouillon d'e-mail pré-rempli (version, commit, navigateur) que l'utilisateur relit et envoie lui-même — jamais d'envoi automatique
 - Bouton **⚖️ Mentions légales** : ouvre directement la page complète des [mentions légales](legal.md)
-- Bouton **🧭 Revoir la visite guidée** : relance la [visite guidée](#visite-guidée-onboarding) depuis le début, quel que soit son état d'avancement précédent
 - Crédits des dépendances open source et copyright
 
 **Navigation** : bouton **Fermer** pour revenir à l'écran en cours.
@@ -141,7 +151,7 @@ Huit onglets composent l'application, plus un menu hamburger qui prend le relais
 
 **Objectif** : présenter les fonctionnalités principales à un nouvel utilisateur, juste après l'avertissement légal.
 
-**Accès** : automatique à la première visite d'un navigateur (une fois l'avertissement légal accepté), ou rejouable à tout moment depuis [« ℹ️ À propos »](#a-propos) (« 🧭 Revoir la visite guidée »).
+**Accès** : automatique à la première visite d'un navigateur (une fois l'avertissement légal accepté), ou rejouable à tout moment depuis [« ⚙️ Paramètres »](#-paramètres) (« 🧭 Revoir la visite guidée »).
 
 **Éléments d'interface** : 5 étapes (Bienvenue ; Recherche & Mon usage ; Fiche technique & Huggor Score ; Comparateur & Hardware ; Favoris, Analytics & mode hors connexion), un indicateur de progression (points), boutons **← Précédent**, **Suivant →** (devient **🚀 Commencer** sur la dernière étape) et **Passer l'introduction**.
 

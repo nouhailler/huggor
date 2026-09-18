@@ -119,7 +119,7 @@ class OnboardingNavigationTests(unittest.TestCase):
         self.assertTrue(next_btn.visible)
 
     def test_reset_always_returns_to_the_first_step(self) -> None:
-        """Rejouer la visite depuis « À propos » doit repartir du début, pas de la dernière position."""
+        """Rejouer la visite depuis « Paramètres » doit repartir du début, pas de la dernière position."""
         index, content, _dots, prev_btn, _next_btn, _finish_btn = onboarding_reset()
 
         self.assertEqual(index, 0)

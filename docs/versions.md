@@ -4,7 +4,8 @@
 
 # Non publié (postérieur à v0.3.0)
 
-- Visite guidée (onboarding) en 5 étapes, affichée juste après l'acceptation de l'avertissement légal au premier lancement, rejouable à tout moment depuis l'écran « ℹ️ À propos » (« 🧭 Revoir la visite guidée »). Mémorisée localement dans le navigateur (`localStorage`, clé `onboarding_completed`), indépendamment de l'avertissement légal. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).
+- Visite guidée (onboarding) en 5 étapes, affichée juste après l'acceptation de l'avertissement légal au premier lancement. Mémorisée localement dans le navigateur (`localStorage`, clé `onboarding_completed`), indépendamment de l'avertissement légal. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).
+- Nouvel écran « ⚙️ Paramètres » (menu hamburger), regroupant les réglages généraux de l'application indépendants d'un onglet précis — pour l'instant, uniquement « 🧭 Revoir la visite guidée » (déplacé depuis l'écran « À propos », qui ne le propose plus).
 - Documentation de l'écran « ℹ️ À propos » (ajouté en v0.3.0 mais jamais documenté, sa doc ayant été volontairement différée à ce moment).
 
 # Version 0.3.0
