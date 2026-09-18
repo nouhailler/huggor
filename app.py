@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import os
 from functools import partial
+from pathlib import Path
 
 import gradio as gr
 
+from src import app_info
 from src.api_client import HuggingFaceClient
 from src.ui.analytics_tab import build_analytics_tab
 from src.ui.compare_tab import build_compare_tab
@@ -16,7 +18,7 @@ from src.ui.hardware_tab import build_hardware_tab
 from src.ui.search_tab import build_search_tab
 from src.ui.usage_tab import build_usage_tab
 from src.ui.test_tab import build_test_tab
-from src.legal_notice import SHORT_WARNING, TITLE as LEGAL_TITLE, render_full_notice_markdown
+from src.legal_notice import EDITOR as LEGAL_EDITOR, SHORT_WARNING, TITLE as LEGAL_TITLE, render_full_notice_markdown
 
 APP_CSS = """
 .gradio-container {
@@ -276,6 +278,18 @@ APP_CSS = """
     text-decoration: underline;
     width: auto !important;
 }
+.hf-about-logo {
+    margin: 0 auto 0.5rem;
+    max-width: 96px;
+}
+.hf-about-logo img {
+    border-radius: 12px;
+}
+.hf-nav-footer {
+    border-top: 1px solid var(--border-color-primary);
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+}
 @media (max-width: 640px) {
     .hf-header {
         align-items: flex-start;
@@ -398,6 +412,127 @@ def hide_legal_details() -> tuple[gr.Column, gr.Column, gr.Button, gr.Button]:
     return gr.Column(visible=True), gr.Column(visible=False), gr.Button(visible=True), gr.Button(visible=False)
 
 
+_ABOUT_CLOSE_JS = """
+() => {
+    const overlay = document.getElementById('hf-about-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+"""
+
+_ABOUT_OPEN_JS = """
+() => {
+    const overlay = document.getElementById('hf-about-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+}
+"""
+
+_ABOUT_TO_LEGAL_JS = """
+() => {
+    const about = document.getElementById('hf-about-overlay');
+    const legal = document.getElementById('hf-legal-overlay');
+    if (about) {
+        about.style.display = 'none';
+    }
+    if (legal) {
+        legal.style.display = 'flex';
+    }
+}
+"""
+
+
+def _build_about_markdown() -> str:
+    """Assembler le texte de l'écran « À propos » à partir de métadonnées réelles.
+
+    Rien n'est codé en dur : version/SHA viennent de Git (``src/app_info``), l'URL
+    d'issues est dérivée du remote réel du dépôt — voir la commande /apropos.
+    """
+    version = app_info.get_app_version()
+    sha = app_info.get_commit_sha()
+    build = app_info.get_build_number()
+    repo_url = app_info.get_repo_url()
+    issue_url = app_info.get_issue_url()
+    year = app_info.current_copyright_year()
+
+    repo_line = f"[Dépôt GitHub et README]({repo_url})" if repo_url else "Dépôt GitHub : à renseigner"
+    issue_line = f"[Signaler un bug]({issue_url})" if issue_url else "Signaler un bug : URL du dépôt à renseigner"
+    versions_link = f"{repo_url}/blob/main/docs/versions.md" if repo_url else None
+    legal_doc_link = f"{repo_url}/blob/main/docs/legal.md" if repo_url else None
+
+    lines = [
+        "## 🤗 HF Explorer (Huggor)",
+        "",
+        f"- **Version** : {version}",
+        f"- **Commit** : `{sha}`",
+        f"- **Build** : {build} — aucun système de build/CI n'attribue de numéro à ce projet",
+    ]
+    if versions_link:
+        lines.append(f"- [Notes de version]({versions_link})")
+    lines += [
+        "",
+        "### Auteur",
+        "",
+        "- Développeur : **Patrick Nouhailler**",
+        "- Site web : [swinux.ch](https://swinux.ch)",
+        "- Portfolio : [swinux.ch/applications](https://swinux.ch/applications/)",
+        f"- {repo_line}",
+        f"- {issue_line}",
+        "",
+        "### Support",
+        "",
+        f"- Contact : {LEGAL_EDITOR['email']}",
+        "",
+        "### Informations légales",
+        "",
+        "- **Mentions légales** : voir le bouton ci-dessous.",
+        "- **CGU** : la clause de clôture des Mentions légales en tient lieu ; aucun document CGU séparé n'existe à ce jour.",
+    ]
+    if legal_doc_link:
+        lines.append(f"- **Politique de confidentialité** : non créée à ce jour (aucune collecte ne le justifiait) — état des lieux et raison détaillés dans les [Mentions légales, section « Ce qui reste hors de ce texte »]({legal_doc_link}#ce-qui-reste-hors-de-ce-texte). À valider si une politique formelle devient nécessaire.")
+    else:
+        lines.append("- **Politique de confidentialité** : non créée à ce jour — à valider si nécessaire.")
+    lines += [
+        "",
+        "### Crédits open source",
+        "",
+    ]
+    lines += [f"- `{name}` — {license_name}" for name, license_name in app_info.DEPENDENCY_CREDITS]
+    lines += [
+        "",
+        f"© {year} Patrick Nouhailler / {LEGAL_EDITOR['name']}",
+        "",
+        "[📚 Documentation](https://github.com/nouhailler/huggor/blob/main/docs/index.md)",
+    ]
+    return "\n".join(lines)
+
+
+def _build_support_mailto_js() -> str:
+    """Construire le JS du bouton support : un brouillon mailto, jamais un envoi silencieux.
+
+    L'utilisateur relit et envoie lui-même depuis son client mail — voir /apropos.
+    """
+    version = app_info.get_app_version()
+    sha = app_info.get_commit_sha()
+    build = app_info.get_build_number()
+    email = LEGAL_EDITOR["email"]
+    return f"""
+() => {{
+    const diagnostics = [
+        'Version : {version}',
+        'Commit : {sha}',
+        'Build : {build}',
+        'Navigateur : ' + navigator.userAgent,
+    ].join('\\n');
+    const subject = encodeURIComponent('Support Huggor (HF Explorer)');
+    const body = encodeURIComponent('Décrivez votre problème ici.\\n\\n---\\n' + diagnostics);
+    window.location.href = 'mailto:{email}?subject=' + subject + '&body=' + body;
+}}
+"""
+
+
 def connection_badge(has_token: bool) -> str:
     """Produire l'indicateur d'authentification sans afficher le token."""
     if has_token:
@@ -446,6 +581,26 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                     legal_back_button = gr.Button("← Retour", variant="secondary", size="sm", visible=False)
                     legal_accept_button = gr.Button("J'ai compris", variant="primary", size="sm")
 
+        with gr.Column(visible=True, elem_classes="hf-legal-overlay", elem_id="hf-about-overlay"):
+            with gr.Column(elem_classes="hf-legal-card"):
+                with gr.Column(elem_classes="hf-legal-scroll"):
+                    logo_path = Path(__file__).resolve().parent / "assets" / "swinux-logo.png"
+                    gr.Image(
+                        value=str(logo_path),
+                        show_label=False,
+                        container=False,
+                        interactive=False,
+                        buttons=[],
+                        height=64,
+                        width=64,
+                        elem_classes="hf-about-logo",
+                    )
+                    gr.Markdown(_build_about_markdown())
+                    about_support_button = gr.Button("📧 Contacter le support", variant="secondary", size="sm")
+                    about_legal_button = gr.Button("⚖️ Mentions légales", variant="secondary", size="sm")
+                with gr.Row(elem_classes="hf-legal-actions"):
+                    about_close_button = gr.Button("Fermer", variant="primary", size="sm")
+
         menu_open = gr.State(False)
         nav_buttons: dict[str, gr.Button] = {}
         with gr.Column(visible=False, elem_classes="hf-nav-menu") as nav_menu:
@@ -456,6 +611,8 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                         nav_buttons[tab_id] = gr.Button(
                             tab_label, elem_classes="hf-nav-item", size="sm"
                         )
+            with gr.Row(elem_classes="hf-nav-row hf-nav-footer"):
+                about_menu_button = gr.Button("ℹ️ À propos", elem_classes="hf-nav-item", size="sm")
 
         details_repo_id = create_repo_id_input(render=False)
         with gr.Tabs(elem_classes="hf-main-tabs") as tabs:
@@ -495,6 +652,15 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             hide_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         )
         legal_accept_button.click(fn=None, js=_LEGAL_ACCEPT_JS, queue=False)
+
+        about_menu_button.click(
+            toggle_nav_menu, inputs=menu_open, outputs=[menu_open, nav_menu], queue=False, show_progress="hidden"
+        ).then(fn=None, js=_ABOUT_OPEN_JS, queue=False)
+        about_close_button.click(fn=None, js=_ABOUT_CLOSE_JS, queue=False)
+        about_legal_button.click(
+            show_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
+        ).then(fn=None, js=_ABOUT_TO_LEGAL_JS, queue=False)
+        about_support_button.click(fn=None, js=_build_support_mailto_js(), queue=False)
 
         with gr.Row(elem_classes="hf-footer"):
             gr.Markdown(
