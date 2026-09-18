@@ -31,3 +31,6 @@ Cette fonctionnalité n'est pas encore implémentée — voir [Limites connues](
 
 **Pourquoi un avertissement s'affiche-t-il à ma première visite ?**
 C'est l'avertissement légal de Huggor (limitation de responsabilité). Il ne s'affiche qu'une fois par navigateur et reste consultable à tout moment via le lien « ⚖️ Mentions légales » en pied de page. Voir [Informations légales](legal.md).
+
+**Comment revoir la visite guidée du début ?**
+Depuis le menu ☰ → « ℹ️ À propos » → « 🧭 Revoir la visite guidée ». Elle repart toujours de la première étape. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).

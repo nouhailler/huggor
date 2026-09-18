@@ -19,6 +19,7 @@ from src.ui.search_tab import build_search_tab
 from src.ui.usage_tab import build_usage_tab
 from src.ui.test_tab import build_test_tab
 from src.legal_notice import EDITOR as LEGAL_EDITOR, SHORT_WARNING, TITLE as LEGAL_TITLE, render_full_notice_markdown
+from src.onboarding import ONBOARDING_STEPS, ONBOARDING_VERSION
 
 APP_CSS = """
 .gradio-container {
@@ -226,6 +227,8 @@ APP_CSS = """
     flex-wrap: wrap;
     gap: 0.5rem;
 }
+/* Classes de panneau génériques : partagées par les overlays mentions légales, à propos et
+   visite guidée, malgré leur préfixe "hf-legal-" d'origine — pas trois jeux de styles dupliqués. */
 .hf-legal-overlay {
     display: none;
     position: fixed;
@@ -289,6 +292,11 @@ APP_CSS = """
     border-top: 1px solid var(--border-color-primary);
     margin-top: 0.6rem;
     padding-top: 0.6rem;
+}
+.hf-onboarding-dots {
+    color: var(--body-text-color-subdued);
+    letter-spacing: 0.2rem;
+    text-align: center;
 }
 @media (max-width: 640px) {
     .hf-header {
@@ -357,36 +365,9 @@ def select_tab_from_menu(tab_id: str) -> tuple[gr.Tabs, bool, gr.Column]:
 
 # JS pur, exécuté côté client sans aller-retour serveur : l'acceptation des mentions légales
 # est strictement locale (localStorage), jamais transmise ni journalisée côté application.
-_LEGAL_CHECK_JS = """
-() => {
-    let acknowledged = false;
-    try {
-        acknowledged = localStorage.getItem('legal_notice_acknowledged') === 'true';
-    } catch (error) {
-        acknowledged = false;
-    }
-    const overlay = document.getElementById('hf-legal-overlay');
-    if (overlay) {
-        overlay.style.display = acknowledged ? 'none' : 'flex';
-    }
-}
-"""
-
-_LEGAL_ACCEPT_JS = """
-() => {
-    try {
-        localStorage.setItem('legal_notice_acknowledged', 'true');
-        localStorage.setItem('legal_notice_acknowledged_version', '1.0');
-    } catch (error) {
-        // Stockage indisponible (navigation privée stricte, par exemple) : on masque quand
-        // même le bandeau pour la session en cours plutôt que de bloquer l'utilisateur.
-    }
-    const overlay = document.getElementById('hf-legal-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-}
-"""
+# La vérification au chargement et l'action du bouton « J'ai compris » tiennent aussi compte de
+# la visite guidée (onboarding) — voir _STARTUP_CHECK_JS et _LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS
+# plus bas, qui remplacent les anciennes versions ne gérant que les mentions légales seules.
 
 _LEGAL_OPEN_JS = """
 () => {
@@ -442,6 +423,133 @@ _ABOUT_TO_LEGAL_JS = """
     }
 }
 """
+
+_ONBOARDING_LAST_INDEX = len(ONBOARDING_STEPS) - 1
+
+# Déclenché par « J'ai compris » côté avertissement légal : la visite guidée s'affiche juste
+# après, mais seulement si elle n'a pas déjà été vue (une acceptation légale ne doit jamais la
+# redéclencher pour quelqu'un qui l'a déjà terminée).
+_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS = f"""
+() => {{
+    try {{
+        localStorage.setItem('legal_notice_acknowledged', 'true');
+        localStorage.setItem('legal_notice_acknowledged_version', '1.0');
+    }} catch (error) {{
+        // Stockage indisponible : on masque quand même le bandeau pour la session en cours.
+    }}
+    const legal = document.getElementById('hf-legal-overlay');
+    if (legal) {{
+        legal.style.display = 'none';
+    }}
+    let onboardingDone = false;
+    try {{
+        onboardingDone = localStorage.getItem('onboarding_completed') === 'true';
+    }} catch (error) {{
+        onboardingDone = false;
+    }}
+    const onboarding = document.getElementById('hf-onboarding-overlay');
+    if (onboarding) {{
+        onboarding.style.display = onboardingDone ? 'none' : 'flex';
+    }}
+}}
+"""
+
+# Vérification unique au chargement : priorité aux mentions légales, puis la visite guidée,
+# jamais les deux affichées en même temps.
+_STARTUP_CHECK_JS = """
+() => {
+    let legalDone = false;
+    let onboardingDone = false;
+    try {
+        legalDone = localStorage.getItem('legal_notice_acknowledged') === 'true';
+    } catch (error) {
+        legalDone = false;
+    }
+    try {
+        onboardingDone = localStorage.getItem('onboarding_completed') === 'true';
+    } catch (error) {
+        onboardingDone = false;
+    }
+    const legal = document.getElementById('hf-legal-overlay');
+    const onboarding = document.getElementById('hf-onboarding-overlay');
+    if (!legalDone) {
+        if (legal) { legal.style.display = 'flex'; }
+        if (onboarding) { onboarding.style.display = 'none'; }
+    } else if (!onboardingDone) {
+        if (legal) { legal.style.display = 'none'; }
+        if (onboarding) { onboarding.style.display = 'flex'; }
+    } else {
+        if (legal) { legal.style.display = 'none'; }
+        if (onboarding) { onboarding.style.display = 'none'; }
+    }
+}
+"""
+
+_ONBOARDING_FINISH_JS = f"""
+() => {{
+    try {{
+        localStorage.setItem('onboarding_completed', 'true');
+        localStorage.setItem('onboarding_completed_version', '{ONBOARDING_VERSION}');
+    }} catch (error) {{
+        // Stockage indisponible : on masque quand même le panneau pour la session en cours.
+    }}
+    const overlay = document.getElementById('hf-onboarding-overlay');
+    if (overlay) {{
+        overlay.style.display = 'none';
+    }}
+}}
+"""
+
+_ABOUT_TO_ONBOARDING_JS = """
+() => {
+    const about = document.getElementById('hf-about-overlay');
+    const onboarding = document.getElementById('hf-onboarding-overlay');
+    if (about) {
+        about.style.display = 'none';
+    }
+    if (onboarding) {
+        onboarding.style.display = 'flex';
+    }
+}
+"""
+
+
+def _format_onboarding_step(index: int) -> str:
+    """Rendre le titre et le corps d'une étape de la visite guidée."""
+    step = ONBOARDING_STEPS[index]
+    return f"## {step.title}\n\n{step.body}"
+
+
+def _format_onboarding_dots(index: int) -> str:
+    """Indicateur de progression simple, sans dépendre d'une bibliothèque de carrousel."""
+    return " ".join("●" if i == index else "○" for i in range(len(ONBOARDING_STEPS)))
+
+
+def _onboarding_state(index: int) -> tuple[int, str, str, gr.Button, gr.Button, gr.Button]:
+    """Construire la mise à jour complète des composants pour une étape donnée."""
+    return (
+        index,
+        _format_onboarding_step(index),
+        _format_onboarding_dots(index),
+        gr.Button(visible=index > 0),
+        gr.Button(visible=index < _ONBOARDING_LAST_INDEX),
+        gr.Button(visible=index == _ONBOARDING_LAST_INDEX),
+    )
+
+
+def onboarding_go_next(index: int) -> tuple[int, str, str, gr.Button, gr.Button, gr.Button]:
+    """Avancer d'une étape, sans dépasser la dernière."""
+    return _onboarding_state(min(index + 1, _ONBOARDING_LAST_INDEX))
+
+
+def onboarding_go_prev(index: int) -> tuple[int, str, str, gr.Button, gr.Button, gr.Button]:
+    """Reculer d'une étape, sans descendre sous la première."""
+    return _onboarding_state(max(index - 1, 0))
+
+
+def onboarding_reset() -> tuple[int, str, str, gr.Button, gr.Button, gr.Button]:
+    """Revenir à la première étape — utilisé quand la visite est rejouée depuis « À propos »."""
+    return _onboarding_state(0)
 
 
 def _build_about_markdown() -> str:
@@ -598,8 +706,23 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                     gr.Markdown(_build_about_markdown())
                     about_support_button = gr.Button("📧 Contacter le support", variant="secondary", size="sm")
                     about_legal_button = gr.Button("⚖️ Mentions légales", variant="secondary", size="sm")
+                    about_onboarding_button = gr.Button("🧭 Revoir la visite guidée", variant="secondary", size="sm")
                 with gr.Row(elem_classes="hf-legal-actions"):
                     about_close_button = gr.Button("Fermer", variant="primary", size="sm")
+
+        onboarding_step = gr.State(0)
+        with gr.Column(visible=True, elem_classes="hf-legal-overlay", elem_id="hf-onboarding-overlay"):
+            with gr.Column(elem_classes="hf-legal-card"):
+                with gr.Column(elem_classes="hf-legal-scroll"):
+                    onboarding_dots = gr.Markdown(_format_onboarding_dots(0), elem_classes="hf-onboarding-dots")
+                    onboarding_content = gr.Markdown(_format_onboarding_step(0))
+                with gr.Row(elem_classes="hf-legal-actions"):
+                    onboarding_skip_button = gr.Button("Passer l'introduction", variant="secondary", size="sm")
+                    onboarding_prev_button = gr.Button("← Précédent", variant="secondary", size="sm", visible=False)
+                    onboarding_next_button = gr.Button("Suivant →", variant="primary", size="sm")
+                    onboarding_finish_button = gr.Button(
+                        "🚀 Commencer", variant="primary", size="sm", visible=_ONBOARDING_LAST_INDEX == 0
+                    )
 
         menu_open = gr.State(False)
         nav_buttons: dict[str, gr.Button] = {}
@@ -651,7 +774,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
         legal_back_button.click(
             hide_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         )
-        legal_accept_button.click(fn=None, js=_LEGAL_ACCEPT_JS, queue=False)
+        legal_accept_button.click(fn=None, js=_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS, queue=False)
 
         about_menu_button.click(
             toggle_nav_menu, inputs=menu_open, outputs=[menu_open, nav_menu], queue=False, show_progress="hidden"
@@ -661,6 +784,28 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             show_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         ).then(fn=None, js=_ABOUT_TO_LEGAL_JS, queue=False)
         about_support_button.click(fn=None, js=_build_support_mailto_js(), queue=False)
+
+        onboarding_outputs = [
+            onboarding_step,
+            onboarding_content,
+            onboarding_dots,
+            onboarding_prev_button,
+            onboarding_next_button,
+            onboarding_finish_button,
+        ]
+        onboarding_next_button.click(
+            onboarding_go_next, inputs=onboarding_step, outputs=onboarding_outputs,
+            queue=False, show_progress="hidden",
+        )
+        onboarding_prev_button.click(
+            onboarding_go_prev, inputs=onboarding_step, outputs=onboarding_outputs,
+            queue=False, show_progress="hidden",
+        )
+        onboarding_finish_button.click(fn=None, js=_ONBOARDING_FINISH_JS, queue=False)
+        onboarding_skip_button.click(fn=None, js=_ONBOARDING_FINISH_JS, queue=False)
+        about_onboarding_button.click(
+            onboarding_reset, outputs=onboarding_outputs, queue=False, show_progress="hidden"
+        ).then(fn=None, js=_ABOUT_TO_ONBOARDING_JS, queue=False)
 
         with gr.Row(elem_classes="hf-footer"):
             gr.Markdown(
@@ -675,7 +820,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             show_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         ).then(fn=None, js=_LEGAL_OPEN_JS, queue=False)
 
-        demo.load(fn=None, js=_LEGAL_CHECK_JS, queue=False)
+        demo.load(fn=None, js=_STARTUP_CHECK_JS, queue=False)
 
     return demo
 

@@ -48,8 +48,8 @@ Informations utiles à fournir au support pour tout problème (voir [Support](su
 **Causes possibles** : les modèles comparés ne déclarent pas assez de valeurs numériques communes (paramètres, contexte, etc.).
 **Solution** : ce n'est pas une erreur — comparer des modèles qui renseignent davantage de métadonnées communes fait apparaître le radar.
 
-## L'avertissement légal réapparaît à chaque visite
+## L'avertissement légal ou la visite guidée réapparaissent à chaque visite
 
-**Symptôme** : le bandeau « ⚠️ Information importante » s'affiche à nouveau alors qu'il a déjà été accepté.
+**Symptôme** : le bandeau « ⚠️ Information importante » et/ou la visite guidée s'affichent à nouveau alors qu'ils ont déjà été vus.
 **Causes possibles** : navigation privée (le `localStorage` n'y persiste pas d'une session à l'autre), extension de blocage qui efface le stockage du site, ou effacement manuel des données de navigation.
-**Solution** : ce n'est pas un dysfonctionnement — en navigation privée, ce comportement est normal et attendu. Utiliser une fenêtre normale pour que l'acceptation soit mémorisée durablement. Voir [Informations légales](legal.md).
+**Solution** : ce n'est pas un dysfonctionnement — en navigation privée, ce comportement est normal et attendu. Utiliser une fenêtre normale pour que l'acceptation soit mémorisée durablement. Voir [Informations légales](legal.md) et [Guide → Visite guidée](guide.md#visite-guidée-onboarding).

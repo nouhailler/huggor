@@ -30,9 +30,19 @@ Système ajouté via la commande `/mentions-legales`. Contenu centralisé dans [
 
 - **Stockage** : `localStorage` du navigateur, clé `legal_notice_acknowledged` (+ `legal_notice_acknowledged_version`). 100 % côté client, rien envoyé au serveur ni journalisé.
 - **Modifier le texte** : éditer [`src/legal_notice.py`](src/legal_notice.py) uniquement — jamais dupliquer un paragraphe ailleurs, il est rendu aux deux endroits depuis ce seul fichier.
-- **Changer la version** : incrémenter `LEGAL_NOTICE_VERSION` dans `src/legal_notice.py` et `LEGAL_NOTICE_VERSION` (chaîne JS) dans `_LEGAL_ACCEPT_JS` (`app.py`). Ne pas déclencher automatiquement une réapparition de l'avertissement pour un changement mineur — c'est un choix délibéré, pas fait par défaut ; si un changement le justifie un jour, comparer `legal_notice_acknowledged_version` au stockage côté JS avant de considérer l'avertissement comme acquis.
+- **Changer la version** : incrémenter `LEGAL_NOTICE_VERSION` dans `src/legal_notice.py` et la chaîne JS correspondante dans `_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS` (`app.py`). Ne pas déclencher automatiquement une réapparition de l'avertissement pour un changement mineur — c'est un choix délibéré, pas fait par défaut ; si un changement le justifie un jour, comparer `legal_notice_acknowledged_version` au stockage côté JS avant de considérer l'avertissement comme acquis.
 - **Tester le premier lancement** : ouvrir l'app dans une fenêtre de navigation privée, ou effacer `localStorage` pour `localhost:7860` (console navigateur : `localStorage.removeItem('legal_notice_acknowledged')` puis recharger).
 - **Tests Python** : [`tests/test_legal_notice.py`](tests/test_legal_notice.py) vérifie la structure du contenu (8 sections, non vides, pas de section GPS puisque Huggor n'en a pas besoin). Le parcours interactif (bandeau → détails → acceptation → persistance) a été vérifié manuellement au navigateur, pas par un test automatisé : le projet n'a pas d'outillage e2e JS et il n'était pas justifié d'en ajouter un pour cette seule fonctionnalité.
+
+## Visite guidée (onboarding)
+
+Contenu centralisé dans [`src/onboarding.py`](src/onboarding.py) (5 étapes), affichée dans `app.py` juste après l'acceptation de l'avertissement légal au premier lancement, et rejouable depuis l'écran « ℹ️ À propos » (bouton « 🧭 Revoir la visite guidée »). Réutilise le même mécanisme d'overlay (`.hf-legal-overlay`/`.hf-legal-card`) que les mentions légales et l'écran « À propos » — voir le commentaire au-dessus de `.hf-legal-overlay` dans `app.py`. Détails complets : [`docs/guide.md`](docs/guide.md#visite-guidée-onboarding).
+
+- **Stockage** : `localStorage` du navigateur, clé `onboarding_completed` (+ `onboarding_completed_version`), indépendante de `legal_notice_acknowledged`. 100 % côté client.
+- **Ordre d'affichage** : mentions légales toujours en premier si non acceptées ; la visite guidée ne s'affiche qu'ensuite (voir `_STARTUP_CHECK_JS` et `_LEGAL_ACCEPT_THEN_MAYBE_ONBOARDING_JS` dans `app.py`), jamais les deux overlays en même temps.
+- **Ajouter/modifier une étape** : éditer `ONBOARDING_STEPS` dans [`src/onboarding.py`](src/onboarding.py) uniquement — la navigation (`onboarding_go_next`/`onboarding_go_prev` dans `app.py`) s'adapte automatiquement au nombre d'étapes.
+- **Tester le premier lancement** : effacer `localStorage` (`legal_notice_acknowledged` ET `onboarding_completed`) ou navigation privée.
+- **Tests Python** : [`tests/test_onboarding.py`](tests/test_onboarding.py) (contenu) et `OnboardingNavigationTests` dans [`tests/test_app.py`](tests/test_app.py) (bornes de navigation). Parcours interactif vérifié manuellement au navigateur, même raison que pour les mentions légales.
 
 ## Git
 

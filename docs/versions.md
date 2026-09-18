@@ -2,6 +2,11 @@
 
 # Versions
 
+# Non publié (postérieur à v0.3.0)
+
+- Visite guidée (onboarding) en 5 étapes, affichée juste après l'acceptation de l'avertissement légal au premier lancement, rejouable à tout moment depuis l'écran « ℹ️ À propos » (« 🧭 Revoir la visite guidée »). Mémorisée localement dans le navigateur (`localStorage`, clé `onboarding_completed`), indépendamment de l'avertissement légal. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).
+- Documentation de l'écran « ℹ️ À propos » (ajouté en v0.3.0 mais jamais documenté, sa doc ayant été volontairement différée à ce moment).
+
 # Version 0.3.0
 
 Date : 2026-09-18.

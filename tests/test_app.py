@@ -11,9 +11,13 @@ from app import (
     connection_badge,
     create_app,
     create_theme,
+    onboarding_go_next,
+    onboarding_go_prev,
+    onboarding_reset,
     select_tab_from_menu,
     toggle_nav_menu,
 )
+from src.onboarding import ONBOARDING_STEPS
 
 
 class StubClient:
@@ -90,6 +94,44 @@ class HamburgerMenuTests(unittest.TestCase):
         self.assertEqual(selected_tabs.selected, "hardware")
         self.assertFalse(is_open)
         self.assertFalse(column.visible)
+
+
+class OnboardingNavigationTests(unittest.TestCase):
+    """Vérifier la navigation de la visite guidée, bornée sur les deux extrémités."""
+
+    def test_next_advances_without_overflowing_past_the_last_step(self) -> None:
+        """Rester bloqué sur la dernière étape, jamais d'index hors limites."""
+        last_index = len(ONBOARDING_STEPS) - 1
+
+        index, _content, _dots, prev_btn, next_btn, finish_btn = onboarding_go_next(last_index)
+
+        self.assertEqual(index, last_index)
+        self.assertFalse(next_btn.visible)
+        self.assertTrue(finish_btn.visible)
+        self.assertTrue(prev_btn.visible)
+
+    def test_prev_recedes_without_underflowing_past_the_first_step(self) -> None:
+        """Rester bloqué sur la première étape, jamais d'index négatif."""
+        index, _content, _dots, prev_btn, next_btn, _finish_btn = onboarding_go_prev(0)
+
+        self.assertEqual(index, 0)
+        self.assertFalse(prev_btn.visible)
+        self.assertTrue(next_btn.visible)
+
+    def test_reset_always_returns_to_the_first_step(self) -> None:
+        """Rejouer la visite depuis « À propos » doit repartir du début, pas de la dernière position."""
+        index, content, _dots, prev_btn, _next_btn, _finish_btn = onboarding_reset()
+
+        self.assertEqual(index, 0)
+        self.assertIn(ONBOARDING_STEPS[0].title, content)
+        self.assertFalse(prev_btn.visible)
+
+    def test_finish_button_only_appears_on_the_last_step(self) -> None:
+        """Le bouton « Commencer » ne doit jamais coexister visuellement avec « Suivant »."""
+        for index in range(len(ONBOARDING_STEPS)):
+            with self.subTest(index=index):
+                _idx, _content, _dots, _prev, next_btn, finish_btn = onboarding_go_next(index - 1)
+                self.assertNotEqual(next_btn.visible, finish_btn.visible)
 
 
 if __name__ == "__main__":
