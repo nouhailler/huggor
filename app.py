@@ -828,6 +828,7 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
 
 def main() -> None:
     """Lancer le serveur Gradio avec les paramètres de l'environnement."""
+    app_info._debug_render_env()
     server_name = os.getenv("GRADIO_SERVER_NAME", "127.0.0.1")
     raw_port = os.getenv("GRADIO_SERVER_PORT", "7860")
     try:

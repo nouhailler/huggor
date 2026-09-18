@@ -7,10 +7,33 @@ au moment où l'application démarre (voir /apropos). Une valeur non déterminab
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
+
+
+def _debug_render_env() -> None:
+    """Diagnostic temporaire : comprendre pourquoi la dérivation Git échoue sur Render.
+
+    À retirer une fois le mécanisme corrigé — ne jamais logger de valeur sensible, seulement
+    le préfixe RENDER_ documenté comme public par Render et des commandes git en lecture seule.
+    """
+    render_vars = {k: v for k, v in os.environ.items() if k.startswith("RENDER")}
+    if render_vars:
+        print(f"[app_info debug] Variables RENDER_* détectées : {render_vars}")
+    else:
+        print("[app_info debug] Aucune variable RENDER_* détectée dans l'environnement.")
+
+    for args in (
+        ("remote", "-v"),
+        ("tag",),
+        ("describe", "--tags", "--always", "--dirty"),
+        ("rev-parse", "--is-shallow-repository"),
+        ("log", "-1", "--format=%H"),
+    ):
+        print(f"[app_info debug] git {' '.join(args)} -> {_run_git(*args)!r}")
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _UNKNOWN = "—"
