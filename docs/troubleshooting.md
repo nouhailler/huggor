@@ -2,7 +2,7 @@
 
 # Dépannage
 
-Informations utiles à fournir au support pour tout problème (voir [Support](support.md)) : version (0.1.0, ou commit Git), mode d'accès (local / Hugging Face Space / Render), navigateur, message d'erreur exact, état de la connexion réseau.
+Informations utiles à fournir au support pour tout problème (voir [Support](support.md)) : version (0.2.0, ou commit Git), mode d'accès (local / Hugging Face Space / Render), navigateur, message d'erreur exact, état de la connexion réseau.
 
 ## Aucun résultat ne s'affiche
 
@@ -47,3 +47,9 @@ Informations utiles à fournir au support pour tout problème (voir [Support](su
 **Symptôme** : le tableau de comparaison s'affiche mais pas le radar, avec le message « Radar indisponible : moins de trois quantités communes renseignées. »
 **Causes possibles** : les modèles comparés ne déclarent pas assez de valeurs numériques communes (paramètres, contexte, etc.).
 **Solution** : ce n'est pas une erreur — comparer des modèles qui renseignent davantage de métadonnées communes fait apparaître le radar.
+
+## L'avertissement légal réapparaît à chaque visite
+
+**Symptôme** : le bandeau « ⚠️ Information importante » s'affiche à nouveau alors qu'il a déjà été accepté.
+**Causes possibles** : navigation privée (le `localStorage` n'y persiste pas d'une session à l'autre), extension de blocage qui efface le stockage du site, ou effacement manuel des données de navigation.
+**Solution** : ce n'est pas un dysfonctionnement — en navigation privée, ce comportement est normal et attendu. Utiliser une fenêtre normale pour que l'acceptation soit mémorisée durablement. Voir [Informations légales](legal.md).

@@ -45,6 +45,10 @@ Si quelqu'un partage un lien Hugging Face Space (`https://huggingface.co/spaces/
 ```
 Lancement (`python app.py` ou lien déployé)
     ↓
+Avertissement légal (première visite de ce navigateur uniquement)
+    ↓
+« J'ai compris » (ou « Voir les détails » d'abord)
+    ↓
 Écran principal (onglet « 🔍 Recherche » actif par défaut)
     ↓
 Champ « Mot-clé » déjà pré-rempli avec « Gemma » (exemple fonctionnel immédiat)
@@ -54,7 +58,7 @@ Appuyer sur Entrée ou cliquer « 🔍 Rechercher »
 Résultats affichés, chacun avec un bouton « Voir détails → »
 ```
 
-Il n'y a pas d'écran de bienvenue, de consentement ni de permissions à accorder au démarrage (aucune permission native de type caméra/GPS n'est utilisée — voir [Permissions](permissions.md)). Le bandeau en haut de l'écran indique immédiatement si un token Hugging Face est configuré (« 🟢 Token HF configuré ») ou non (« Accès public »).
+À la toute première visite d'un navigateur, un avertissement légal (« ⚠️ Information importante ») s'affiche avant l'écran principal — voir [Informations légales](legal.md). Il ne réapparaît plus ensuite sur ce même navigateur (mémorisé dans son `localStorage`), et reste consultable à tout moment via le lien « ⚖️ Mentions légales » en pied de page. Aucune permission native de type caméra/GPS n'est utilisée — voir [Permissions](permissions.md). Le bandeau en haut de l'écran indique immédiatement si un token Hugging Face est configuré (« 🟢 Token HF configuré ») ou non (« Accès public »).
 
 Aucune configuration initiale n'est requise : l'application fonctionne sans compte, sans inscription, sans token. Le seul réglage possible est l'authentification Hugging Face (voir [Permissions](permissions.md)), qui peut être ajoutée à tout moment sans redémarrer l'application (relancer `python app.py` après avoir modifié `.env`, ou re-fournir `HF_TOKEN` côté serveur pour un déploiement).
 

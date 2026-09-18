@@ -16,6 +16,7 @@ from src.ui.hardware_tab import build_hardware_tab
 from src.ui.search_tab import build_search_tab
 from src.ui.usage_tab import build_usage_tab
 from src.ui.test_tab import build_test_tab
+from src.legal_notice import SHORT_WARNING, TITLE as LEGAL_TITLE, render_full_notice_markdown
 
 APP_CSS = """
 .gradio-container {
@@ -223,6 +224,58 @@ APP_CSS = """
     flex-wrap: wrap;
     gap: 0.5rem;
 }
+.hf-legal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.55);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+.hf-legal-card {
+    background: var(--block-background-fill);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    max-height: min(85vh, 720px);
+    max-width: 560px;
+    width: 100%;
+    overflow: hidden;
+}
+.hf-legal-scroll {
+    overflow-y: auto;
+    padding: 1.25rem 1.4rem 0.5rem;
+}
+.hf-legal-actions {
+    border-top: 1px solid var(--border-color-primary);
+    flex-shrink: 0;
+    gap: 0.6rem;
+    padding: 0.9rem 1.4rem;
+}
+.hf-footer {
+    align-items: center;
+    color: var(--body-text-color-subdued);
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    gap: 0.4rem 1rem;
+}
+.hf-footer-legal-button {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--link-text-color) !important;
+    display: inline;
+    font: inherit !important;
+    height: auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    text-decoration: underline;
+    width: auto !important;
+}
 @media (max-width: 640px) {
     .hf-header {
         align-items: flex-start;
@@ -288,6 +341,63 @@ def select_tab_from_menu(tab_id: str) -> tuple[gr.Tabs, bool, gr.Column]:
     return gr.Tabs(selected=tab_id), False, gr.Column(visible=False)
 
 
+# JS pur, exécuté côté client sans aller-retour serveur : l'acceptation des mentions légales
+# est strictement locale (localStorage), jamais transmise ni journalisée côté application.
+_LEGAL_CHECK_JS = """
+() => {
+    let acknowledged = false;
+    try {
+        acknowledged = localStorage.getItem('legal_notice_acknowledged') === 'true';
+    } catch (error) {
+        acknowledged = false;
+    }
+    const overlay = document.getElementById('hf-legal-overlay');
+    if (overlay) {
+        overlay.style.display = acknowledged ? 'none' : 'flex';
+    }
+}
+"""
+
+_LEGAL_ACCEPT_JS = """
+() => {
+    try {
+        localStorage.setItem('legal_notice_acknowledged', 'true');
+        localStorage.setItem('legal_notice_acknowledged_version', '1.0');
+    } catch (error) {
+        // Stockage indisponible (navigation privée stricte, par exemple) : on masque quand
+        // même le bandeau pour la session en cours plutôt que de bloquer l'utilisateur.
+    }
+    const overlay = document.getElementById('hf-legal-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+"""
+
+_LEGAL_OPEN_JS = """
+() => {
+    const overlay = document.getElementById('hf-legal-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+}
+"""
+
+
+def show_legal_details() -> tuple[gr.Column, gr.Column, gr.Button, gr.Button]:
+    """Basculer vers la page complète des mentions légales, dans le même panneau.
+
+    Rester dans le même panneau (plutôt qu'ouvrir un second overlay) évite tout conflit de
+    z-index avec le bandeau court : voir la commande /mentions-legales, piège des overlays.
+    """
+    return gr.Column(visible=False), gr.Column(visible=True), gr.Button(visible=False), gr.Button(visible=True)
+
+
+def hide_legal_details() -> tuple[gr.Column, gr.Column, gr.Button, gr.Button]:
+    """Revenir à l'avertissement court, sans quitter le panneau."""
+    return gr.Column(visible=True), gr.Column(visible=False), gr.Button(visible=True), gr.Button(visible=False)
+
+
 def connection_badge(has_token: bool) -> str:
     """Produire l'indicateur d'authentification sans afficher le token."""
     if has_token:
@@ -324,6 +434,17 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                 menu_toggle = gr.Button(
                     "☰", elem_classes="hf-hamburger", size="sm", min_width=1
                 )
+
+        with gr.Column(visible=True, elem_classes="hf-legal-overlay", elem_id="hf-legal-overlay"):
+            with gr.Column(elem_classes="hf-legal-card"):
+                with gr.Column(elem_classes="hf-legal-scroll") as legal_short_page:
+                    gr.Markdown(f"## {LEGAL_TITLE}\n\n{SHORT_WARNING}")
+                with gr.Column(elem_classes="hf-legal-scroll", visible=False) as legal_full_page:
+                    gr.Markdown(render_full_notice_markdown())
+                with gr.Row(elem_classes="hf-legal-actions"):
+                    legal_details_button = gr.Button("Voir les détails", variant="secondary", size="sm")
+                    legal_back_button = gr.Button("← Retour", variant="secondary", size="sm", visible=False)
+                    legal_accept_button = gr.Button("J'ai compris", variant="primary", size="sm")
 
         menu_open = gr.State(False)
         nav_buttons: dict[str, gr.Button] = {}
@@ -366,11 +487,29 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
                 partial(select_tab_from_menu, tab_id), outputs=[tabs, menu_open, nav_menu]
             )
 
-        gr.Markdown(
-            "Données fournies par le [Hugging Face Hub](https://huggingface.co/models). "
-            "[📚 Documentation](https://github.com/nouhailler/huggor/blob/main/docs/index.md)",
-            elem_classes="hf-footer",
+        legal_page_outputs = [legal_short_page, legal_full_page, legal_details_button, legal_back_button]
+        legal_details_button.click(
+            show_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
         )
+        legal_back_button.click(
+            hide_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
+        )
+        legal_accept_button.click(fn=None, js=_LEGAL_ACCEPT_JS, queue=False)
+
+        with gr.Row(elem_classes="hf-footer"):
+            gr.Markdown(
+                "Données fournies par le [Hugging Face Hub](https://huggingface.co/models). "
+                "[📚 Documentation](https://github.com/nouhailler/huggor/blob/main/docs/index.md)",
+                container=False,
+            )
+            legal_footer_button = gr.Button(
+                "⚖️ Mentions légales", elem_classes="hf-footer-legal-button", size="sm"
+            )
+        legal_footer_button.click(
+            show_legal_details, outputs=legal_page_outputs, queue=False, show_progress="hidden"
+        ).then(fn=None, js=_LEGAL_OPEN_JS, queue=False)
+
+        demo.load(fn=None, js=_LEGAL_CHECK_JS, queue=False)
 
     return demo
 

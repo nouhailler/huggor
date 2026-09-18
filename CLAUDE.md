@@ -24,6 +24,16 @@ python -m unittest discover -s tests -v
 
 Isolés du réseau, bibliothèque standard uniquement (`unittest`).
 
+## Mentions légales / avertissement de premier lancement
+
+Système ajouté via la commande `/mentions-legales`. Contenu centralisé dans [`src/legal_notice.py`](src/legal_notice.py), affiché à deux endroits dans [`app.py`](app.py) : un bandeau au premier lancement et un lien permanent « ⚖️ Mentions légales » en pied de page. Détails complets : [`docs/legal.md`](docs/legal.md).
+
+- **Stockage** : `localStorage` du navigateur, clé `legal_notice_acknowledged` (+ `legal_notice_acknowledged_version`). 100 % côté client, rien envoyé au serveur ni journalisé.
+- **Modifier le texte** : éditer [`src/legal_notice.py`](src/legal_notice.py) uniquement — jamais dupliquer un paragraphe ailleurs, il est rendu aux deux endroits depuis ce seul fichier.
+- **Changer la version** : incrémenter `LEGAL_NOTICE_VERSION` dans `src/legal_notice.py` et `LEGAL_NOTICE_VERSION` (chaîne JS) dans `_LEGAL_ACCEPT_JS` (`app.py`). Ne pas déclencher automatiquement une réapparition de l'avertissement pour un changement mineur — c'est un choix délibéré, pas fait par défaut ; si un changement le justifie un jour, comparer `legal_notice_acknowledged_version` au stockage côté JS avant de considérer l'avertissement comme acquis.
+- **Tester le premier lancement** : ouvrir l'app dans une fenêtre de navigation privée, ou effacer `localStorage` pour `localhost:7860` (console navigateur : `localStorage.removeItem('legal_notice_acknowledged')` puis recharger).
+- **Tests Python** : [`tests/test_legal_notice.py`](tests/test_legal_notice.py) vérifie la structure du contenu (8 sections, non vides, pas de section GPS puisque Huggor n'en a pas besoin). Le parcours interactif (bandeau → détails → acceptation → persistance) a été vérifié manuellement au navigateur, pas par un test automatisé : le projet n'a pas d'outillage e2e JS et il n'était pas justifié d'en ajouter un pour cette seule fonctionnalité.
+
 ## Git
 
 Dépôt GitHub : `nouhailler/huggor`. Ne jamais commit de secret (`.env`, tokens). `data/cache/` et `data/analytics/` sont ignorés par git ; `data/favorites.json` est versionné mais doit rester vide (`[]`) dans les commits — c'est un fichier de données utilisateur, pas un exemple.

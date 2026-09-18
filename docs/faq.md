@@ -28,3 +28,6 @@ Non. Le radar ne compare que les modèles sélectionnés, et les listes Analytic
 
 **Pourquoi l'onglet 🧪 Test n'affiche-t-il rien de fonctionnel ?**
 Cette fonctionnalité n'est pas encore implémentée — voir [Limites connues](reference.md#limites-connues).
+
+**Pourquoi un avertissement s'affiche-t-il à ma première visite ?**
+C'est l'avertissement légal de Huggor (limitation de responsabilité). Il ne s'affiche qu'une fois par navigateur et reste consultable à tout moment via le lien « ⚖️ Mentions légales » en pied de page. Voir [Informations légales](legal.md).

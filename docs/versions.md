@@ -2,6 +2,10 @@
 
 # Versions
 
+# Non publié (postérieur à v0.2.0)
+
+- Avertissement légal de premier lancement + page « ⚖️ Mentions légales » accessible en permanence depuis le pied de page. Contenu centralisé dans `src/legal_notice.py`, acceptation mémorisée localement dans le navigateur (`localStorage`), aucune donnée transmise au serveur. Voir [`docs/legal.md`](legal.md).
+
 # Version 0.2.0
 
 Date : 2026-09-18.

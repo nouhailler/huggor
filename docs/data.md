@@ -12,6 +12,7 @@
 | Observations Analytics (tendances, croissance) | Résultats de recherche déjà reçus du Hub, agrégés localement | `data/analytics/` | Aucune | Détecter des tendances dans le temps, localement |
 | RAM/VRAM déclarées | Saisie de l'utilisateur | Non stockée (recalculée à chaque saisie) | Jamais transmise au Hub | Calculer un verdict de compatibilité matérielle |
 | Token Hugging Face (`HF_TOKEN`) | Configuration de l'utilisateur/de l'administrateur du déploiement | Variable d'environnement, fichier `.env` local ou secret de la plateforme de déploiement | Envoyé au Hub uniquement pour authentifier les requêtes | Accéder aux ressources privées/protégées — voir [Permissions](permissions.md) |
+| Acceptation de l'avertissement légal | Clic sur « J'ai compris » | `localStorage` du navigateur (clé `legal_notice_acknowledged`) | Aucune (jamais envoyée au serveur) | Ne pas réafficher l'avertissement à chaque visite — voir [Informations légales](legal.md) |
 
 Aucune donnée personnelle identifiante (nom, e-mail, adresse) n'est collectée par l'application elle-même. Elle ne dispose d'aucun compte utilisateur.
 
@@ -27,4 +28,4 @@ Aucune donnée personnelle identifiante (nom, e-mail, adresse) n'est collectée 
 
 **Ce qui est conservé** : uniquement des métadonnées publiques du Hub et les données personnelles saisies volontairement (favoris). **Suppression** : voir [Gestion du cache](features.md#gestion-du-cache) pour vider le cache manuellement ; supprimer `data/favorites.json` (ou son contenu) efface les favoris. **À la désinstallation** (paquet Debian) : les données dans `${XDG_DATA_HOME:-~/.local/share}/hf-explorer/` sont conservées par défaut, pas supprimées automatiquement — voir [Bien démarrer](getting-started.md#mise-à-jour-et-désinstallation). **Export** : aucune fonction d'export n'existe dans l'interface. `data/favorites.json` reste un fichier JSON lisible et copiable directement en dehors de l'application.
 
-Aucune base de données externe, aucun `localStorage`/`IndexedDB` navigateur n'est utilisé : tout le stockage se fait côté serveur, dans des fichiers JSON locaux (voir [`src/utils/cache.py`](../src/utils/cache.py) et [`src/utils/favorites.py`](../src/utils/favorites.py)).
+Aucune base de données externe ni `IndexedDB` n'est utilisé : l'essentiel du stockage se fait côté serveur, dans des fichiers JSON locaux (voir [`src/utils/cache.py`](../src/utils/cache.py) et [`src/utils/favorites.py`](../src/utils/favorites.py)). Une seule exception, purement côté navigateur : `localStorage` mémorise l'acceptation de l'avertissement légal (clé `legal_notice_acknowledged`) — voir [Informations légales](legal.md). Rien d'autre n'y est stocké.
