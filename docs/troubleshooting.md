@@ -2,7 +2,7 @@
 
 # Dépannage
 
-Informations utiles à fournir au support pour tout problème (voir [Support](support.md)) : version (0.2.0, ou commit Git), mode d'accès (local / Hugging Face Space / Render), navigateur, message d'erreur exact, état de la connexion réseau.
+Informations utiles à fournir au support pour tout problème (voir [Support](support.md)) : version (0.3.0, ou commit Git), mode d'accès (local / Hugging Face Space / Render), navigateur, message d'erreur exact, état de la connexion réseau.
 
 ## Aucun résultat ne s'affiche
 

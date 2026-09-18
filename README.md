@@ -41,6 +41,8 @@ Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, 
 - [Gestion du cache](src/cache_manager.py) industrialisée par domaine (recherches, détails, model cards, statistiques, benchmarks à venir) : aperçu entrées/taille/fraîcheur et purge ciblée dans l'onglet Analytics (« 🗄️ Gestion du cache »), et dans la fiche modèle un repère « ⏱ Dernière mise à jour » avec un bouton « 🔄 Actualiser depuis Hugging Face » pour forcer un rechargement sans passer par le cache
 - Mode hors connexion : si le Hugging Face Hub devient injoignable (coupure réseau, DNS, timeout — pas un simple refus 404/403/429 qui prouve au contraire qu'il répond), un bandeau « 🟠 Mode hors connexion » apparaît et les recherches, fiches déjà consultées et comparaisons continuent de s'afficher depuis le cache local même expiré ; les favoris restent bien sûr consultables puisqu'ils sont purement locaux. L'état repasse en ligne dès qu'un appel réseau réussit à nouveau
 - Menu hamburger (☰) : sur petit écran, la barre des huit onglets laisse place à un menu déroulant regroupant les fonctionnalités par catégorie (🔍 Explorer, 🔬 Analyser un modèle, 📊 Suivre et organiser) — une seule interface responsive, sans mode séparé pour mobile et desktop
+- Avertissement légal au premier lancement (mémorisé localement dans le navigateur) et page « ⚖️ Mentions légales » accessible en permanence depuis le pied de page — voir [`src/legal_notice.py`](src/legal_notice.py)
+- Écran « ℹ️ À propos » tout en bas du menu hamburger : version et commit réels (dérivés de Git, jamais codés en dur), liens auteur/support/dépôt/signaler un bug, crédits des dépendances open source — voir [`src/app_info.py`](src/app_info.py)
 
 Le radar n’est pas une mesure de qualité. Les statistiques portent uniquement sur les 50 résultats sélectionnés, pas sur tout le Hub. L’évolution commence au premier chargement, sans historique reconstruit. Les observations sont séparées par filtres et empreinte d’authentification dans `data/analytics/`, avec 90 jours observés conservés et une expiration après un an d’inactivité.
 
@@ -100,7 +102,7 @@ python -m unittest discover -s tests -v
 
 ## Capture d'écran
 
-_À ajouter avec l'interface Gradio._
+![Recherche de modèles dans HF Explorer, avec des résultats affichés pour « Gemma »](docs/assets/screenshots/search-results.png)
 
 ## Paquet Debian / Ubuntu
 

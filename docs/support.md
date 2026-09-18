@@ -8,7 +8,7 @@ Ouvrir une [issue GitHub](https://github.com/nouhailler/huggor/issues) sur le d�
 
 ## Informations à fournir
 
-- Version de l'application (0.1.0, ou commit Git exact : `git rev-parse HEAD`)
+- Version de l'application (visible dans l'écran « ℹ️ À propos », ou commit Git exact : `git rev-parse HEAD`)
 - Mode d'accès : local (`python app.py`), paquet Debian, Hugging Face Space, ou Render
 - Appareil et système d'exploitation
 - Navigateur et sa version

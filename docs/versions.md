@@ -2,9 +2,15 @@
 
 # Versions
 
-# Non publié (postérieur à v0.2.0)
+# Version 0.3.0
 
-- Avertissement légal de premier lancement + page « ⚖️ Mentions légales » accessible en permanence depuis le pied de page. Contenu centralisé dans `src/legal_notice.py`, acceptation mémorisée localement dans le navigateur (`localStorage`), aucune donnée transmise au serveur. Voir [`docs/legal.md`](legal.md).
+Date : 2026-09-18.
+
+## Nouveautés
+
+- Avertissement légal de premier lancement + page « ⚖️ Mentions légales » accessible en permanence depuis le pied de page. Contenu centralisé dans `src/legal_notice.py`, acceptation mémorisée localement dans le navigateur (`localStorage`), aucune donnée transmise au serveur. Voir [Informations légales](legal.md).
+- Écran « ℹ️ À propos » tout en bas du menu hamburger : version et commit dérivés de Git au démarrage (jamais codés en dur), liens auteur/site/portfolio/dépôt/signaler un bug (dérivés du remote Git réel), bouton support ouvrant un brouillon d'e-mail avec diagnostic, crédits des licences des dépendances open source. Voir [`src/app_info.py`](../src/app_info.py).
+- Capture d'écran ajoutée au README.
 
 # Version 0.2.0
 
