@@ -367,7 +367,8 @@ def create_app(client: HuggingFaceClient | None = None) -> gr.Blocks:
             )
 
         gr.Markdown(
-            "Données fournies par le [Hugging Face Hub](https://huggingface.co/models).",
+            "Données fournies par le [Hugging Face Hub](https://huggingface.co/models). "
+            "[📚 Documentation](https://github.com/nouhailler/huggor/blob/main/docs/index.md)",
             elem_classes="hf-footer",
         )
 
