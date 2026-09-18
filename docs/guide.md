@@ -139,7 +139,7 @@ Huit onglets composent l'application, plus un menu hamburger qui prend le relais
 **Accès** : tout en bas du [menu hamburger](#-menu-hamburger-mobile), en dessous de [⚙️ Paramètres](#-paramètres).
 
 **Éléments d'interface** :
-- Logo, nom, **version et commit** (dérivés de Git au démarrage, jamais codés en dur — « — » si indéterminable)
+- Logo, nom, **version et commit** (dérivés des variables fournies par la plateforme d'hébergement quand elle en fournit — ex. Render — sinon de Git local, jamais codés en dur — « — » si indéterminable partout)
 - Lien **Notes de version**, liens **auteur/site/portfolio/dépôt/signaler un bug** (dérivés du remote Git réel du dépôt)
 - Bouton **📧 Contacter le support** : ouvre un brouillon d'e-mail pré-rempli (version, commit, navigateur) que l'utilisateur relit et envoie lui-même — jamais d'envoi automatique
 - Bouton **⚖️ Mentions légales** : ouvre directement la page complète des [mentions légales](legal.md)

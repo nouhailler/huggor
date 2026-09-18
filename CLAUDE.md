@@ -44,6 +44,14 @@ Contenu centralisé dans [`src/onboarding.py`](src/onboarding.py) (5 étapes), a
 - **Tester le premier lancement** : effacer `localStorage` (`legal_notice_acknowledged` ET `onboarding_completed`) ou navigation privée.
 - **Tests Python** : [`tests/test_onboarding.py`](tests/test_onboarding.py) (contenu) et `OnboardingNavigationTests` dans [`tests/test_app.py`](tests/test_app.py) (bornes de navigation). Parcours interactif vérifié manuellement au navigateur, même raison que pour les mentions légales.
 
+## Écran « À propos » / métadonnées de build
+
+Contenu assemblé dans `_build_about_markdown()` (`app.py`) à partir de [`src/app_info.py`](src/app_info.py). Point piégeux confirmé empiriquement le 2026-09-18 : **Render déploie depuis un clone Git superficiel**, sans tags ni remote `origin` — `git describe`/`git remote` y échouent silencieusement (repli sur un hash nu, ou `None`). `src/app_info.py` compense en préférant les variables `RENDER_GIT_COMMIT`/`RENDER_GIT_BRANCH`/`RENDER_GIT_REPO_SLUG` (injectées par Render lui-même, donc fiables même sur ce clone superficiel) avant de retomber sur Git local puis sur `—`. Toujours garder cet ordre de repli si ce fichier est modifié : Render en priorité, jamais l'inverse, sinon la régression revient silencieusement en production sans échouer en local.
+
+- **`PYTHONUNBUFFERED=1`** est déclaré dans `render.yaml` : sans lui, la sortie standard de Python (donc tout `print()` de débogage) n'apparaît dans les logs Render qu'après un délai imprévisible, voire jamais tant que le process tourne — c'est ce qui a caché ce problème un moment.
+- **Tests Python** : [`tests/test_app_info.py`](tests/test_app_info.py), notamment `RenderEnvironmentPriorityTests` qui verrouille cet ordre de priorité avec des variables d'environnement simulées.
+- **Ne jamais logger la valeur d'un secret pour déboguer** un problème d'environnement sur Render : `GET /v1/services/{id}/env-vars` de l'API Render renvoie les valeurs **en clair**, contrairement à l'API Hugging Face qui masque ses secrets — vérifié en le découvrant après coup avec `HF_TOKEN`. Se limiter aux noms de clés, ou aux variables déjà documentées comme publiques par Render (préfixe `RENDER_`, hors tout ce qui ressemble à un token/secret).
+
 ## Git
 
 Dépôt GitHub : `nouhailler/huggor`. Ne jamais commit de secret (`.env`, tokens). `data/cache/` et `data/analytics/` sont ignorés par git ; `data/favorites.json` est versionné mais doit rester vide (`[]`) dans les commits — c'est un fichier de données utilisateur, pas un exemple.
