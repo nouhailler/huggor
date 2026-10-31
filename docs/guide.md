@@ -97,7 +97,7 @@ Huit onglets composent l'application, plus un menu hamburger qui prend le relais
 
 **Cas particuliers** : « Rising models » sans historique suffisant affiche un message explicite invitant à charger au moins une tendance, ou à revenir un autre jour (une seule journée observée ne suffit pas à détecter une croissance).
 
-**Limites** : le radar et les statistiques portent uniquement sur l'échantillon chargé (jusqu'à 50 résultats), pas sur tout le Hub. Voir [Fonctionnalités → Analytics](features.md#analytics-observatoire-du-hub) et [Gestion du cache](features.md#gestion-du-cache).
+**Limites** : le radar et les statistiques portent uniquement sur l'échantillon chargé (jusqu'à 50 résultats), pas sur tout le Hub. Voir [Fonctionnalités → Analytics](features.md#analytics--observatoire-du-hub) et [Gestion du cache](features.md#gestion-du-cache).
 
 ## ⭐ Favoris
 

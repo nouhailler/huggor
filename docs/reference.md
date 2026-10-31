@@ -58,7 +58,7 @@ Source : [`src/api_client.py`](../src/api_client.py) (méthode `_translate_error
 
 - **Navigateurs** : tout navigateur récent supportant JavaScript (desktop ou mobile). Aucune restriction connue à un navigateur en particulier — non testé exhaustivement par navigateur (À vérifier pour une matrice de compatibilité précise par nom/version).
 - **Écrans** : responsive dès 375px de large (menu hamburger en dessous de 768px) jusqu'aux grands écrans desktop.
-- **Python** (exécution locale/serveur) : 3.10 ou supérieur, requis par le code et documenté dans le [README](../README.md#prérequis).
+- **Python** (exécution locale/serveur) : 3.10 ou supérieur, requis par le code et documenté dans le [README](../README.md#démarrage-rapide).
 - **Systèmes** : le paquet packagé est spécifique à Debian/Ubuntu (`.deb`) ; l'application elle-même, étant un serveur Python + une page web, peut tourner sur tout système supportant Python 3.10+ (Linux, macOS, Windows) sans paquet dédié.
 - **PWA installable** : uniquement quand déployée sur un Hugging Face Space (activation automatique par Gradio). Pas d'installation PWA sur Render ou en local sans configuration explicite (`pwa=True`).
 

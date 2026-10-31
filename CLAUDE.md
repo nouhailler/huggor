@@ -1,6 +1,6 @@
 # Contexte projet — Huggor (HF Explorer)
 
-Application Python/Gradio pour rechercher, examiner, comparer et tester les modèles du Hugging Face Hub. Voir [README.md](README.md) pour l'installation, le lancement et le déploiement (Hugging Face Spaces, Render).
+Application Python/Gradio pour rechercher, examiner, comparer et tester les modèles du Hugging Face Hub. Voir [README.md](README.md) pour le démarrage rapide, et [docs/](docs/index.md) (configuration, architecture, déploiement) (Hugging Face Spaces, Render).
 
 ## Documentation
 

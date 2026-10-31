@@ -32,7 +32,7 @@ Informations utiles à fournir au support pour tout problème (voir [Support](su
 **Symptôme** : la page reste sur « Chargement… » plusieurs dizaines de secondes lors d'un déploiement Hugging Face Spaces ou Render.
 **Causes possibles** : le service gratuit était en veille après inactivité (comportement normal des tiers gratuits de ces plateformes) et redémarre à la demande.
 **Diagnostic** : recharger la page après 30 à 50 secondes.
-**Solution** : patienter puis rafraîchir ; ce n'est pas un dysfonctionnement mais un comportement attendu du tier gratuit — voir le [README](../README.md#déploiement-sur-render).
+**Solution** : patienter puis rafraîchir ; ce n'est pas un dysfonctionnement mais un comportement attendu du tier gratuit — voir le [Déploiement sur Render](deployment-render.md).
 **Si le problème persiste** : vérifier les logs de déploiement de la plateforme (Render : `hf spaces logs` n'est pas applicable ici, utiliser le tableau de bord Render).
 
 ## Le bandeau « Mode hors connexion » apparaît de façon inattendue

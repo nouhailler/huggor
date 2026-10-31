@@ -6,7 +6,7 @@
 
 Huggor (« 🤗 HF Explorer ») est une application **web**, pas une application mobile native ni une PWA installable de façon systématique :
 
-- Elle tourne dans un navigateur, en local ou déployée (Hugging Face Spaces, Render — voir le [README](../README.md#déploiement-sur-hugging-face-spaces)).
+- Elle tourne dans un navigateur, en local ou déployée (Hugging Face Spaces, Render — voir le [Render](deployment-render.md), [Hugging Face Spaces](deployment-huggingface.md)).
 - Le mode PWA (installation sur l'écran d'accueil, icône dédiée) est fourni par Gradio et s'active **automatiquement uniquement** quand l'application tourne sur un Hugging Face Space. Sur Render ou en local, elle reste une page web classique sauf à ajouter explicitement `pwa=True` dans `app.py` (non fait à ce jour).
 - Compatibilité : tout navigateur récent (desktop ou mobile) supportant JavaScript. Sur petit écran (< 768px), la barre d'onglets laisse place à un [menu hamburger](guide.md#-menu-hamburger-mobile) — voir [Compatibilité](reference.md#compatibilité) pour le détail.
 
@@ -67,4 +67,4 @@ Aucune configuration initiale n'est requise : l'application fonctionne sans comp
 - **En local / dépôt Git** : `git pull` puis `pip install -r requirements.txt` si les dépendances ont changé.
 - **Paquet Debian** : `sudo apt install ./hf-explorer_<nouvelle-version>_all.deb` ; les mises à jour conservent les favoris et l'historique (stockés dans `${XDG_DATA_HOME:-~/.local/share}/hf-explorer/`).
 - **Désinstallation (paquet Debian)** : `sudo apt remove hf-explorer` — les données locales (`data/`) sont conservées par défaut, pas supprimées automatiquement. Pour les effacer manuellement : supprimer `${XDG_DATA_HOME:-~/.local/share}/hf-explorer/`.
-- **Déploiement (Spaces/Render)** : la désinstallation consiste à supprimer le Space ou le service Render depuis leur interface respective ; voir le [README](../README.md) pour les liens.
+- **Déploiement (Spaces/Render)** : la désinstallation consiste à supprimer le Space ou le service Render depuis leur interface respective ; voir [Render](deployment-render.md) et [Hugging Face Spaces](deployment-huggingface.md).

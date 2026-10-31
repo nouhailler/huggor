@@ -10,7 +10,9 @@
 - 🚀 [Bien démarrer](getting-started.md)
 - 📖 [Guide utilisateur](guide.md)
 - 🧩 [Fonctionnalités](features.md)
-- ⚙️ [Paramètres](settings.md)
+- ⚙️ [Paramètres](settings.md) · [Configuration (variables d'environnement)](configuration.md)
+- 🏗️ [Architecture](architecture.md)
+- 🚢 Déploiement : [Render](deployment-render.md) · [Hugging Face Spaces](deployment-huggingface.md) · [Paquet Debian](packaging-debian.md)
 - 🔐 [Permissions](permissions.md) · [Données et confidentialité](data.md)
 - 📡 [Fonctionnement hors connexion](offline.md)
 - 🛠️ [Dépannage](troubleshooting.md)
@@ -60,15 +62,16 @@
 - [Calculateur de ressources (Hardware)](features.md#calculateur-de-ressources-hardware)
 - [Comparateur décisionnel](features.md#comparateur-décisionnel)
 - [Favoris (collections)](features.md#favoris-collections)
-- [Analytics — Observatoire du Hub](features.md#analytics-observatoire-du-hub)
+- [Analytics — Observatoire du Hub](features.md#analytics--observatoire-du-hub)
 - [Gestion du cache](features.md#gestion-du-cache)
 - [Mode hors connexion](features.md#mode-hors-connexion)
 </details>
 
 <details>
-<summary><strong>4. Paramètres</strong> (1)</summary>
+<summary><strong>4. Paramètres et configuration</strong> (2)</summary>
 
 - [Tous les paramètres exposés](settings.md)
+- [Variables d'environnement](configuration.md)
 </details>
 
 <details>

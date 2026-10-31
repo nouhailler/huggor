@@ -17,6 +17,8 @@
 
 Aucune donnée personnelle identifiante (nom, e-mail, adresse) n'est collectée par l'application elle-même. Elle ne dispose d'aucun compte utilisateur.
 
+**Télémétrie du framework** : Gradio, la bibliothèque d'interface, active par défaut sa propre télémétrie anonyme (`GRADIO_ANALYTICS_ENABLED`, défaut `True` dans le code de Gradio 6.26.0) ; Huggor ne la désactive pas. Ce n'est pas une donnée collectée par Huggor. Pour la couper, définir `GRADIO_ANALYTICS_ENABLED=False` avant le lancement — voir [Configuration](configuration.md). Le contenu exact de cette télémétrie relève de Gradio : `À vérifier` dans sa documentation.
+
 ## Stockage local
 
 | Répertoire | Contenu | Durée de vie / TTL | Suivi par Git |
