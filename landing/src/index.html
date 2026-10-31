@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Huggor — Explorez et comparez les modèles d'IA de Hugging Face</title>
+    <meta name="description" content="Huggor HF Explorer vous permet d'explorer, analyser et comparer les modèles Hugging Face et d'évaluer leurs besoins matériels pour savoir s'ils peuvent fonctionner sur votre machine.">
+    <meta name="theme-color" content="#0b1020">
+    <meta name="color-scheme" content="light dark">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="Huggor — HF Explorer">
+    <meta property="og:title" content="Huggor — Explorez et comparez les modèles d'IA de Hugging Face">
+    <meta property="og:description" content="Explorez, analysez et comparez les modèles du Hugging Face Hub, puis évaluez s'ils tiennent dans la RAM et la VRAM de votre machine.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Huggor — Explorez et comparez les modèles d'IA de Hugging Face">
+    <meta name="twitter:description" content="Explorez, analysez et comparez les modèles du Hugging Face Hub, puis évaluez s'ils tiennent dans la RAM et la VRAM de votre machine.">
+    <!--SITE_META-->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Huggor — HF Explorer",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web, Linux",
+        "description": "Application Python/Gradio pour explorer, analyser et comparer les modèles du Hugging Face Hub et estimer leurs besoins en RAM et VRAM.",
+        "url": "{{APP_URL}}",
+        "codeRepository": "{{GITHUB_URL}}",
+        "inLanguage": "fr"
+      }
+    </script>
+    <script type="module" src="/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header" id="haut">
+      <div class="container header-bar">
+        <a class="brand" href="#accueil" aria-label="Huggor — HF Explorer, retour à l'accueil">
+          <img class="brand-mark" src="/favicon.svg" alt="" width="36" height="36">
+          <span class="brand-text"><strong>Huggor</strong><small>HF Explorer</small></span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+          <span class="menu-toggle-bars" aria-hidden="true"></span>
+          <span class="sr-only">Menu</span>
+        </button>
+        <nav class="site-nav" id="menu-principal" aria-label="Navigation principale">
+          <ul>
+            <li><a href="#compatibilite">Compatibilité</a></li>
+            <li><a href="#explorer">Explorer</a></li>
+            <li><a href="#comparer">Comparer</a></li>
+            <li><a href="#acces">Téléchargements</a></li>
+            <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">GitHub<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{HUB_URL}}" target="_blank" rel="noopener">Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></li>
+          </ul>
+          <div class="nav-actions">
+            <a class="btn btn-primary btn-small" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer les modèles<span class="sr-only"> (nouvel onglet)</span></a>
+            <a class="btn btn-ghost btn-small" href="#acces">Téléchargements</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenu">
+      <section class="hero" id="accueil" aria-labelledby="titre-hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">HF Explorer · Hugging Face Hub</p>
+            <h1 id="titre-hero">Huggor — Découvrez les modèles d'IA. <span class="accent">Vérifiez s'ils tiennent sur votre machine.</span></h1>
+            <p class="lead">Explorez, analysez et comparez les modèles du Hugging Face Hub. Évaluez leurs besoins en ressources matérielles pour choisir des modèles adaptés à votre configuration.</p>
+            <ol class="steps" aria-label="Les trois actions principales">
+              <li><span class="step-number" aria-hidden="true">1</span><span><strong>Explorer</strong> les modèles du Hub</span></li>
+              <li><span class="step-number" aria-hidden="true">2</span><span><strong>Comparer</strong> leurs caractéristiques</span></li>
+              <li><span class="step-number" aria-hidden="true">3</span><span><strong>Évaluer</strong> leur compatibilité matérielle</span></li>
+            </ol>
+            <div class="button-row">
+              <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
+              <a class="btn btn-ghost-light" href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">Télécharger Huggor<span class="sr-only"> (nouvel onglet)</span></a>
+            </div>
+            <p class="hero-note">Application web gratuite hébergée sur Render : après une période d'inactivité, le premier chargement peut prendre 30 à 50 secondes.</p>
+          </div>
+          <figure class="hero-visual">
+            <img src="/images/shot-hardware.webp" width="1100" height="1290" alt="Capture de HF Explorer : calculateur Hardware indiquant, pour un modèle de 14,8 milliards de paramètres, quelles précisions tiennent dans 16 Go de RAM." fetchpriority="high">
+            <figcaption>Capture réelle de HF Explorer : onglet Hardware.</figcaption>
+          </figure>
+        </div>
+        <div class="container">
+          <dl class="facts">
+            <div><dt>6</dt><dd>précisions évaluées, de FP32 à Q4_K_M</dd></div>
+            <div><dt>2 à 4</dt><dd>modèles comparés côte à côte</dd></div>
+            <div><dt>9</dt><dd>composantes détaillées dans le Huggor Score</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="section section-dark" id="compatibilite" aria-labelledby="titre-compatibilite">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Le cœur de Huggor</p>
+            <h2 id="titre-compatibilite">Est-ce que ce modèle tient sur ma machine ?</h2>
+            <p class="lead">Les modèles d'IA peuvent exiger des ressources très différentes. Avant de télécharger plusieurs gigaoctets, il est utile de connaître la taille d'un modèle, son besoin en mémoire et les limites de sa configuration. Huggor aide à anticiper cette compatibilité.</p>
+          </div>
+
+          <div class="params-grid">
+            <article class="card card-dark">
+              <h3>Ce que Huggor prend en compte</h3>
+              <ul class="check-list">
+                <li><strong>Nombre de paramètres</strong> du modèle, lu dans les métadonnées du Hub</li>
+                <li><strong>Précision / quantification</strong> : FP32, FP16, INT8, Q8, Q6, Q4_K_M</li>
+                <li><strong>RAM et VRAM</strong> que vous déclarez</li>
+                <li><strong>Marge d'exécution</strong> de 10 % ajoutée aux poids</li>
+                <li><strong>Architecture</strong> (couches, dimensions, têtes d'attention) pour estimer le contexte via le cache KV</li>
+              </ul>
+            </article>
+            <article class="card card-dark">
+              <h3>Ce qui n'est pas pris en compte</h3>
+              <ul class="cross-list">
+                <li>Les noms de GPU et de CPU saisis : champs facultatifs, <strong>non utilisés dans le calcul</strong></li>
+                <li>L'espace de stockage disponible</li>
+                <li>Le moteur d'inférence, la taille de lot et les autres processus en cours</li>
+                <li>Toute mesure réelle de performance : la vitesse affichée est un repère générique</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="estimator card" id="simulateur">
+            <div class="estimator-head">
+              <h3>Illustration de la méthode</h3>
+              <p>Ajustez les valeurs : ce simulateur applique les mêmes formules et constantes que l'onglet Hardware de l'application, à partir d'un nombre de paramètres que vous choisissez. Dans HF Explorer, ce nombre vient du modèle réel.</p>
+            </div>
+            <form class="estimator-form" id="estimator-form" novalidate>
+              <label for="est-preset">Taille du modèle
+                <select id="est-preset">
+                  <option value="1">1 milliard de paramètres</option>
+                  <option value="3">3 milliards</option>
+                  <option value="7">7 milliards</option>
+                  <option value="14.8" selected>14,8 milliards</option>
+                  <option value="32">32 milliards</option>
+                  <option value="70">70 milliards</option>
+                  <option value="custom">Autre valeur…</option>
+                </select>
+              </label>
+              <label for="est-params" id="est-params-label" hidden>Paramètres (en milliards)
+                <input id="est-params" type="number" min="0.1" max="1000" step="0.1" value="14.8" inputmode="decimal">
+              </label>
+              <label for="est-ram">RAM (Gio)
+                <input id="est-ram" type="number" min="0" max="4096" step="1" value="16" inputmode="numeric">
+              </label>
+              <label for="est-vram">VRAM (Gio)
+                <input id="est-vram" type="number" min="0" max="1024" step="1" value="0" inputmode="numeric">
+              </label>
+            </form>
+            <p class="estimator-summary" id="est-summary" role="status" aria-live="polite"></p>
+            <div class="chart" id="est-chart" aria-hidden="true"></div>
+            <div class="table-wrap">
+              <table class="data-table" id="est-table">
+                <caption class="sr-only">Mémoire estimée et verdict pour chaque précision</caption>
+                <thead><tr><th scope="col">Précision</th><th scope="col">Mémoire estimée</th><th scope="col">Verdict</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <noscript><p class="note">Le simulateur nécessite JavaScript. La capture ci-dessus montre le même calcul dans l'application.</p></noscript>
+          </div>
+
+          <p class="disclaimer" role="note"><strong>Une aide à la décision, pas une garantie.</strong> Ces estimations ne garantissent pas qu'un modèle fonctionnera dans toutes les conditions. La consommation réelle dépend notamment du moteur d'inférence, de la longueur du contexte, de la taille de lot, de la quantification exacte et des autres processus en cours. La taille des fichiers d'un modèle ne mesure pas, à elle seule, ses besoins en mémoire.</p>
+        </div>
+      </section>
+
+      <section class="section" id="explorer" aria-labelledby="titre-explorer">
+        <div class="container split">
+          <div class="split-copy">
+            <p class="eyebrow">Explorer</p>
+            <h2 id="titre-explorer">Explorer le Hugging Face Hub sans ouvrir chaque fiche</h2>
+            <p class="lead">HF Explorer interroge l'API du Hub et présente les résultats sous forme de cartes synthétiques, avec un lien direct vers la fiche d'origine pour consulter le détail sur Hugging Face.</p>
+            <ul class="check-list">
+              <li>Recherche par <strong>mot-clé</strong>, puis par <strong>domaine</strong> (LLM, Vision, Image, Audio, Speech, Embeddings, Multimodal, Reranking) et <strong>tâche précise</strong></li>
+              <li>Filtres de <strong>langue</strong> et de <strong>licence</strong>, plage du <strong>nombre de paramètres</strong></li>
+              <li>Tri par <strong>téléchargements</strong>, <strong>likes</strong>, date de création ou pertinence ; 5 à 100 résultats</li>
+              <li>Chaque carte : auteur, popularité, taille en paramètres, tâche, bibliothèque et tags</li>
+              <li><strong>Mon usage</strong> : partir d'un objectif (chatbot, code, RAG, traduction…) et de votre RAM/VRAM pour ne voir que des modèles jouables</li>
+            </ul>
+            <p><a class="text-link" href="{{HUB_URL}}" target="_blank" rel="noopener">Parcourir le Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></p>
+          </div>
+          <figure class="shot">
+            <img src="/images/shot-search.webp" width="1100" height="860" loading="lazy" alt="Capture de HF Explorer : écran de recherche avec les filtres de domaine, tâche, langue, licence et tri, puis la liste des modèles Gemma trouvés.">
+            <figcaption>Recherche et filtres dans HF Explorer.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section section-tint" id="analyser" aria-labelledby="titre-analyser">
+        <div class="container split split-reverse">
+          <div class="split-copy">
+            <p class="eyebrow">Analyser</p>
+            <h2 id="titre-analyser">Comprendre un modèle en une fiche</h2>
+            <p class="lead">La fiche technique rassemble ce qu'il faut savoir avant de télécharger, expliqué en français, avec des infobulles sur chaque champ.</p>
+            <ul class="check-list">
+              <li><strong>Identité et architecture</strong> : famille, classes, nombre de paramètres, type de données, contexte maximal, vocabulaire</li>
+              <li><strong>Précisions et quantifications détectées</strong> (FP32 à Q2, GPTQ, AWQ, EXL2, MLX) et <strong>variantes déjà quantifiées</strong> trouvées sur le Hub</li>
+              <li><strong>Fichiers du dépôt</strong> : inventaire annoté, arborescence, recommandation des poids à télécharger</li>
+              <li><strong>Verdict matériel</strong> (Model Advisor) selon la précision, et modèles similaires</li>
+              <li><strong>Huggor Score</strong> sur 100, toujours accompagné du détail de ses neuf composantes</li>
+              <li>Model Card complète et extraits de code pour un usage local</li>
+            </ul>
+            <p class="note">Les variantes quantifiées et les modèles similaires reposent sur des heuristiques fondées sur les métadonnées publiques ; le score n'est pas une mesure de qualité du modèle.</p>
+          </div>
+          <figure class="shot">
+            <img src="/images/shot-details.webp" width="1100" height="1160" loading="lazy" alt="Capture de HF Explorer : fiche d'un modèle avec les tableaux Identité et Architecture, puis le début du Huggor Score sur 100.">
+            <figcaption>Fiche technique d'un modèle.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="comparer" aria-labelledby="titre-comparer">
+        <div class="container split">
+          <div class="split-copy">
+            <p class="eyebrow">Comparer</p>
+            <h2 id="titre-comparer">Le meilleur modèle n'est pas forcément le plus gros</h2>
+            <p class="lead">C'est celui qui correspond à votre usage et à votre matériel. Le comparateur met 2 à 4 modèles côte à côte et propose une recommandation motivée.</p>
+            <div class="table-wrap">
+              <table class="data-table">
+                <caption class="sr-only">Critères comparés par HF Explorer</caption>
+                <thead><tr><th scope="col">Critère</th><th scope="col">Ce qui est comparé</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Taille</th><td>Nombre de paramètres, taille des fichiers</td></tr>
+                  <tr><th scope="row">Popularité</th><td>Téléchargements et likes</td></tr>
+                  <tr><th scope="row">Capacités</th><td>Contexte, licence, couverture du français déclarée</td></tr>
+                  <tr><th scope="row">Matériel</th><td>Adéquation à une machine locale (verdict Model Advisor)</td></tr>
+                  <tr><th scope="row">Formats</th><td>Disponibilité de GGUF, type de données (dtype)</td></tr>
+                  <tr><th scope="row">Technique</th><td>Tâche, architecture, dernière mise à jour, radar des quantités communes</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="note">La recommandation combine l'estimation RAM/VRAM, la disponibilité GGUF et, en dernier recours, la popularité. Ce n'est pas un jugement de qualité absolue : vérifiez toujours la Model Card.</p>
+          </div>
+          <figure class="shot">
+            <img src="/images/shot-compare.webp" width="1100" height="1190" loading="lazy" alt="Capture de HF Explorer : comparaison de deux modèles dans un tableau décisionnel, suivie d'une recommandation du meilleur compromis pour un usage local.">
+            <figcaption>Comparaison de deux modèles et recommandation.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section section-tint" id="machine" aria-labelledby="titre-machine">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Votre matériel</p>
+            <h2 id="titre-machine">Connaître les limites de sa machine</h2>
+            <p class="lead">Huggor ne détecte pas votre matériel : vous déclarez votre mémoire, et l'application la confronte aux besoins estimés du modèle. Quatre notions restent distinctes.</p>
+          </div>
+          <div class="four-grid">
+            <article class="card">
+              <h3><span class="tag tag-violet">Connu</span> Votre machine</h3>
+              <p><strong>RAM</strong> et <strong>VRAM</strong> que vous renseignez. Rien n'est détecté automatiquement. Les champs GPU et CPU sont facultatifs et ne servent qu'à votre repère. Le stockage n'est pas pris en compte.</p>
+            </article>
+            <article class="card">
+              <h3><span class="tag tag-cyan">Estimé</span> Le modèle</h3>
+              <p>Paramètres × octets par paramètre de chaque précision, plus 10 % de marge d'exécution. Le cache KV permet d'estimer le contexte réaliste quand l'architecture est standard.</p>
+            </article>
+            <article class="card">
+              <h3><span class="tag tag-orange">Marges</span> Seuils de confort</h3>
+              <p>Jusqu'à 85 % de la mémoire disponible : « tient confortablement ». Entre 85 % et 100 % : « à la limite ». Au-delà : « ne tient pas ».</p>
+            </article>
+            <article class="card">
+              <h3><span class="tag tag-grey">Limites</span> De l'estimation</h3>
+              <p>La vitesse repose sur des repères génériques de bande passante (GPU dédié récent, RAM double canal), pas sur votre matériel exact. C'est un ordre de grandeur.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="pour-qui" aria-labelledby="titre-pour-qui">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Pour qui ?</p>
+            <h2 id="titre-pour-qui">Pour choisir avant de télécharger</h2>
+          </div>
+          <ul class="audience-grid">
+            <li><h3>Exécuter des modèles en local</h3><p>Savoir quelle précision tient dans votre RAM ou votre VRAM avant de lancer un téléchargement.</p></li>
+            <li><h3>Passionnés d'IA et développeurs</h3><p>Parcourir le Hub par tâche, comparer des candidats et lire des fiches techniques claires.</p></li>
+            <li><h3>Avec ou sans GPU dédié</h3><p>Déclarez une VRAM nulle : le calcul bascule sur la RAM et indique la vitesse attendue.</p></li>
+            <li><h3>Utilisateurs d'Ollama, llama.cpp et autres</h3><p>Huggor ne pilote pas ces outils et n'exécute aucun modèle : il aide seulement à choisir un modèle adapté, en amont.</p></li>
+            <li><h3>Curieux de l'écosystème</h3><p>Découvrir les modèles disponibles, leurs licences et leur popularité sans connaître le jargon du Hub.</p></li>
+            <li><h3>Éviter les mauvaises surprises</h3><p>Ne plus télécharger des modèles trop gros pour votre matériel.</p></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section section-tint" id="acces" aria-labelledby="titre-acces">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Deux façons d'utiliser Huggor</p>
+            <h2 id="titre-acces">Application web et téléchargements</h2>
+          </div>
+          <div class="access-grid">
+            <article class="card access-card">
+              <h3>Utiliser HF Explorer en ligne</h3>
+              <p>L'application web Python/Gradio s'ouvre directement dans votre navigateur, sans installation ni compte.</p>
+              <ul class="plain-list">
+                <li>Gratuit, hébergé sur Render (offre gratuite)</li>
+                <li>Mise en veille après inactivité : 30 à 50 secondes au premier chargement</li>
+                <li>Stockage éphémère : vos favoris et le cache sont réinitialisés quand l'instance redémarre</li>
+              </ul>
+              <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Ouvrir HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
+            </article>
+            <article class="card access-card">
+              <h3>Télécharger Huggor <span class="tag tag-violet">Linux</span></h3>
+              <p>Dernière version publiée : <strong>{{RELEASE_VERSION}}</strong> {{RELEASE_DATE}}. Paquet Debian/Ubuntu <code>{{DEB_NAME}}</code> ({{DEB_SIZE}}), indépendant de l'architecture.</p>
+              <p class="install-label" id="install-label">Installation en une commande, sans sudo :</p>
+              <div class="code-block">
+                <pre><code id="install-command" aria-labelledby="install-label">{{INSTALL_COMMAND}}</code></pre>
+                <button type="button" class="btn btn-small btn-ghost" id="copy-command" data-target="install-command">Copier</button>
+              </div>
+              <ul class="plain-list">
+                <li>Prérequis : Python 3.10 ou supérieur avec son module <code>venv</code>, Internet au premier lancement</li>
+                <li>Intégrité vérifiée par SHA-256 ; mise à jour en relançant la commande</li>
+                <li>Pas de binaire Windows ni macOS : l'application se lance depuis les sources</li>
+              </ul>
+              <div class="button-row">
+                <a class="btn btn-primary" href="{{DEB_URL}}">Télécharger le .deb</a>
+                <a class="btn btn-ghost" href="{{CHECKSUM_URL}}">Somme SHA-256</a>
+                <a class="btn btn-ghost" href="{{RELEASES_URL}}" target="_blank" rel="noopener">Voir toutes les versions sur GitHub<span class="sr-only"> (nouvel onglet)</span></a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="open-source" aria-labelledby="titre-open-source">
+        <div class="container split">
+          <div class="split-copy">
+            <p class="eyebrow">Transparence</p>
+            <h2 id="titre-open-source">Un code consultable sur GitHub</h2>
+            <p class="lead">Le code source de Huggor est public sur GitHub, ainsi que l'historique des versions et la documentation.</p>
+            <dl class="spec-list">
+              <div><dt>Langage</dt><dd>Python (3.10 ou supérieur)</dd></div>
+              <div><dt>Interface</dt><dd>Gradio</dd></div>
+              <div><dt>Bibliothèques</dt><dd>huggingface_hub, pandas, plotly, python-dotenv</dd></div>
+              <div><dt>Lancement local</dt><dd><code>python app.py</code> après <code>pip install -r requirements.txt</code></dd></div>
+              <div><dt>Distribution</dt><dd>Installateur et paquet .deb, ou instance web</dd></div>
+              <div><dt>Tests</dt><dd>Tests unitaires <code>unittest</code>, isolés du réseau</dd></div>
+              <div><dt>Licence</dt><dd>Aucun fichier de licence n'est publié à ce jour : les conditions de réutilisation ne sont pas encore définies.</dd></div>
+            </dl>
+          </div>
+          <div class="link-card card">
+            <h3>Liens utiles</h3>
+            <ul class="link-list">
+              <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">Code source<span class="sr-only"> (nouvel onglet)</span></a></li>
+              <li><a href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">Versions téléchargeables<span class="sr-only"> (nouvel onglet)</span></a></li>
+              <li><a href="{{DOCS_URL}}" target="_blank" rel="noopener">Documentation et instructions d'installation<span class="sr-only"> (nouvel onglet)</span></a></li>
+              <li><a href="{{CONTRIBUTING_URL}}" target="_blank" rel="noopener">Contribuer<span class="sr-only"> (nouvel onglet)</span></a></li>
+              <li><a href="{{ISSUES_URL}}" target="_blank" rel="noopener">Signaler un problème<span class="sr-only"> (nouvel onglet)</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta" aria-labelledby="titre-cta">
+        <div class="container cta-inner">
+          <h2 id="titre-cta">Trouvez les modèles adaptés à votre machine.</h2>
+          <p class="lead">Explorez l'écosystème Hugging Face, comparez les modèles et évaluez leurs besoins matériels avec Huggor.</p>
+          <div class="button-row button-row-center">
+            <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
+            <a class="btn btn-ghost-light" href="#acces">Télécharger Huggor</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="#accueil" aria-label="Huggor — HF Explorer, retour en haut">
+            <img class="brand-mark" src="/favicon.svg" alt="" width="36" height="36">
+            <span class="brand-text"><strong>Huggor</strong><small>HF Explorer</small></span>
+          </a>
+          <p>Explorer, analyser et comparer les modèles du Hugging Face Hub, et estimer leurs besoins en mémoire. Édité par <a href="https://swinux.ch" target="_blank" rel="noopener">Swinux<span class="sr-only"> (nouvel onglet)</span></a>.</p>
+        </div>
+        <nav aria-label="Liens du pied de page">
+          <ul class="footer-links">
+            <li><a href="{{APP_URL}}" target="_blank" rel="noopener">Application web<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">Dépôt GitHub<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">Téléchargements<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{HUB_URL}}" target="_blank" rel="noopener">Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{LEGAL_URL}}" target="_blank" rel="noopener">Informations légales<span class="sr-only"> (nouvel onglet)</span></a></li>
+          </ul>
+        </nav>
+        <p class="footer-small">Ce site ne dépose aucun cookie et n'utilise aucun traceur. Les données de modèles proviennent de l'API publique du Hugging Face Hub. Aucune licence n'est indiquée à ce jour pour le code de Huggor.</p>
+      </div>
+    </footer>
+  </body>
+</html>

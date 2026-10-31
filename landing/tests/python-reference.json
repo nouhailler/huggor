@@ -1,0 +1,3461 @@
+{
+ "generatedBy": "src.resource_calculator.calculate_resources",
+ "cases": [
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 2640000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 1320000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 660000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 701250000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 541398000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 402204000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 9.1,
+   "tpsHigh": 21.2
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 9.1,
+   "tpsHigh": 21.2
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 68.2,
+   "tpsHigh": 159.1
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 68.2,
+   "tpsHigh": 159.1
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 68.2,
+   "tpsHigh": 159.1
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 9.1,
+   "tpsHigh": 21.2
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 68.2,
+   "tpsHigh": 159.1
+  },
+  {
+   "parametersBillions": 0.6,
+   "parameters": 600000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 2640000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 1320000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 660000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 701250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 541398000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 402204000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 68.2,
+   "tpsHigh": 159.1
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 4400000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 2200000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 1100000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 1168750000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 902330000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 670340000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 5.5,
+   "tpsHigh": 12.7
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 5.5,
+   "tpsHigh": 12.7
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 40.9,
+   "tpsHigh": 95.5
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 40.9,
+   "tpsHigh": 95.5
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 40.9,
+   "tpsHigh": 95.5
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 5.5,
+   "tpsHigh": 12.7
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 40.9,
+   "tpsHigh": 95.5
+  },
+  {
+   "parametersBillions": 1.0,
+   "parameters": 1000000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 4400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 2200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 1100000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 1168750000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 902330000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 670340000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 40.9,
+   "tpsHigh": 95.5
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 13200000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 6600000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 3300000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 3506250000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 2706990000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 2011020000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 13200000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP16",
+   "path": "cpu",
+   "tpsLow": 3.6,
+   "tpsHigh": 8.5
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 1.8,
+   "tpsHigh": 4.2
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 1.8,
+   "tpsHigh": 4.2
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 1.8,
+   "tpsHigh": 4.2
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 13.6,
+   "tpsHigh": 31.8
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 1.8,
+   "tpsHigh": 4.2
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 13.6,
+   "tpsHigh": 31.8
+  },
+  {
+   "parametersBillions": 3.0,
+   "parameters": 3000000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 13200000000,
+     "path": "gpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 6600000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 3300000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 3506250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 2706990000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 2011020000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "gpu",
+   "tpsLow": 13.6,
+   "tpsHigh": 31.8
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 30800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 15400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 7700000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 8181250000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 6316310000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 4692380000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 30800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 15400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "warning",
+     "memoryBytes": 7700000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "warning",
+     "memoryBytes": 8181250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "cpu"
+    }
+   ],
+   "best": "Q6",
+   "path": "cpu",
+   "tpsLow": 3.8,
+   "tpsHigh": 8.9
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 30800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "warning",
+     "memoryBytes": 15400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "cpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "cpu",
+   "tpsLow": 3.1,
+   "tpsHigh": 7.3
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 30800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "warning",
+     "memoryBytes": 15400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "gpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "cpu",
+   "tpsLow": 3.1,
+   "tpsHigh": 7.3
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "warning",
+     "memoryBytes": 30800000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 15400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP16",
+   "path": "cpu",
+   "tpsLow": 1.6,
+   "tpsHigh": 3.6
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 30800000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 15400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 0.8,
+   "tpsHigh": 1.8
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 30800000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 15400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 0.8,
+   "tpsHigh": 1.8
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 30800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 15400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP16",
+   "path": "gpu",
+   "tpsLow": 11.7,
+   "tpsHigh": 27.3
+  },
+  {
+   "parametersBillions": 7.0,
+   "parameters": 7000000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 30800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "warning",
+     "memoryBytes": 15400000000,
+     "path": "gpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 7700000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 8181250000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 6316310000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 4692380000,
+     "path": "gpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "gpu",
+   "tpsLow": 23.4,
+   "tpsHigh": 54.5
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 32560000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 16280000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 17297500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 13354484000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 9921032000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 32560000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 16280000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 17297500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 13354484000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 9921032000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 32560000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "warning",
+     "memoryBytes": 16280000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 17297500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "cpu"
+    }
+   ],
+   "best": "Q6",
+   "path": "cpu",
+   "tpsLow": 1.8,
+   "tpsHigh": 4.2
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 32560000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "warning",
+     "memoryBytes": 16280000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 17297500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "cpu"
+    }
+   ],
+   "best": "Q6",
+   "path": "cpu",
+   "tpsLow": 1.8,
+   "tpsHigh": 4.2
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "warning",
+     "memoryBytes": 32560000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 16280000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 17297500000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "gpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "cpu",
+   "tpsLow": 1.5,
+   "tpsHigh": 3.4
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "warning",
+     "memoryBytes": 65120000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 32560000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 16280000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 17297500000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "gpu"
+    }
+   ],
+   "best": "FP16",
+   "path": "cpu",
+   "tpsLow": 0.7,
+   "tpsHigh": 1.7
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "ok",
+     "memoryBytes": 65120000000,
+     "path": "cpu"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 32560000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 16280000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 17297500000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP32",
+   "path": "cpu",
+   "tpsLow": 0.4,
+   "tpsHigh": 0.9
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 32560000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 16280000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 17297500000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "gpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "gpu",
+   "tpsLow": 11.1,
+   "tpsHigh": 25.8
+  },
+  {
+   "parametersBillions": 14.8,
+   "parameters": 14800000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 65120000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 32560000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "warning",
+     "memoryBytes": 16280000000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 17297500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 13354484000,
+     "path": "gpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 9921032000,
+     "path": "gpu"
+    }
+   ],
+   "best": "Q6",
+   "path": "gpu",
+   "tpsLow": 13.5,
+   "tpsHigh": 31.5
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 28874560000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 21450880000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 28874560000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 21450880000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 28874560000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 21450880000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 28874560000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 21450880000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 28874560000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 21450880000,
+     "path": "cpu"
+    }
+   ],
+   "best": "Q6",
+   "path": "cpu",
+   "tpsLow": 0.8,
+   "tpsHigh": 1.9
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 35200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 37400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 28874560000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 21450880000,
+     "path": "gpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "cpu",
+   "tpsLow": 0.7,
+   "tpsHigh": 1.6
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "ok",
+     "memoryBytes": 70400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 35200000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 37400000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 28874560000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 21450880000,
+     "path": "cpu"
+    }
+   ],
+   "best": "FP16",
+   "path": "cpu",
+   "tpsLow": 0.3,
+   "tpsHigh": 0.8
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 28874560000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 21450880000,
+     "path": "gpu"
+    }
+   ],
+   "best": "Q4_K_M",
+   "path": "gpu",
+   "tpsLow": 8.4,
+   "tpsHigh": 19.6
+  },
+  {
+   "parametersBillions": 32.0,
+   "parameters": 32000000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 140800000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 70400000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 35200000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 37400000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 28874560000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 21450880000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "warning",
+     "memoryBytes": 63163100000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 46923800000,
+     "path": "cpu"
+    }
+   ],
+   "best": "Q4_K_M",
+   "path": "cpu",
+   "tpsLow": 0.5,
+   "tpsHigh": 1.2
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "ok",
+     "memoryBytes": 77000000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "ok",
+     "memoryBytes": 81812500000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 63163100000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 46923800000,
+     "path": "cpu"
+    }
+   ],
+   "best": "INT8",
+   "path": "cpu",
+   "tpsLow": 0.3,
+   "tpsHigh": 0.7
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 70.0,
+   "parameters": 70000000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 308000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 154000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 77000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 81812500000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 63163100000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 46923800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 0,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 8,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 16,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 16,
+   "vramGib": 8,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 32,
+   "vramGib": 12,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 64,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 128,
+   "vramGib": 0,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "warning",
+     "memoryBytes": 132000000000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "ok",
+     "memoryBytes": 108279600000,
+     "path": "cpu"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "ok",
+     "memoryBytes": 80440800000,
+     "path": "cpu"
+    }
+   ],
+   "best": "Q6",
+   "path": "cpu",
+   "tpsLow": 0.2,
+   "tpsHigh": 0.5
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 16,
+   "vramGib": 24,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  },
+  {
+   "parametersBillions": 120.0,
+   "parameters": 120000000000,
+   "ramGib": 0,
+   "vramGib": 16,
+   "precisions": [
+    {
+     "label": "FP32",
+     "status": "no",
+     "memoryBytes": 528000000000,
+     "path": "none"
+    },
+    {
+     "label": "FP16",
+     "status": "no",
+     "memoryBytes": 264000000000,
+     "path": "none"
+    },
+    {
+     "label": "INT8",
+     "status": "no",
+     "memoryBytes": 132000000000,
+     "path": "none"
+    },
+    {
+     "label": "Q8",
+     "status": "no",
+     "memoryBytes": 140250000000,
+     "path": "none"
+    },
+    {
+     "label": "Q6",
+     "status": "no",
+     "memoryBytes": 108279600000,
+     "path": "none"
+    },
+    {
+     "label": "Q4_K_M",
+     "status": "no",
+     "memoryBytes": 80440800000,
+     "path": "none"
+    }
+   ],
+   "best": null,
+   "path": "none",
+   "tpsLow": null,
+   "tpsHigh": null
+  }
+ ]
+}

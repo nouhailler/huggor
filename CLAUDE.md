@@ -52,6 +52,10 @@ Contenu assemblé dans `_build_about_markdown()` (`app.py`) à partir de [`src/a
 - **Tests Python** : [`tests/test_app_info.py`](tests/test_app_info.py), notamment `RenderEnvironmentPriorityTests` qui verrouille cet ordre de priorité avec des variables d'environnement simulées.
 - **Ne jamais logger la valeur d'un secret pour déboguer** un problème d'environnement sur Render : `GET /v1/services/{id}/env-vars` de l'API Render renvoie les valeurs **en clair**, contrairement à l'API Hugging Face qui masque ses secrets — vérifié en le découvrant après coup avec `HF_TOKEN`. Se limiter aux noms de clés, ou aux variables déjà documentées comme publiques par Render (préfixe `RENDER_`, hors tout ce qui ressemble à un token/secret).
 
+## Landing page (`landing/`)
+
+Site statique indépendant de l'application, déployé sur Cloudflare Pages (détails : [`landing/README.md`](landing/README.md)). URLs centralisées dans `landing/site.config.json` ; ne jamais écrire une adresse en dur dans `src/index.html`. **Toute affirmation de la page doit correspondre à une fonction réelle** (tableau « Correspondance contenu ↔ code » du README de `landing/`). `landing/src/estimator.js` reprend les constantes de `src/resource_calculator.py` : si l'une change, mettre à jour l'autre et régénérer `landing/tests/python-reference.json` (`npm test` dans `landing/`). Ne pas déclarer de licence ni de `SITE_URL` à la place du propriétaire.
+
 ## Git
 
 Dépôt GitHub : `nouhailler/huggor`. Ne jamais commit de secret (`.env`, tokens). `data/cache/` et `data/analytics/` sont ignorés par git ; `data/favorites.json` est versionné mais doit rester vide (`[]`) dans les commits — c'est un fichier de données utilisateur, pas un exemple.

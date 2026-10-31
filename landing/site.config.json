@@ -1,0 +1,18 @@
+{
+  "appUrl": "https://huggor.onrender.com/",
+  "githubUrl": "https://github.com/nouhailler/huggor",
+  "downloadsUrl": "https://github.com/nouhailler/huggor-downloads",
+  "downloadsRepository": "nouhailler/huggor-downloads",
+  "hubUrl": "https://huggingface.co/models",
+  "docsUrl": "https://github.com/nouhailler/huggor/blob/main/docs/index.md",
+  "legalUrl": "https://github.com/nouhailler/huggor/blob/main/docs/legal.md",
+  "issuesUrl": "https://github.com/nouhailler/huggor/issues",
+  "contributingUrl": "https://github.com/nouhailler/huggor/blob/main/CONTRIBUTING.md",
+  "siteUrl": "",
+  "fallbackRelease": {
+    "version": "0.3.0",
+    "tag": "v0.3.0",
+    "debAsset": "hf-explorer_0.3.0_all.deb",
+    "checksumAsset": "hf-explorer_0.3.0_all.deb.sha256"
+  }
+}

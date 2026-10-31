@@ -221,6 +221,10 @@ Historique des évolutions : [CHANGELOG.md](CHANGELOG.md) (version 0.1.0) et [do
 
 Liste complète : [docs/reference.md](docs/reference.md#limites-connues).
 
+## Site de présentation
+
+La landing page de Huggor (HTML/CSS/JS statique, sans dépendance) est dans [`landing/`](landing/README.md), prévue pour Cloudflare Pages. Elle est indépendante de l'application.
+
 ## Contribuer et obtenir de l'aide
 
 - 🐞 [Signaler un bug ou demander une fonctionnalité](https://github.com/nouhailler/huggor/issues/new)
