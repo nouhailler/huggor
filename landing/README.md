@@ -4,6 +4,7 @@ Site de présentation statique de [Huggor](https://github.com/nouhailler/huggor)
 
 - HTML / CSS / JavaScript natifs, **aucune dépendance** (Node.js 18+ uniquement pour le script de build).
 - Pas de cookie, pas de traceur, pas de police ni de script externe (CSP stricte dans `src/_headers`).
+- Les boutons « Installer » de la page d'accueil mènent à `/installer/`, qui donne la commande curl de `huggor-downloads` ; l'accueil n'affiche plus de bouton « Télécharger ».
 - Contenu aligné sur les fonctions réellement présentes dans le code : voir le tableau [Correspondance contenu ↔ code](#correspondance-contenu--code).
 
 ## Structure
@@ -15,6 +16,7 @@ landing/
 ├── serve.mjs          # serveur statique local (applique aussi src/_headers)
 ├── src/
 │   ├── index.html     # la page (marqueurs {{APP_URL}}, {{DEB_URL}}…)
+│   ├── installer/index.html   # page d'installation : commande curl, prérequis, mise à jour, désinstallation
 │   ├── styles.css, main.js, estimator.js
 │   ├── sw.js, manifest.webmanifest, icons/   # PWA de la vitrine uniquement
 │   ├── images/        # captures réelles de HF Explorer (WebP)
@@ -88,7 +90,7 @@ Les en-têtes de sécurité (CSP, `nosniff`, `Referrer-Policy`…) et le cache s
 | Filtres : mot-clé, domaine/tâche, langue, licence, plage de paramètres, tri, 5–100 résultats | `SearchFilters` dans `src/api_client.py`, `src/ui/search_tab.py` |
 | Comparateur 2 à 4 modèles, critères, recommandation, radar | `src/comparison.py`, `src/ui/compare_tab.py` |
 | Huggor Score, 9 composantes | `src/huggor_score.py` |
-| Téléchargements : `.deb` et `install.sh`, Linux uniquement | dépôt `huggor-downloads` (release lue via l'API) |
+| Page `/installer/` : commande `curl … install.sh \| bash`, options `--release` et `--uninstall`, prérequis, `.deb` manuel ; Linux uniquement | dépôt `huggor-downloads` (release lue via l'API) |
 | Aucune licence indiquée | absence de fichier `LICENSE` dans le dépôt |
 
 Non affirmé volontairement : filtre par architecture ou par auteur (non implémentés), intégration avec Ollama ou d'autres moteurs, exécution de modèles ou entraînement, binaires Windows/macOS, garantie de fonctionnement.

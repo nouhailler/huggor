@@ -78,20 +78,22 @@ const values = {
   DEB_NAME: release.debAsset,
   DEB_URL: `${downloadBase}/${release.debAsset}`,
   CHECKSUM_URL: release.checksumAsset ? `${downloadBase}/${release.checksumAsset}` : releasesUrl,
+  INSTALL_PAGE: '/installer/',
   INSTALL_URL: `https://raw.githubusercontent.com/${config.downloadsRepository}/main/install.sh`,
   INSTALL_COMMAND: `curl -fsSL https://raw.githubusercontent.com/${config.downloadsRepository}/main/install.sh | bash`,
 };
 
-const siteMeta = siteUrl
-  ? [
-      `<link rel="canonical" href="${siteUrl}/">`,
-      `<meta property="og:url" content="${siteUrl}/">`,
-      `<meta property="og:image" content="${siteUrl}/og-image.png">`,
-      '<meta property="og:image:width" content="1200">',
-      '<meta property="og:image:height" content="630">',
-      `<meta name="twitter:image" content="${siteUrl}/og-image.png">`,
-    ].join('\n    ')
-  : '<!-- SITE_URL non défini : canonical, og:url et og:image absolus omis. -->';
+const siteMetaFor = (pagePath) =>
+  siteUrl
+    ? [
+        `<link rel="canonical" href="${siteUrl}${pagePath}">`,
+        `<meta property="og:url" content="${siteUrl}${pagePath}">`,
+        `<meta property="og:image" content="${siteUrl}/og-image.png">`,
+        '<meta property="og:image:width" content="1200">',
+        '<meta property="og:image:height" content="630">',
+        `<meta name="twitter:image" content="${siteUrl}/og-image.png">`,
+      ].join('\n    ')
+    : '<!-- SITE_URL non défini : canonical, og:url et og:image absolus omis. -->';
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -113,7 +115,7 @@ for (const file of await walk(outputDirectory)) {
     continue;
   }
   let content = await readFile(file, 'utf8');
-  content = content.replaceAll('<!--SITE_META-->', siteMeta);
+  content = content.replace(/<!--SITE_META:([^ ]*)-->/g, (match, pagePath) => siteMetaFor(pagePath));
   content = content.replace(/\{\{([A-Z_]+)\}\}/g, (match, key) => {
     if (key === 'BUILD_ID') {
       return match;
@@ -132,7 +134,7 @@ if (siteUrl) {
   const lastModified = new Date().toISOString().slice(0, 10);
   await writeFile(
     path.join(outputDirectory, 'sitemap.xml'),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${siteUrl}/</loc><lastmod>${lastModified}</lastmod></url>\n</urlset>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${siteUrl}/</loc><lastmod>${lastModified}</lastmod></url>\n  <url><loc>${siteUrl}/installer/</loc><lastmod>${lastModified}</lastmod></url>\n</urlset>\n`,
   );
 }
 await writeFile(path.join(outputDirectory, 'robots.txt'), `${robots.join('\n')}\n`);

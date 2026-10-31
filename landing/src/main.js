@@ -20,18 +20,17 @@ if (toggle && nav) {
   });
 }
 
-// Copie de la commande d'installation
-const copyButton = document.getElementById('copy-command');
-if (copyButton) {
+// Copie des commandes (boutons .copy-button, cible indiquée par data-target)
+for (const copyButton of document.querySelectorAll('.copy-button')) {
   copyButton.addEventListener('click', async () => {
-    const text = document.getElementById(copyButton.dataset.target)?.textContent?.trim() ?? '';
+    const target = document.getElementById(copyButton.dataset.target);
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(target?.textContent?.trim() ?? '');
       copyButton.textContent = 'Copié';
     } catch {
       const selection = window.getSelection();
       const range = document.createRange();
-      range.selectNodeContents(document.getElementById(copyButton.dataset.target));
+      range.selectNodeContents(target);
       selection.removeAllRanges();
       selection.addRange(range);
       copyButton.textContent = 'Sélectionné : Ctrl+C';

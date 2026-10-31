@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Installer Huggor sur Linux — une commande</title>
+    <meta name="description" content="Installez Huggor (HF Explorer) sur Linux avec une seule commande curl : sans sudo, avec vérification SHA-256, mise à jour et désinstallation simples.">
+    <meta name="theme-color" content="#0b1020">
+    <meta name="color-scheme" content="light dark">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="Huggor — HF Explorer">
+    <meta property="og:title" content="Installer Huggor sur Linux — une commande">
+    <meta property="og:description" content="Une commande curl, sans sudo, avec vérification SHA-256, pour installer Huggor (HF Explorer) sur Linux.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Installer Huggor sur Linux — une commande">
+    <meta name="twitter:description" content="Une commande curl, sans sudo, avec vérification SHA-256, pour installer Huggor (HF Explorer) sur Linux.">
+    <!--SITE_META:/installer/-->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="stylesheet" href="/styles.css">
+    <script type="module" src="/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <header class="site-header">
+      <div class="container header-bar">
+        <a class="brand" href="/" aria-label="Huggor — HF Explorer, retour à l'accueil">
+          <img class="brand-mark" src="/favicon.svg" alt="" width="36" height="36">
+          <span class="brand-text"><strong>Huggor</strong><small>HF Explorer</small></span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+          <span class="menu-toggle-bars" aria-hidden="true"></span>
+          <span class="sr-only">Menu</span>
+        </button>
+        <nav class="site-nav" id="menu-principal" aria-label="Navigation principale">
+          <ul>
+            <li><a href="/#compatibilite">Compatibilité</a></li>
+            <li><a href="/#explorer">Explorer</a></li>
+            <li><a href="/#comparer">Comparer</a></li>
+            <li><a href="{{INSTALL_PAGE}}" aria-current="page">Installer</a></li>
+            <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">GitHub<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{HUB_URL}}" target="_blank" rel="noopener">Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></li>
+          </ul>
+          <div class="nav-actions">
+            <a class="btn btn-primary btn-small" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer les modèles<span class="sr-only"> (nouvel onglet)</span></a>
+            <a class="btn btn-ghost btn-small" href="/">Accueil</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenu">
+      <section class="hero page-hero" aria-labelledby="titre-installer">
+        <div class="container">
+          <p class="eyebrow">Installation · Linux</p>
+          <h1 id="titre-installer">Installer Huggor <span class="accent">en une commande</span></h1>
+          <p class="lead">Ouvrez un terminal, collez la commande ci-dessous et validez. Huggor s'installe dans votre dossier personnel, <strong>sans <code>sudo</code></strong>, après vérification de l'intégrité du paquet.</p>
+
+          <div class="install-box">
+            <p class="install-label" id="install-label">Commande d'installation</p>
+            <div class="code-block code-block-dark">
+              <pre><code id="install-command" aria-labelledby="install-label">{{INSTALL_COMMAND}}</code></pre>
+              <button type="button" class="btn btn-small btn-primary copy-button" data-target="install-command">Copier</button>
+            </div>
+            <p class="install-meta">Version publiée : <strong>{{RELEASE_VERSION}}</strong> {{RELEASE_DATE}} · paquet <code>{{DEB_NAME}}</code> ({{DEB_SIZE}}), indépendant de l'architecture.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="titre-etapes">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Pas à pas</p>
+            <h2 id="titre-etapes">Après l'installation</h2>
+          </div>
+          <ol class="install-steps">
+            <li>
+              <h3>Lancer Huggor</h3>
+              <p>Dans le terminal :</p>
+              <div class="code-block"><pre><code id="run-command">huggor</code></pre><button type="button" class="btn btn-small btn-ghost copy-button" data-target="run-command">Copier</button></div>
+              <p class="note">Si la commande est introuvable, ajoutez <code>~/.local/bin</code> à votre <code>PATH</code>. Au premier lancement, les dépendances Python s'installent dans un environnement isolé (connexion Internet nécessaire) : gardez le terminal ouvert.</p>
+            </li>
+            <li>
+              <h3>Ouvrir l'interface</h3>
+              <p>Dans votre navigateur : <a href="http://127.0.0.1:7860" rel="noopener"><code>http://127.0.0.1:7860</code></a>. Arrêt de l'application avec <code>Ctrl+C</code> dans le terminal.</p>
+            </li>
+            <li>
+              <h3>Indiquer votre RAM et votre VRAM</h3>
+              <p>Dans l'onglet <strong>Hardware</strong>, déclarez la mémoire de votre machine pour estimer quelles précisions d'un modèle y tiennent. Un token Hugging Face (<code>export HF_TOKEN=…</code> avant <code>huggor</code>) est facultatif : il ne sert que pour les dépôts privés ou protégés.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section section-tint" aria-labelledby="titre-prerequis">
+        <div class="container split">
+          <div class="split-copy">
+            <p class="eyebrow">Avant de commencer</p>
+            <h2 id="titre-prerequis">Prérequis</h2>
+            <ul class="check-list">
+              <li>Linux (testé sous Debian ; le script n'utilise pas <code>apt</code>)</li>
+              <li><code>python3</code> en version <strong>3.10 ou supérieure</strong>, avec son module <code>venv</code> (Debian/Ubuntu : <code>sudo apt install python3-venv</code>)</li>
+              <li><code>curl</code>, <code>tar</code>, <code>sha256sum</code>, <code>flock</code>, et <code>dpkg-deb</code> ou <code>ar</code></li>
+              <li>Une connexion Internet à l'installation et au premier lancement</li>
+            </ul>
+            <p class="note">Il n'existe pas de binaire Windows ni macOS. Sur ces systèmes, Huggor se lance depuis les sources : voir les <a href="{{GITHUB_URL}}#démarrage-rapide" target="_blank" rel="noopener">instructions du dépôt<span class="sr-only"> (nouvel onglet)</span></a>.</p>
+          </div>
+          <div class="card">
+            <h3>Ce que fait la commande</h3>
+            <ol class="plain-steps">
+              <li>Détermine la dernière release publiée sur <a href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">huggor-downloads<span class="sr-only"> (nouvel onglet)</span></a>.</li>
+              <li>Télécharge le paquet en HTTPS et <strong>vérifie son SHA-256</strong> : en cas d'écart, rien n'est installé.</li>
+              <li>Place le code dans <code>~/.local/lib/huggor</code> et crée la commande <code>~/.local/bin/huggor</code>.</li>
+              <li>Ajoute une entrée « HF Explorer » au menu des applications.</li>
+            </ol>
+            <p class="note">Vos favoris et le cache sont conservés dans <code>~/.local/share/hf-explorer/</code> lors des mises à jour et de la désinstallation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="titre-gerer">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">Gérer l'installation</p>
+            <h2 id="titre-gerer">Lire, mettre à jour, désinstaller</h2>
+          </div>
+          <div class="manage-grid">
+            <article class="card">
+              <h3>Lire le script avant de l'exécuter</h3>
+              <div class="code-block"><pre><code id="inspect-command">curl -fsSL {{INSTALL_URL}} -o install-huggor.sh
+less install-huggor.sh
+bash install-huggor.sh</code></pre><button type="button" class="btn btn-small btn-ghost copy-button" data-target="inspect-command">Copier</button></div>
+            </article>
+            <article class="card">
+              <h3>Mettre à jour</h3>
+              <p>Relancez la commande d'installation : le code est remplacé par la dernière release, vos données sont conservées. Pour une version précise, ajoutez <code>-s -- --release X.Y.Z</code> après <code>bash</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Désinstaller</h3>
+              <div class="code-block"><pre><code id="uninstall-command">{{INSTALL_COMMAND}} -s -- --uninstall</code></pre><button type="button" class="btn btn-small btn-ghost copy-button" data-target="uninstall-command">Copier</button></div>
+              <p class="note">Les favoris, le cache et l'environnement Python restent dans <code>~/.local/share/hf-explorer/</code> : supprimez ce dossier vous-même pour les effacer.</p>
+            </article>
+          </div>
+
+          <div class="card manual-card">
+            <h3>Installation manuelle (paquet Debian/Ubuntu)</h3>
+            <p>Vous préférez télécharger le paquet vous-même ? Il est publié avec sa somme de contrôle.</p>
+            <div class="button-row">
+              <a class="btn btn-ghost" href="{{DEB_URL}}">Paquet .deb</a>
+              <a class="btn btn-ghost" href="{{CHECKSUM_URL}}">Somme SHA-256</a>
+              <a class="btn btn-ghost" href="{{RELEASES_URL}}" target="_blank" rel="noopener">Toutes les versions sur GitHub<span class="sr-only"> (nouvel onglet)</span></a>
+            </div>
+            <div class="code-block"><pre><code id="deb-command">sha256sum -c {{DEB_NAME}}.sha256
+sudo apt install ./{{DEB_NAME}}</code></pre><button type="button" class="btn btn-small btn-ghost copy-button" data-target="deb-command">Copier</button></div>
+            <p class="note">Avec ce paquet, la commande de lancement est <code>hf-explorer</code> (et non <code>huggor</code>).</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta" aria-labelledby="titre-cta-install">
+        <div class="container cta-inner">
+          <h2 id="titre-cta-install">Pas envie d'installer ?</h2>
+          <p class="lead">L'application web s'ouvre directement dans votre navigateur, sans installation ni compte.</p>
+          <div class="button-row button-row-center">
+            <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
+            <a class="btn btn-ghost-light" href="/">Retour à l'accueil</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="/" aria-label="Huggor — HF Explorer, retour à l'accueil">
+            <img class="brand-mark" src="/favicon.svg" alt="" width="36" height="36">
+            <span class="brand-text"><strong>Huggor</strong><small>HF Explorer</small></span>
+          </a>
+          <p>Explorer, analyser et comparer les modèles du Hugging Face Hub, et estimer leurs besoins en mémoire. Édité par <a href="https://swinux.ch" target="_blank" rel="noopener">Swinux<span class="sr-only"> (nouvel onglet)</span></a>.</p>
+        </div>
+        <nav aria-label="Liens du pied de page">
+          <ul class="footer-links">
+            <li><a href="{{APP_URL}}" target="_blank" rel="noopener">Application web<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">Dépôt GitHub<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">Versions publiées<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{HUB_URL}}" target="_blank" rel="noopener">Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{LEGAL_URL}}" target="_blank" rel="noopener">Informations légales<span class="sr-only"> (nouvel onglet)</span></a></li>
+          </ul>
+        </nav>
+        <p class="footer-small">Ce site ne dépose aucun cookie et n'utilise aucun traceur. Les données de modèles proviennent de l'API publique du Hugging Face Hub. Aucune licence n'est indiquée à ce jour pour le code de Huggor.</p>
+      </div>
+    </footer>
+  </body>
+</html>

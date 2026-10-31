@@ -15,7 +15,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Huggor — Explorez et comparez les modèles d'IA de Hugging Face">
     <meta name="twitter:description" content="Explorez, analysez et comparez les modèles du Hugging Face Hub, puis évaluez s'ils tiennent dans la RAM et la VRAM de votre machine.">
-    <!--SITE_META-->
+    <!--SITE_META:/-->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <link rel="manifest" href="/manifest.webmanifest">
@@ -53,13 +53,13 @@
             <li><a href="#compatibilite">Compatibilité</a></li>
             <li><a href="#explorer">Explorer</a></li>
             <li><a href="#comparer">Comparer</a></li>
-            <li><a href="#acces">Téléchargements</a></li>
+            <li><a href="{{INSTALL_PAGE}}">Installer</a></li>
             <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">GitHub<span class="sr-only"> (nouvel onglet)</span></a></li>
             <li><a href="{{HUB_URL}}" target="_blank" rel="noopener">Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></li>
           </ul>
           <div class="nav-actions">
             <a class="btn btn-primary btn-small" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer les modèles<span class="sr-only"> (nouvel onglet)</span></a>
-            <a class="btn btn-ghost btn-small" href="#acces">Téléchargements</a>
+            <a class="btn btn-ghost btn-small" href="{{INSTALL_PAGE}}">Installer</a>
           </div>
         </nav>
       </div>
@@ -79,7 +79,7 @@
             </ol>
             <div class="button-row">
               <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
-              <a class="btn btn-ghost-light" href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">Télécharger Huggor<span class="sr-only"> (nouvel onglet)</span></a>
+              <a class="btn btn-ghost-light" href="{{INSTALL_PAGE}}">Installer Huggor</a>
             </div>
             <p class="hero-note">Application web gratuite hébergée sur Render : après une période d'inactivité, le premier chargement peut prendre 30 à 50 secondes.</p>
           </div>
@@ -293,7 +293,7 @@
         <div class="container">
           <div class="section-head">
             <p class="eyebrow">Deux façons d'utiliser Huggor</p>
-            <h2 id="titre-acces">Application web et téléchargements</h2>
+            <h2 id="titre-acces">Application web et installation</h2>
           </div>
           <div class="access-grid">
             <article class="card access-card">
@@ -307,21 +307,15 @@
               <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Ouvrir HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
             </article>
             <article class="card access-card">
-              <h3>Télécharger Huggor <span class="tag tag-violet">Linux</span></h3>
-              <p>Dernière version publiée : <strong>{{RELEASE_VERSION}}</strong> {{RELEASE_DATE}}. Paquet Debian/Ubuntu <code>{{DEB_NAME}}</code> ({{DEB_SIZE}}), indépendant de l'architecture.</p>
-              <p class="install-label" id="install-label">Installation en une commande, sans sudo :</p>
-              <div class="code-block">
-                <pre><code id="install-command" aria-labelledby="install-label">{{INSTALL_COMMAND}}</code></pre>
-                <button type="button" class="btn btn-small btn-ghost" id="copy-command" data-target="install-command">Copier</button>
-              </div>
+              <h3>Installer Huggor <span class="tag tag-violet">Linux</span></h3>
+              <p>Dernière version publiée : <strong>{{RELEASE_VERSION}}</strong> {{RELEASE_DATE}}. Une seule commande, sans <code>sudo</code>, installe Huggor dans votre dossier personnel et vérifie l'intégrité du paquet.</p>
               <ul class="plain-list">
                 <li>Prérequis : Python 3.10 ou supérieur avec son module <code>venv</code>, Internet au premier lancement</li>
-                <li>Intégrité vérifiée par SHA-256 ; mise à jour en relançant la commande</li>
+                <li>Mise à jour en relançant la commande, désinstallation en une commande</li>
                 <li>Pas de binaire Windows ni macOS : l'application se lance depuis les sources</li>
               </ul>
               <div class="button-row">
-                <a class="btn btn-primary" href="{{DEB_URL}}">Télécharger le .deb</a>
-                <a class="btn btn-ghost" href="{{CHECKSUM_URL}}">Somme SHA-256</a>
+                <a class="btn btn-primary" href="{{INSTALL_PAGE}}">Installer</a>
                 <a class="btn btn-ghost" href="{{RELEASES_URL}}" target="_blank" rel="noopener">Voir toutes les versions sur GitHub<span class="sr-only"> (nouvel onglet)</span></a>
               </div>
             </article>
@@ -364,7 +358,7 @@
           <p class="lead">Explorez l'écosystème Hugging Face, comparez les modèles et évaluez leurs besoins matériels avec Huggor.</p>
           <div class="button-row button-row-center">
             <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">Explorer HF Explorer<span class="sr-only"> (nouvel onglet)</span></a>
-            <a class="btn btn-ghost-light" href="#acces">Télécharger Huggor</a>
+            <a class="btn btn-ghost-light" href="{{INSTALL_PAGE}}">Installer Huggor</a>
           </div>
         </div>
       </section>
@@ -383,7 +377,7 @@
           <ul class="footer-links">
             <li><a href="{{APP_URL}}" target="_blank" rel="noopener">Application web<span class="sr-only"> (nouvel onglet)</span></a></li>
             <li><a href="{{GITHUB_URL}}" target="_blank" rel="noopener">Dépôt GitHub<span class="sr-only"> (nouvel onglet)</span></a></li>
-            <li><a href="{{DOWNLOADS_URL}}" target="_blank" rel="noopener">Téléchargements<span class="sr-only"> (nouvel onglet)</span></a></li>
+            <li><a href="{{INSTALL_PAGE}}">Installer</a></li>
             <li><a href="{{HUB_URL}}" target="_blank" rel="noopener">Hugging Face Hub<span class="sr-only"> (nouvel onglet)</span></a></li>
             <li><a href="{{LEGAL_URL}}" target="_blank" rel="noopener">Informations légales<span class="sr-only"> (nouvel onglet)</span></a></li>
           </ul>
