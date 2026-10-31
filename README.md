@@ -87,7 +87,19 @@ Ouvrez ensuite <http://127.0.0.1:7860>. Au premier affichage, un avertissement l
 - **Configuration** : renseignez `HF_TOKEN` dans `.env`, ou authentifiez la machine avec `hf auth login`.
 - **Ne le publiez jamais** : `.env` est ignoré par Git (`.gitignore`) ; ne copiez pas un token dans une issue, une capture d'écran ou un commit.
 
-Autres modes d'installation : [paquet Debian/Ubuntu](docs/packaging-debian.md), [Render](docs/deployment-render.md), [Hugging Face Spaces](docs/deployment-huggingface.md).
+### Installation en une commande (Linux)
+
+Sans cloner le dépôt, ni `sudo` : l'installateur télécharge la dernière release depuis [huggor-downloads](https://github.com/nouhailler/huggor-downloads), vérifie son SHA-256 et installe l'application dans `~/.local`.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nouhailler/huggor-downloads/main/install.sh | bash
+```
+
+Lancez ensuite `huggor` et ouvrez <http://127.0.0.1:7860>. Prérequis : Python 3.10+ avec son module `venv`, et Internet au premier lancement. Options, mise à jour et désinstallation : [docs/packaging-debian.md](docs/packaging-debian.md).
+
+### Autres modes d'installation
+
+[Paquet Debian/Ubuntu](docs/packaging-debian.md), [Render](docs/deployment-render.md), [Hugging Face Spaces](docs/deployment-huggingface.md).
 
 ## Configuration
 
@@ -162,7 +174,7 @@ python -m unittest discover -s tests -v
 | Cible | Statut | Guide |
 |---|---|---|
 | Local | Référence | [Démarrage rapide](#démarrage-rapide) |
-| Debian / Ubuntu | Paquet `.deb` (release v0.1.0 ; reconstructible) | [docs/packaging-debian.md](docs/packaging-debian.md) |
+| Linux (installateur) / Debian / Ubuntu | Commande `curl` ou paquet `.deb` publié dans [huggor-downloads](https://github.com/nouhailler/huggor-downloads/releases) | [docs/packaging-debian.md](docs/packaging-debian.md) |
 | Render | Utilisé pour la [démo](https://huggor.onrender.com/), tier gratuit | [docs/deployment-render.md](docs/deployment-render.md) |
 | Hugging Face Spaces | Déconseillé sans abonnement PRO | [docs/deployment-huggingface.md](docs/deployment-huggingface.md) |
 

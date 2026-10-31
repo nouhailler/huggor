@@ -27,14 +27,22 @@ cp .env.example .env
 
 Un token Hugging Face est facultatif pour les modèles publics, nécessaire pour les ressources privées ou protégées — voir [Permissions](permissions.md). Renseignez-le dans `.env` (`HF_TOKEN=...`) ou authentifiez la machine avec `hf auth login`. Ne jamais versionner `.env`.
 
+### Installation en une commande (Linux, sans sudo)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nouhailler/huggor-downloads/main/install.sh | bash
+```
+
+Puis `huggor` et <http://127.0.0.1:7860>. Détails, options et désinstallation : [Paquet Debian / Ubuntu](packaging-debian.md).
+
 ### Paquet Debian/Ubuntu
 
 ```bash
-sudo apt install ./hf-explorer_0.1.0_all.deb
+sudo apt install ./hf-explorer_0.3.0_all.deb
 hf-explorer
 ```
 
-Téléchargez le `.deb` depuis les [releases GitHub](https://github.com/nouhailler/huggor/releases). Python 3.10+ requis (Ubuntu 22.04+, Debian 12+). Au premier lancement, une connexion Internet est nécessaire pour installer les dépendances Python dans un environnement isolé — gardez le terminal ouvert. L'entrée **HF Explorer** du menu des applications ouvre aussi le lanceur.
+Téléchargez le `.deb` depuis les [releases de huggor-downloads](https://github.com/nouhailler/huggor-downloads/releases). Python 3.10+ requis (Ubuntu 22.04+, Debian 12+). Au premier lancement, une connexion Internet est nécessaire pour installer les dépendances Python dans un environnement isolé — gardez le terminal ouvert. L'entrée **HF Explorer** du menu des applications ouvre aussi le lanceur.
 
 ### Accès via une instance déjà déployée
 
