@@ -1,58 +1,61 @@
----
-title: HF Explorer
-emoji: 🤗
-colorFrom: indigo
-colorTo: blue
-sdk: gradio
-sdk_version: 6.26.0
-app_file: app.py
-pinned: false
----
+# 🤗 HF Explorer (Huggor)
 
-# HF Explorer
+Rechercher, examiner, comparer et évaluer les modèles du Hugging Face Hub depuis une interface web, avec un verdict clair : *ce modèle tient-il sur ma machine ?*
 
-HF Explorer est une application Python destinée à rechercher, examiner, comparer et tester les modèles du Hugging Face Hub depuis une interface Gradio.
+**Démo en ligne : <https://huggor.onrender.com/>** — la première visite peut prendre 30 à 50 secondes (tier gratuit en veille). · [Documentation](docs/index.md) · [Releases](https://github.com/nouhailler/huggor/releases)
 
-## État du projet
+## Aperçu
 
-Les étapes 1 à 5 sont implémentées : accès au Hub, cache local, recherche, fiches techniques, comparateur et Analytics. L’étape 6 ajoutera le test d’inférence.
+### Recherche par mot-clé, domaine et tâche
 
-### Fonctionnalités disponibles
+![Recherche de modèles dans HF Explorer, avec des résultats affichés pour « Gemma »](docs/assets/screenshots/search-results.png)
 
-- Recherche par mot-clé, domaine et tâche précise (navigation pédagogique 🧠 LLM, 👁️ Vision, 🖼️ Image, 🎙️ Audio, 🗣️ Speech, 🔤 Embeddings, 🌐 Multimodal, 🧩 Reranking, chacune détaillée en tâches réellement couvertes par le Hub), langue et licence
-- Filtrage par plage de paramètres et limite de 5 à 100 résultats
-- Tri par téléchargements, likes, date de création ou pertinence
-- Cartes synthétiques avec lien direct vers le Hub
-- Ouverture et chargement automatiques de la fiche depuis « Voir détails »
-- Fiche technique centrale : identité, architecture, quantification et compatibilités d'exécution
-- Recommandation explicite des poids, shards ou adapters à télécharger
-- Model Card complète, inventaire annoté et arborescence des fichiers avec leurs tailles
-- Génération de snippets pour une utilisation locale et avec `InferenceClient`
-- [Onglet ⭐ Favoris](src/ui/favorites_tab.py) : collections personnalisées, tags, statut, note personnelle (1 à 5), date du dernier test et commentaire libre pour chaque modèle enregistré, avec filtrage par collection et retrait direct
-- Fiche technique : tableau des précisions et quantifications détectées (FP32/FP16/BF16/INT8, paliers GGUF Q8 à Q2, GPTQ, AWQ, EXL2, MLX)
-- Fiche technique : recherche automatique des versions déjà quantifiées d'un modèle sur le Hub (GGUF, GPTQ, AWQ, EXL2, MLX), triées par popularité
-- Fiche technique : verdict d'adéquation matérielle (« Model Advisor ») estimant la RAM/VRAM nécessaire selon la précision
-- Fiche technique : [Huggor Score](src/huggor_score.py) sur 100, toujours accompagné du détail de ses neuf composantes (popularité, fraîcheur, documentation, licence, Safetensors, quantification, compatibilité locale, taille, maturité) pour ne jamais rester une boîte noire
-- Fiche technique : modèles similaires rapprochés par famille, tâche, taille, langue déclarée, licence et disponibilité quantifiée, en excluant les simples quantifications du modèle affiché
-- [Onglet 💻 Hardware](src/ui/hardware_tab.py) : calculateur de ressources indiquant, selon votre RAM/VRAM déclarée, quelles précisions (FP32 à Q4_K_M) tiennent réellement, avec une estimation de vitesse et de contexte clairement présentée comme théorique
-- [Onglet 🎯 Mon usage](src/ui/usage_tab.py) : recherche par objectif (Chatbot, Coding, RAG, Embeddings, Traduction, Vision, Speech, Génération d'images) plutôt que par jargon Hugging Face, croisée avec votre RAM/VRAM pour ne remonter que des modèles jouables sur votre machine, verdict de précision et de vitesse à l'appui, avec un bouton « ⭐ Pin » pour ajouter directement un résultat aux favoris
-- Comparaison décisionnelle de 2 à 4 modèles : tableau critère par critère (paramètres, popularité, contexte, licence, couverture FR déclarée, adéquation locale, GGUF) et recommandation motivée du meilleur compromis pour un usage local, en plus du tableau technique complet et du radar des quantités relatives
-- [Onglet 📈 Analytics](src/ui/analytics_tab.py) — 🔭 Observatoire du Hub : tendances curatées en listes classées (🔥 plus téléchargés, ❤️ plus appréciés, 🆕 récents, 🇫🇷 français, 💻 optimisés local) et détection de « Rising models » (ex. 100k → 500k téléchargements) fondée sur vos propres observations locales dans le temps, en plus de l'analyse détaillée par filtres (top 50, répartition des tâches/licences, évolution observée)
-- [Gestion du cache](src/cache_manager.py) industrialisée par domaine (recherches, détails, model cards, statistiques, benchmarks à venir) : aperçu entrées/taille/fraîcheur et purge ciblée dans l'onglet Analytics (« 🗄️ Gestion du cache »), et dans la fiche modèle un repère « ⏱ Dernière mise à jour » avec un bouton « 🔄 Actualiser depuis Hugging Face » pour forcer un rechargement sans passer par le cache
-- Mode hors connexion : si le Hugging Face Hub devient injoignable (coupure réseau, DNS, timeout — pas un simple refus 404/403/429 qui prouve au contraire qu'il répond), un bandeau « 🟠 Mode hors connexion » apparaît et les recherches, fiches déjà consultées et comparaisons continuent de s'afficher depuis le cache local même expiré ; les favoris restent bien sûr consultables puisqu'ils sont purement locaux. L'état repasse en ligne dès qu'un appel réseau réussit à nouveau
-- Menu hamburger (☰) : sur petit écran, la barre des huit onglets laisse place à un menu déroulant regroupant les fonctionnalités par catégorie (🔍 Explorer, 🔬 Analyser un modèle, 📊 Suivre et organiser) — une seule interface responsive, sans mode séparé pour mobile et desktop
-- Avertissement légal au premier lancement (mémorisé localement dans le navigateur) et page « ⚖️ Mentions légales » accessible en permanence depuis le pied de page — voir [`src/legal_notice.py`](src/legal_notice.py)
-- Écran « ℹ️ À propos » tout en bas du menu hamburger : version et commit réels (dérivés de Git, jamais codés en dur), liens auteur/support/dépôt/signaler un bug, crédits des dépendances open source — voir [`src/app_info.py`](src/app_info.py)
-- Visite guidée en 5 étapes présentant les fonctionnalités principales, accessible à la demande depuis l'écran « ⚙️ Paramètres » du menu hamburger — voir [`src/onboarding.py`](src/onboarding.py)
+### Fiche technique complète et Huggor Score
 
-Le radar n’est pas une mesure de qualité. Les statistiques portent uniquement sur les 50 résultats sélectionnés, pas sur tout le Hub. L’évolution commence au premier chargement, sans historique reconstruit. Les observations sont séparées par filtres et empreinte d’authentification dans `data/analytics/`, avec 90 jours observés conservés et une expiration après un an d’inactivité.
+![Fiche d'un modèle : identité, architecture, puis Huggor Score sur 100 avec le détail de ses composantes](docs/assets/screenshots/model-details.png)
 
-## Prérequis
+### Comparateur décisionnel
 
-- Python 3.10 ou supérieur
-- Un token Hugging Face est facultatif pour les modèles publics et nécessaire pour les ressources privées ou protégées
+![Comparaison de deux modèles : tableau critère par critère et recommandation motivée](docs/assets/screenshots/compare.png)
+
+### Calculateur de ressources (Hardware)
+
+![Calculateur Hardware : précisions qui tiennent dans la RAM/VRAM déclarée, avec vitesse et contexte estimés](docs/assets/screenshots/hardware.png)
+
+### Menu mobile
+
+<img src="docs/assets/screenshots/mobile-menu.png" alt="Menu hamburger sur petit écran, regroupant les fonctionnalités par catégorie" width="320">
+
+## Fonctionnalités
+
+### 🔍 Explorer
+- Recherche par mot-clé, **domaine** (🧠 LLM, 👁️ Vision, 🖼️ Image, 🎙️ Audio, 🗣️ Speech, 🔤 Embeddings, 🌐 Multimodal, 🧩 Reranking) puis **tâche précise**, langue et licence
+- Filtre par plage de paramètres, tri (téléchargements, likes, date, pertinence), 5 à 100 résultats
+- 🎯 **Mon usage** : recherche par objectif (Chatbot, Coding, RAG, Traduction…) croisée avec votre RAM/VRAM pour ne remonter que des modèles jouables sur votre machine, avec un bouton « ⭐ Pin » vers les favoris
+
+### 🔬 Analyser un modèle
+- **Fiche technique** : identité, architecture, précisions et quantifications détectées (FP32 à Q2, GPTQ, AWQ, EXL2, MLX), compatibilités d'exécution, Model Card complète, inventaire et arborescence des fichiers, recommandation des poids à télécharger
+- **[Huggor Score](src/huggor_score.py)** sur 100, toujours accompagné du détail de ses neuf composantes (popularité, fraîcheur, documentation, licence, Safetensors, quantification, compatibilité locale, taille, maturité)
+- **Model Advisor** : verdict d'adéquation matérielle selon la précision, versions déjà quantifiées sur le Hub, modèles similaires
+- 💻 **[Hardware](src/ui/hardware_tab.py)** : quelles précisions tiennent réellement dans votre RAM/VRAM, avec vitesse et contexte estimés (présentés comme théoriques)
+- 🆚 **Comparateur** de 2 à 4 modèles : tableau critère par critère, recommandation motivée, tableau technique complet et radar
+- Snippets prêts à l'emploi (usage local et `InferenceClient`)
+
+### 📊 Suivre et organiser
+- ⭐ **[Favoris](src/ui/favorites_tab.py)** : collections, tags, statut, note personnelle, date du dernier test et commentaire
+- 📈 **[Analytics](src/ui/analytics_tab.py)** : tendances curatées (🔥 plus téléchargés, ❤️ plus appréciés, 🆕 récents, 🇫🇷 français, 💻 optimisés local), détection de « Rising models » fondée sur vos propres observations locales, analyse par filtres. Les statistiques portent sur l'échantillon chargé (50 résultats), pas sur tout le Hub ; le radar n'est pas une mesure de qualité
+- 🗄️ **[Gestion du cache](src/cache_manager.py)** par domaine (aperçu entrées/taille/fraîcheur, purge ciblée) et bouton « 🔄 Actualiser depuis Hugging Face » dans la fiche
+
+### 🧰 Confort d'utilisation
+- **Mode hors connexion** : si le Hub est injoignable, un bandeau « 🟠 Mode hors connexion » apparaît et recherches, fiches et comparaisons déjà consultées restent disponibles depuis le cache local
+- **Menu hamburger (☰)** sur petit écran, regroupant les fonctionnalités par catégorie — une seule interface responsive, sans mode séparé mobile/desktop
+- **⚙️ Paramètres** (visite guidée en 5 étapes à la demande), **ℹ️ À propos** (version, commit, support, crédits des dépendances) et **⚖️ Mentions légales** — voir [`src/onboarding.py`](src/onboarding.py), [`src/app_info.py`](src/app_info.py), [`src/legal_notice.py`](src/legal_notice.py)
+
+> L'onglet 🧪 Test (test d'inférence) est un espace réservé : il n'est pas encore implémenté.
 
 ## Installation
+
+Prérequis : Python 3.10 ou supérieur. Un token Hugging Face est facultatif pour les modèles publics, nécessaire pour les ressources privées ou protégées.
 
 ```bash
 python3 -m venv .venv
@@ -63,13 +66,59 @@ cp .env.example .env
 
 Renseignez `HF_TOKEN` dans `.env`, ou authentifiez la machine avec `hf auth login`. Ne versionnez jamais le fichier `.env`.
 
-## Lancement
+### Lancement
 
 ```bash
 python app.py
 ```
 
-L'interface est ensuite disponible par défaut sur <http://127.0.0.1:7860>. Les variables `GRADIO_SERVER_NAME` et `GRADIO_SERVER_PORT` permettent de modifier cette adresse.
+L'interface est disponible par défaut sur <http://127.0.0.1:7860>. `GRADIO_SERVER_NAME` et `GRADIO_SERVER_PORT` permettent de modifier cette adresse.
+
+### Paquet Debian / Ubuntu
+
+Téléchargez le `.deb` depuis les [releases GitHub](https://github.com/nouhailler/huggor/releases), puis :
+
+```bash
+sudo apt install ./hf-explorer_0.1.0_all.deb
+hf-explorer
+```
+
+Python 3.10+ requis (Ubuntu 22.04+, Debian 12+). Le premier lancement nécessite Internet pour installer les dépendances dans un environnement isolé : gardez le terminal ouvert, puis ouvrez `http://127.0.0.1:7860`. Arrêt avec `Ctrl+C`. L'entrée **HF Explorer** du menu des applications ouvre aussi le lanceur.
+
+Environnement et données sont conservés dans `${XDG_DATA_HOME:-~/.local/share}/hf-explorer/` (modifiable via `HF_EXPLORER_DATA_DIR`) ; les mises à jour et la désinstallation les préservent. Pour un token : `export HF_TOKEN=…` avant `hf-explorer`, ou `hf auth login`. Pour reconstruire le paquet : `python3 scripts/build_deb.py --version 0.1.0` (résultat dans `dist/`).
+
+## Déploiement sur Render
+
+Hébergement gratuit d'un vrai processus Python persistant, mis en veille après 15 minutes d'inactivité. C'est la cible de la [démo en ligne](https://huggor.onrender.com/). Le fichier [`render.yaml`](render.yaml) décrit le service (Blueprint) ; Render fournit le port via `$PORT`, d'où la commande de démarrage :
+
+```yaml
+startCommand: GRADIO_SERVER_NAME=0.0.0.0 GRADIO_SERVER_PORT=$PORT python app.py
+```
+
+1. Sur <https://dashboard.render.com> : **New → Blueprint**, connectez le dépôt GitHub `nouhailler/huggor`.
+2. Renseignez le secret `HF_TOKEN` dans les paramètres du service si des ressources privées ou protégées doivent être accessibles (déclaré avec `sync: false` : jamais dans le dépôt).
+3. Render installe `requirements.txt`, lance l'application et l'expose sur `https://<nom-du-service>.onrender.com`.
+
+Réserves : stockage éphémère (`data/cache/`, `data/analytics/`, `data/favorites.json` réinitialisés à chaque redémarrage ou mise en veille, sauf disque persistant payant) ; délai de 30 à 50 secondes au premier visiteur après une veille ; le mode PWA de Gradio n'est pas activé automatiquement (`pwa=True` dans `launch()` si souhaité).
+
+## Déploiement sur Hugging Face Spaces
+
+Techniquement possible sans modification du code (l'application lit `GRADIO_SERVER_NAME`/`GRADIO_SERVER_PORT` et résout le token via `huggingface_hub`), mais **déconseillé sans abonnement PRO** : héberger un Space Gradio sur le matériel gratuit **CPU Basic** l'exige, et **ZeroGPU** impose une fonction `@spaces.GPU` que Huggor n'a pas. Pour un Space, il faut en outre ajouter ce bloc YAML en tête de ce fichier :
+
+```yaml
+---
+title: HF Explorer
+emoji: 🤗
+colorFrom: indigo
+colorTo: blue
+sdk: gradio
+sdk_version: 6.26.0
+app_file: app.py
+pinned: false
+---
+```
+
+Puis : créer le Space (SDK **Gradio**) sur <https://huggingface.co/new-space>, `git remote add space https://huggingface.co/spaces/<compte>/<nom>` et `git push space main`, et renseigner `HF_TOKEN` dans **Settings → Repository secrets** si besoin. Le stockage est éphémère comme sur Render ; Gradio y active automatiquement le mode PWA.
 
 ## Utilisation du client API
 
@@ -78,86 +127,23 @@ from src.api_client import HuggingFaceClient, SearchFilters
 
 client = HuggingFaceClient()
 models = client.search_models(
-    SearchFilters(
-        query="bert",
-        pipeline_tag="text-classification",
-        language="fr",
-        sort="downloads",
-        limit=20,
-    )
+    SearchFilters(query="bert", pipeline_tag="text-classification", language="fr", sort="downloads", limit=20)
 )
 
 details = client.get_model_info("google-bert/bert-base-multilingual-cased")
 card_markdown = client.get_model_card("google-bert/bert-base-multilingual-cased")
 ```
 
-Chaque recherche impose une limite comprise entre 5 et 100 résultats. Les réponses sont conservées dans `data/cache/` avec une durée de vie configurable.
+Chaque recherche impose une limite de 5 à 100 résultats. Les réponses sont conservées dans `data/cache/` avec une durée de vie configurable.
 
 ## Tests
 
-Les tests sont isolés du réseau et utilisent la bibliothèque standard :
+Isolés du réseau, bibliothèque standard uniquement :
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-## Capture d'écran
+## Documentation
 
-![Recherche de modèles dans HF Explorer, avec des résultats affichés pour « Gemma »](docs/assets/screenshots/search-results.png)
-
-## Paquet Debian / Ubuntu
-
-Téléchargez le fichier `.deb` depuis les [releases GitHub](https://github.com/nouhailler/huggor/releases), puis installez-le :
-
-```bash
-sudo apt install ./hf-explorer_0.1.0_all.deb
-hf-explorer
-```
-
-Python 3.10 ou supérieur est requis (par exemple Ubuntu 22.04+ ou Debian 12+).
-L’entrée **HF Explorer** du menu des applications ouvre aussi le lanceur dans un terminal.
-Au premier lancement, une connexion Internet est nécessaire pour télécharger les dépendances Python dans un environnement isolé. Gardez le terminal ouvert, puis ouvrez `http://127.0.0.1:7860` dans votre navigateur. Pour arrêter l’application, utilisez `Ctrl+C`.
-
-Le lanceur conserve son environnement Python et les données dans `${XDG_DATA_HOME:-~/.local/share}/hf-explorer/`. Aucune donnée personnelle n’est incluse dans le paquet. Les mises à jour conservent les favoris et l’historique. La désinstallation du paquet conserve également ces données. Pour utiliser un token, lancez `export HF_TOKEN=…` avant `hf-explorer` ou utilisez `hf auth login`.
-
-Pour reconstruire le paquet depuis les sources avec Python et `dpkg-deb` :
-
-```bash
-python3 scripts/build_deb.py --version 0.1.0
-```
-
-Le résultat est écrit dans `dist/`. `HF_EXPLORER_DATA_DIR` permet de choisir un autre emplacement pour les données.
-
-## Déploiement sur Hugging Face Spaces
-
-Aucune modification du code n'est nécessaire : l'application lit déjà `GRADIO_SERVER_NAME`/`GRADIO_SERVER_PORT` (fournis automatiquement par l'environnement d'un Space) et résout le token Hugging Face via les mécanismes standards de `huggingface_hub` (variable d'environnement ou `hf auth login`). Le bloc YAML en tête de ce fichier (`sdk: gradio`, `app_file: app.py`) est la seule configuration requise par Spaces.
-
-**Attention au matériel choisi à la création** : à ce jour, héberger un Space Gradio (non statique) sur le matériel gratuit **CPU Basic** nécessite un abonnement PRO — malgré ce qu'affiche `hf spaces hardware`. Seul **ZeroGPU** reste accessible sans abonnement pour ce type de Space, mais il exige au moins une fonction décorée `@spaces.GPU` pour démarrer, ce que Huggor n'a pas et n'a pas besoin d'avoir (aucun calcul GPU). Sans abonnement PRO, Spaces n'est donc pas une option gratuite viable pour cette application : voir la section [Déploiement sur Render](#déploiement-sur-render) ci-dessous pour une alternative gratuite sans cette contrainte. Le reste de cette section reste valable pour qui dispose déjà d'un compte PRO ou accepte ZeroGPU.
-
-1. Créez un Space sur <https://huggingface.co/new-space> avec le SDK **Gradio**, en visibilité publique ou privée selon vos besoins.
-2. Ajoutez son dépôt Git comme remote et poussez la branche `main` :
-   ```bash
-   git remote add space https://huggingface.co/spaces/<votre-compte>/<nom-du-space>
-   git push space main
-   ```
-3. Si des ressources privées ou protégées doivent être accessibles, renseignez `HF_TOKEN` dans **Settings → Repository secrets** du Space (jamais dans le code ni dans ce dépôt).
-4. Le Space installe `requirements.txt`, lance `python app.py`, et expose l'interface sur son URL publique — partageable telle quelle, sans compte Hugging Face requis pour la consulter si le Space est public.
-
-Le stockage est éphémère par défaut : `data/cache/`, `data/analytics/` et `data/favorites.json` sont réinitialisés à chaque redémarrage du conteneur (mise en veille après inactivité, ou nouveau déploiement), sauf si un stockage persistant est activé dans les paramètres payants du Space. Le mode hors connexion et le cache restent pleinement fonctionnels dans l'intervalle, mais ne survivent pas à un redémarrage sans ce stockage persistant.
-
-Gradio active automatiquement le mode PWA (installable, avec un shell mis en cache pour un chargement instantané même hors ligne) dès que l'application tourne sur un Space — aucun paramètre `pwa=` n'est nécessaire dans `app.py`.
-
-## Déploiement sur Render
-
-Alternative gratuite à Hugging Face Spaces, sans la restriction PRO ci-dessus : Render héberge un vrai processus Python persistant (pas seulement du statique), avec un tier gratuit qui se met simplement en veille après inactivité — comme un Space — plutôt que de refuser l'hébergement.
-
-Le fichier [`render.yaml`](render.yaml) à la racine décrit le service (Blueprint Render) : aucune modification du code n'a été nécessaire. La seule subtilité est que Render fournit le port à écouter via la variable `$PORT` (pas via `GRADIO_SERVER_PORT`), donc la commande de démarrage fait le pont :
-```yaml
-startCommand: GRADIO_SERVER_NAME=0.0.0.0 GRADIO_SERVER_PORT=$PORT python app.py
-```
-
-1. Sur <https://dashboard.render.com>, **New → Blueprint**, connectez le dépôt GitHub `nouhailler/huggor`. Render détecte `render.yaml` automatiquement.
-2. Dans les paramètres du service créé, renseignez le secret `HF_TOKEN` si des ressources privées ou protégées doivent être accessibles (déclaré dans `render.yaml` avec `sync: false` pour ne jamais l'exposer dans le dépôt).
-3. Render installe `requirements.txt`, lance la commande de démarrage, et expose l'interface sur une URL `https://<nom-du-service>.onrender.com` publique par défaut.
-
-Mêmes réserves que pour Spaces : stockage éphémère (`data/cache/`, `data/analytics/`, `data/favorites.json` réinitialisés à chaque redémarrage ou mise en veille, sauf disque persistant payant), et une mise en veille après 15 minutes d'inactivité sur le tier gratuit qui ajoute un délai de démarrage (30 à 50 secondes) au prochain visiteur. Le mode PWA de Gradio n'est en revanche pas activé automatiquement ici (ce comportement est spécifique à la détection d'un Space Hugging Face) ; il peut être activé explicitement avec `pwa=True` dans l'appel à `launch()` si souhaité.
+La documentation complète (guide par onglet, fonctionnalités, données, mode hors connexion, dépannage, FAQ, versions) est dans [`/docs`](docs/index.md). Mentions légales : [docs/legal.md](docs/legal.md).

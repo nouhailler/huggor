@@ -4,6 +4,7 @@
 
 # Non publié (postérieur à v0.3.0)
 
+- README restructuré : captures d'écran en tête (recherche, fiche modèle, comparateur, hardware, menu mobile — dans `docs/assets/screenshots/`), fonctionnalités regroupées par thème, section « État du projet » obsolète supprimée, déploiement Render avant Hugging Face Spaces. L'en-tête YAML propre à Spaces a été retiré du README (le Space a été abandonné) ; il reste documenté dans la section Spaces pour qui voudrait le recréer.
 - Visite guidée (onboarding) en 5 étapes, accessible à la demande depuis l'écran « ⚙️ Paramètres ». Mémorise sa complétion localement dans le navigateur (`localStorage`, clé `onboarding_completed`), indépendamment de l'avertissement légal. Voir [Guide → Visite guidée](guide.md#visite-guidée-onboarding).
 - Nouvel écran « ⚙️ Paramètres » (menu hamburger), regroupant les réglages généraux de l'application indépendants d'un onglet précis — pour l'instant, uniquement « 🧭 Revoir la visite guidée » (déplacé depuis l'écran « À propos », qui ne le propose plus).
 - Documentation de l'écran « ℹ️ À propos » (ajouté en v0.3.0 mais jamais documenté, sa doc ayant été volontairement différée à ce moment).
