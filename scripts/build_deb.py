@@ -26,6 +26,7 @@ def main() -> None:
         for filename in ("app.py", "requirements.txt", "README.md"):
             shutil.copy2(ROOT / filename, app / filename)
         shutil.copytree(ROOT / "src", app / "src", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        shutil.copytree(ROOT / "assets", app / "assets")
         binary = package / "usr/bin/hf-explorer"
         binary.parent.mkdir(parents=True)
         shutil.copy2(ROOT / "packaging/hf-explorer", binary)
